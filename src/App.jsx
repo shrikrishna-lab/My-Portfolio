@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import PublicLayout from './pages/public/PublicLayout';
 import Home from './pages/public/Home';
@@ -24,11 +24,15 @@ const ProtectedRoute = ({ children }) => {
 export default function App() {
   const fetchAll = useStore((s) => s.fetchAll);
   const checkSession = useStore((s) => s.checkSession);
+  const [authReady, setAuthReady] = useState(false);
 
   useEffect(() => {
     checkSession();
+    setAuthReady(true);
     fetchAll();
   }, [checkSession, fetchAll]);
+
+  if (!authReady) return null;
 
   return (
     <Router>
