@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useStore } from '@/lib/store';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    Shield, User, Sparkles, FolderKanban, Award, MessageSquare, Settings,
+    Shield, User, Sparkles, FolderKanban, Award, MessageSquare, Settings, RefreshCw,
     Plus, Pencil, Trash2, X, Save, Image as ImageIcon, Music, Play, Pause, Eye, EyeOff, VolumeX, AlertCircle,
     Github, ExternalLink, UploadCloud, Check, Upload
 } from 'lucide-react';
@@ -456,11 +456,22 @@ function AchievementsTab() {
 function MessagesTab() {
     const messages = useStore((s) => s.messages);
     const deleteMessage = useStore((s) => s.deleteMessage);
+    const fetchMessagesFromGitHub = useStore((s) => s.fetchMessagesFromGitHub);
+    const [syncing, setSyncing] = useState(false);
+
+    const handleSync = async () => {
+        setSyncing(true);
+        await fetchMessagesFromGitHub();
+        setSyncing(false);
+    };
 
     return (
         <div>
             <div className="flex items-center justify-between mb-5">
                 <h2 className="text-xl font-bold text-[#18112E]">Messages ({messages.length})</h2>
+                <button onClick={handleSync} disabled={syncing} className="flex items-center gap-2 bg-[#18112E] text-white px-4 py-2 rounded-[12px] text-xs font-bold hover:bg-[#FFB800] hover:text-[#18112E] transition-all disabled:opacity-50">
+                    <RefreshCw className={`w-3.5 h-3.5 ${syncing ? 'animate-spin' : ''}`} /> {syncing ? 'Syncing...' : 'Sync'}
+                </button>
             </div>
             {messages.length === 0 ? (
                 <div className="text-center py-12 bg-white rounded-[16px] border border-dashed border-neutral-200 text-neutral-400 font-bold"><MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-50" />No messages yet.</div>

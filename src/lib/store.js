@@ -26,6 +26,7 @@ let nextId = 100;
 function genId() { return String(nextId++); }
 
 export const useStore = create((set, get) => ({
+  getGithubToken: () => { try { return localStorage.getItem('github_token') || ''; } catch { return ''; } },
   profile: null,
   skills: [],
   projects: [],
@@ -134,21 +135,68 @@ export const useStore = create((set, get) => ({
     });
   },
 
-  addMessage: (message) => {
+  addMessage: async (message) => {
     const newMessage = { ...message, id: genId(), createdAt: new Date().toISOString() };
     set((s) => {
       const messages = [newMessage, ...s.messages];
       save({ ...s, messages });
       return { messages };
     });
+    const token = get().getGithubToken?.();
+    if (token) {
+      try {
+        const state = get();
+        const data = { profile: state.profile, skills: state.skills, projects: state.projects, achievements: state.achievements, messages: state.messages };
+        const repo = 'shrikrishna-lab/My-Portfolio', path = 'public/data.json', branch = 'main';
+        const headers = { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' };
+        const existing = await fetch(`https://api.github.com/repos/${repo}/contents/${path}?ref=${branch}`, { headers }).then(r => r.json());
+        const sha = existing.sha;
+        const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2) + '\n')));
+        await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, { method: 'PUT', headers, body: JSON.stringify({ message: 'New message from contact form', content, sha, branch }) });
+      } catch {}
+    }
   },
 
-  deleteMessage: (id) => {
+  fetchMessagesFromGitHub: async () => {
+    try {
+      const res = await fetch('https://raw.githubusercontent.com/shrikrishna-lab/My-Portfolio/main/public/data.json');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.messages && data.messages.length > 0) {
+          set((s) => {
+            const existingIds = new Set(s.messages.map(m => m.id));
+            const merged = [...s.messages];
+            for (const msg of data.messages) {
+              if (!existingIds.has(msg.id)) merged.push(msg);
+            }
+            merged.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+            save({ ...s, messages: merged });
+            return { messages: merged };
+          });
+        }
+      }
+    } catch {}
+  },
+
+  deleteMessage: async (id) => {
     set((s) => {
       const messages = s.messages.filter((m) => m.id !== id);
       save({ ...s, messages });
       return { messages };
     });
+    const token = get().getGithubToken?.();
+    if (token) {
+      try {
+        const state = get();
+        const data = { profile: state.profile, skills: state.skills, projects: state.projects, achievements: state.achievements, messages: state.messages };
+        const repo = 'shrikrishna-lab/My-Portfolio', path = 'public/data.json', branch = 'main';
+        const headers = { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' };
+        const existing = await fetch(`https://api.github.com/repos/${repo}/contents/${path}?ref=${branch}`, { headers }).then(r => r.json());
+        const sha = existing.sha;
+        const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2) + '\n')));
+        await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, { method: 'PUT', headers, body: JSON.stringify({ message: 'Delete message via admin panel', content, sha, branch }) });
+      } catch {}
+    }
   },
 
   uploadImage: async (file) => {
