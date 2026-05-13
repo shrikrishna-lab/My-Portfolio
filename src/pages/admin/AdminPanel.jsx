@@ -585,7 +585,7 @@ function SettingsTab() {
             <hr className="border-neutral-200" />
 
             <h2 className="text-xl font-bold text-[#18112E]">Music Player</h2>
-            <p className="text-sm text-neutral-500 font-medium">Set a song to play in the admin panel.</p>
+            <p className="text-sm text-neutral-500 font-medium">Set a song for the admin panel — paste a URL or upload a file.</p>
 
             <div className="bg-[#F8F9FA] border border-neutral-200 rounded-[16px] p-5 space-y-4">
                 <div>
@@ -593,12 +593,24 @@ function SettingsTab() {
                     <input type="text" defaultValue={getMusicName()} onChange={(e) => { setMusicName(e.target.value); window.location.reload(); }} placeholder="My Song" className="w-full bg-white border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
                 </div>
                 <div>
-                    <label className="text-xs font-bold text-[#18112E] block mb-1.5">Audio URL</label>
-                    <input type="text" defaultValue={getMusicUrl()} onChange={(e) => { setMusicUrl(e.target.value); window.location.reload(); }} placeholder="https://example.com/song.mp3" className="w-full bg-white border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
+                    <label className="text-xs font-bold text-[#18112E] block mb-1.5">Audio URL or Upload</label>
+                    <div className="flex gap-2">
+                        <input type="text" defaultValue={getMusicUrl()} onChange={(e) => { setMusicUrl(e.target.value); window.location.reload(); }} placeholder="https://example.com/song.mp3" className="flex-1 bg-white border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
+                        <label className="flex items-center gap-1.5 px-4 bg-[#18112E] text-white rounded-[12px] text-xs font-bold cursor-pointer hover:bg-[#FFB800] hover:text-[#18112E] transition-all whitespace-nowrap">
+                            <UploadCloud className="w-4 h-4" /> Upload
+                            <input type="file" accept="audio/*" className="hidden" onChange={(e) => {
+                                const f = e.target.files?.[0];
+                                if (!f) return;
+                                const r = new FileReader();
+                                r.onload = () => { setMusicUrl(r.result); window.location.reload(); };
+                                r.readAsDataURL(f);
+                            }} />
+                        </label>
+                    </div>
                 </div>
                 {getMusicUrl() && (
                     <div className="flex items-center gap-3 text-sm text-green-600 font-medium">
-                        <Music className="w-4 h-4" /> Song set. Music button appears at bottom-right.
+                        <Music className="w-4 h-4" /> Song set — player appears bottom-right.
                     </div>
                 )}
             </div>
@@ -606,20 +618,44 @@ function SettingsTab() {
             <hr className="border-neutral-200" />
 
             <h2 className="text-xl font-bold text-[#18112E]">Background</h2>
-            <p className="text-sm text-neutral-500 font-medium">Set a background image or video for the admin panel.</p>
+            <p className="text-sm text-neutral-500 font-medium">Set a background image or video — paste a URL or upload a file.</p>
 
             <div className="bg-[#F8F9FA] border border-neutral-200 rounded-[16px] p-5 space-y-4">
                 <div>
-                    <label className="text-xs font-bold text-[#18112E] block mb-1.5">Background Image URL</label>
-                    <input type="text" defaultValue={getBgImg()} onChange={(e) => { setBgImg(e.target.value); window.location.reload(); }} placeholder="https://example.com/bg.jpg" className="w-full bg-white border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
+                    <label className="text-xs font-bold text-[#18112E] block mb-1.5">Background Image — URL or Upload</label>
+                    <div className="flex gap-2">
+                        <input type="text" defaultValue={getBgImg()} onChange={(e) => { setBgImg(e.target.value); window.location.reload(); }} placeholder="https://example.com/bg.jpg" className="flex-1 bg-white border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
+                        <label className="flex items-center gap-1.5 px-4 bg-[#18112E] text-white rounded-[12px] text-xs font-bold cursor-pointer hover:bg-[#FFB800] hover:text-[#18112E] transition-all whitespace-nowrap">
+                            <UploadCloud className="w-4 h-4" /> Upload
+                            <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                                const f = e.target.files?.[0];
+                                if (!f) return;
+                                const r = new FileReader();
+                                r.onload = () => { setBgImg(r.result); window.location.reload(); };
+                                r.readAsDataURL(f);
+                            }} />
+                        </label>
+                    </div>
                 </div>
                 <div>
-                    <label className="text-xs font-bold text-[#18112E] block mb-1.5">Background Video URL (overrides image)</label>
-                    <input type="text" defaultValue={getBgVid()} onChange={(e) => { setBgVid(e.target.value); window.location.reload(); }} placeholder="https://example.com/bg.mp4" className="w-full bg-white border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
+                    <label className="text-xs font-bold text-[#18112E] block mb-1.5">Background Video — URL or Upload (overrides image)</label>
+                    <div className="flex gap-2">
+                        <input type="text" defaultValue={getBgVid()} onChange={(e) => { setBgVid(e.target.value); window.location.reload(); }} placeholder="https://example.com/bg.mp4" className="flex-1 bg-white border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
+                        <label className="flex items-center gap-1.5 px-4 bg-[#18112E] text-white rounded-[12px] text-xs font-bold cursor-pointer hover:bg-[#FFB800] hover:text-[#18112E] transition-all whitespace-nowrap">
+                            <UploadCloud className="w-4 h-4" /> Upload
+                            <input type="file" accept="video/*" className="hidden" onChange={(e) => {
+                                const f = e.target.files?.[0];
+                                if (!f) return;
+                                const r = new FileReader();
+                                r.onload = () => { setBgVid(r.result); window.location.reload(); };
+                                r.readAsDataURL(f);
+                            }} />
+                        </label>
+                    </div>
                 </div>
                 {(getBgImg() || getBgVid()) && (
                     <div className="flex items-center gap-3 text-sm text-green-600 font-medium">
-                        <ImageIcon className="w-4 h-4" /> Background set. Toggle it from the floating buttons.
+                        <ImageIcon className="w-4 h-4" /> Background set — toggle it from the floating buttons (bottom-left).
                     </div>
                 )}
             </div>
