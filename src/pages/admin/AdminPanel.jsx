@@ -12,39 +12,7 @@ const REPO = 'shrikrishna-lab/My-Portfolio';
 const FILE_PATH = 'public/data.json';
 const BRANCH = 'main';
 const TOKEN_KEY = 'github_token';
-const COMMIT_MSG = 'Update portfolio data via admin panel';
-
 function getToken() { try { return localStorage.getItem(TOKEN_KEY) || ''; } catch { return ''; } }
-function saveToken(t) { try { localStorage.setItem(TOKEN_KEY, t); } catch {} }
-
-async function deployToGitHub(data, token) {
-  const url = `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`;
-  const headers = {
-    Authorization: `token ${token}`,
-    Accept: 'application/vnd.github.v3+json',
-    'Content-Type': 'application/json',
-  };
-
-  const existing = await fetch(url + `?ref=${BRANCH}`, { headers }).then((r) => r.json());
-  const sha = existing.sha;
-
-  const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2) + '\n')));
-
-  const body = { message: COMMIT_MSG, content, sha, branch: BRANCH };
-
-  const res = await fetch(url, {
-    method: 'PUT',
-    headers,
-    body: JSON.stringify(body),
-  });
-
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.message || 'Deploy failed');
-  }
-
-  return res.json();
-}
 
 const TABS = [
     { id: 'profile', label: 'Profile', icon: User },
@@ -490,78 +458,86 @@ function MessagesTab() {
     );
 }
 
-export default function AdminPanel() {
-    const [activeTab, setActiveTab] = useState('profile');
-    const [deploying, setDeploying] = useState(false);
-    const [deployMsg, setDeployMsg] = useState('');
-    const [showToken, setShowToken] = useState(false);
+function SettingsTab() {
     const [tokenInput, setTokenInput] = useState(getToken());
-    const profile = useStore((s) => s.profile);
+    const [deploying, setDeploying] = useState(false);
+    const [msg, setMsg] = useState({ text: '', type: '' });
+    const store = useStore;
+
+    const saveToken = () => {
+        try { localStorage.setItem(TOKEN_KEY, tokenInput); } catch {}
+        setMsg({ text: 'Token saved.', type: 'success' });
+        setTimeout(() => setMsg({ text: '', type: '' }), 3000);
+    };
 
     const handleDeploy = async () => {
-        setDeploying(true);
-        setDeployMsg('');
         const token = getToken();
-        if (!token) { setDeployMsg('Set your GitHub token first (gear icon).'); setDeploying(false); return; }
+        if (!token) { setMsg({ text: 'Enter and save your GitHub token first.', type: 'error' }); return; }
+        setDeploying(true);
+        setMsg({ text: '', type: '' });
         try {
-            const state = useStore.getState();
-            const data = {
-                profile: state.profile,
-                skills: state.skills,
-                projects: state.projects,
-                achievements: state.achievements,
-                messages: state.messages,
-            };
-            await deployToGitHub(data, token);
-            setDeployMsg('Deployed! Vercel will auto-redeploy in a few seconds.');
+            const state = store.getState();
+            const data = { profile: state.profile, skills: state.skills, projects: state.projects, achievements: state.achievements, messages: state.messages };
+
+            const url = `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`;
+            const headers = { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' };
+
+            const existing = await fetch(url + `?ref=${BRANCH}`, { headers }).then((r) => r.json());
+            const sha = existing.sha;
+            const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2) + '\n')));
+
+            const res = await fetch(url, { method: 'PUT', headers, body: JSON.stringify({ message: 'Update portfolio data via admin panel', content, sha, branch: BRANCH }) });
+
+            if (!res.ok) { const err = await res.json(); throw new Error(err.message); }
+
+            setMsg({ text: 'Deployed! Vercel will auto-redeploy in ~30s.', type: 'success' });
         } catch (e) {
-            setDeployMsg('Error: ' + e.message);
+            setMsg({ text: 'Error: ' + e.message, type: 'error' });
         }
         setDeploying(false);
     };
 
-    const saveTokenHandler = () => {
-        saveToken(tokenInput);
-        setShowToken(false);
-        setDeployMsg('Token saved.');
-        setTimeout(() => setDeployMsg(''), 2000);
-    };
+    return (
+        <div className="space-y-6">
+            <h2 className="text-xl font-bold text-[#18112E]">Deploy to Production</h2>
+            <p className="text-sm text-neutral-500 font-medium">Push your changes to GitHub. Vercel will auto-redeploy so all users see the updates.</p>
+
+            <div className="bg-[#F8F9FA] border border-neutral-200 rounded-[16px] p-5 space-y-4">
+                <div>
+                    <label className="text-xs font-bold text-[#18112E] block mb-1.5">GitHub Personal Access Token</label>
+                    <div className="flex gap-2">
+                        <input type="password" value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} placeholder="ghp_... or github_pat_..." className="flex-1 bg-white border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
+                        <button onClick={saveToken} className="bg-[#18112E] text-white px-5 py-3 rounded-[12px] text-sm font-bold hover:bg-[#FFB800] hover:text-[#18112E] transition-all">Save</button>
+                    </div>
+                    <a href="https://github.com/settings/tokens" target="_blank" rel="noreferrer" className="text-[11px] text-blue-600 underline mt-1.5 inline-block">Generate a classic token with repo scope</a>
+                </div>
+
+                <div className="pt-2 border-t border-neutral-200">
+                    <button onClick={handleDeploy} disabled={deploying || !getToken()} className="flex items-center gap-2 bg-[#FFB800] text-[#18112E] px-6 py-3 rounded-[12px] font-bold hover:bg-[#ffcc33] transition-all disabled:opacity-50 shadow-md">
+                        <Upload className="w-5 h-5" /> {deploying ? 'Deploying to GitHub...' : 'Deploy to Production'}
+                    </button>
+                    <p className="text-[11px] text-neutral-400 mt-2">Commits to <span className="font-mono">{REPO}/{FILE_PATH}</span> on <span className="font-mono">{BRANCH}</span>. Vercel redeploys automatically.</p>
+                </div>
+            </div>
+
+            {msg.text && (
+                <div className={`rounded-[12px] p-4 text-sm font-bold ${msg.type === 'error' ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-700'}`}>
+                    {msg.text}
+                </div>
+            )}
+        </div>
+    );
+}
+
+export default function AdminPanel() {
+    const [activeTab, setActiveTab] = useState('profile');
 
     return (
         <div className="min-h-screen bg-[#F8F9FA] font-sans">
             <header className="h-[60px] bg-white border-b border-neutral-100 px-4 md:px-6 flex items-center justify-between sticky top-0 z-50 shadow-sm">
                 <span className="text-lg font-extrabold tracking-tight text-[#18112E]">Admin<span className="text-[#FFB800]">.</span></span>
-                <div className="flex items-center gap-3">
-                    <button onClick={() => setShowToken(!showToken)} className="text-xs font-bold text-neutral-400 hover:text-[#18112E] transition-colors">
-                        {getToken() ? '\u2699\uFE0F' : '\uD83D\uDD11'}
-                    </button>
-                    {getToken() && (
-                        <button onClick={handleDeploy} disabled={deploying} className="flex items-center gap-1.5 bg-[#18112E] text-white px-4 py-1.5 rounded-[8px] text-xs font-bold hover:bg-[#FFB800] hover:text-[#18112E] transition-all disabled:opacity-50">
-                            <Upload className="w-3.5 h-3.5" /> {deploying ? 'Deploying...' : 'Deploy'}
-                        </button>
-                    )}
-                    <a href="/" className="text-xs font-bold text-neutral-500 hover:text-[#18112E] transition-colors">View Site</a>
-                </div>
+                <a href="/" className="text-xs font-bold text-neutral-500 hover:text-[#18112E] transition-colors">View Site</a>
             </header>
-
-            {showToken && (
-                <div className="max-w-[1200px] mx-auto px-4 md:px-8 pt-4">
-                    <div className="bg-white border border-[#FFB800] rounded-[12px] p-4 shadow-sm flex items-center gap-3 flex-wrap">
-                        <span className="text-xs font-bold text-[#18112E] shrink-0">GitHub Token:</span>
-                        <input type="password" value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} placeholder="ghp_..." className="flex-1 min-w-[200px] bg-[#F8F9FA] border-2 border-transparent focus:border-[#FFB800] rounded-[8px] px-3 py-2 text-xs font-medium outline-none transition-all" />
-                        <button onClick={saveTokenHandler} className="bg-[#FFB800] text-[#18112E] px-4 py-2 rounded-[8px] text-xs font-bold hover:bg-[#ffcc33] transition-all">Save</button>
-                        <a href="https://github.com/settings/tokens" target="_blank" rel="noreferrer" className="text-[10px] text-blue-600 underline">Get a token (repo scope)</a>
-                    </div>
-                </div>
-            )}
-
-            {deployMsg && (
-                <div className="max-w-[1200px] mx-auto px-4 md:px-8 pt-4">
-                    <div className={`rounded-[12px] p-3 text-xs font-bold ${deployMsg.includes('Error') ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-700'}`}>
-                        {deployMsg}
-                    </div>
-                </div>
-            )}
 
             <div className="max-w-[1200px] mx-auto p-4 md:p-8">
                 <div className="flex items-center justify-between pb-4 border-b border-neutral-200 mb-6">
@@ -589,6 +565,7 @@ export default function AdminPanel() {
                         {activeTab === 'projects' && <ProjectsTab />}
                         {activeTab === 'achievements' && <AchievementsTab />}
                         {activeTab === 'messages' && <MessagesTab />}
+                        {activeTab === 'settings' && <SettingsTab />}
                     </div>
                 </motion.div>
             </div>
