@@ -34,19 +34,21 @@ export const useStore = create((set, get) => ({
   loading: true,
 
   fetchAll: async () => {
+    try {
+      const res = await fetch('/data.json');
+      if (res.ok) {
+        const data = await res.json();
+        set({ ...data, loading: false });
+        save(data);
+        return;
+      }
+    } catch {}
     const saved = loadSaved();
     if (saved) {
       set({ ...saved, loading: false });
       return;
     }
-    try {
-      const res = await fetch('/data.json');
-      const data = await res.json();
-      set({ ...data, loading: false });
-      save(data);
-    } catch {
-      set({ loading: false });
-    }
+    set({ loading: false });
   },
 
   updateProfile: (updates) => {
