@@ -688,37 +688,34 @@ function MusicBar() {
     const [playing, setPlaying] = useState(false);
     const audioRef = useRef(null);
 
-    if (!url) return null;
-
     const toggle = () => {
-        if (!audioRef.current) {
-            audioRef.current = new Audio(url);
-            audioRef.current.loop = true;
-        }
-        if (playing) {
-            audioRef.current.pause();
-        } else {
-            audioRef.current.play().catch(() => {});
-        }
+        const el = audioRef.current;
+        if (!el) return;
+        if (playing) { el.pause(); }
+        else { el.play().catch(() => {}); }
         setPlaying(!playing);
     };
 
     useEffect(() => {
-        return () => {
-            if (audioRef.current) {
-                audioRef.current.pause();
-                audioRef.current = null;
-            }
-        };
+        const el = audioRef.current;
+        if (!el) return;
+        const onEnd = () => { el.currentTime = 0; el.play().catch(() => {}); };
+        el.addEventListener('ended', onEnd);
+        return () => { el.removeEventListener('ended', onEnd); el.pause(); };
     }, []);
 
+    if (!url) return null;
+
     return (
-        <div className={`fixed bottom-4 right-4 z-50 flex items-center gap-3 bg-white border-2 border-[#18112E] rounded-[16px] px-4 py-3 shadow-[4px_4px_0_#18112E] transition-all ${playing ? 'bg-[#FFB800]' : ''}`}>
-            <button onClick={toggle} className="w-9 h-9 rounded-[10px] bg-[#18112E] text-white flex items-center justify-center hover:bg-[#FFB800] hover:text-[#18112E] transition-all">
-                {playing ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-            </button>
-            <span className="text-sm font-bold text-[#18112E] max-w-[120px] truncate">{name}</span>
-        </div>
+        <>
+            <audio ref={audioRef} src={url} loop preload="auto" />
+            <div className={`fixed bottom-4 right-4 z-50 flex items-center gap-3 bg-white border-2 border-[#18112E] rounded-[16px] px-4 py-3 shadow-[4px_4px_0_#18112E] transition-all ${playing ? 'bg-[#FFB800]' : ''}`}>
+                <button onClick={toggle} className="w-9 h-9 rounded-[10px] bg-[#18112E] text-white flex items-center justify-center hover:bg-[#FFB800] hover:text-[#18112E] transition-all">
+                    {playing ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                </button>
+                <span className="text-sm font-bold text-[#18112E] max-w-[120px] truncate">{name}</span>
+            </div>
+        </>
     );
 }
 
