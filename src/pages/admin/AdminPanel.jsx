@@ -519,20 +519,23 @@ function PasswordGate({ children }) {
     };
 
     return (
-        <div className="min-h-screen bg-[#F8F9FA] flex items-center justify-center p-4 font-sans" style={getBgImg() ? { backgroundImage: `url(${getBgImg()})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}>
-            <form onSubmit={handleSubmit} className="bg-white/95 backdrop-blur border border-neutral-100 rounded-[24px] p-8 shadow-sm w-full max-w-sm space-y-6">
+        <div className="min-h-screen flex items-center justify-center p-4 font-sans relative overflow-hidden" style={{ background: getBgVid() || getBgImg() ? undefined : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+            {getBgVid() && (isYoutubeUrl(getBgVid()) ? <iframe src={getYoutubeEmbed(getBgVid())} className="fixed inset-0 w-full h-full z-0 pointer-events-none" allow="autoplay; fullscreen" title="bg" /> : <video src={getBgVid()} autoPlay loop muted playsInline className="fixed inset-0 w-full h-full object-cover z-0" />)}
+            {getBgImg() && !getBgVid() && <img src={getBgImg()} className="fixed inset-0 w-full h-full object-cover z-0" alt="" />}
+            {(getBgVid() || getBgImg()) && <div className="fixed inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60 z-[1]" />}
+            <form onSubmit={handleSubmit} className="relative z-10 bg-white/15 backdrop-blur-2xl border border-white/10 rounded-[24px] p-8 shadow-2xl shadow-black/10 w-full max-w-sm space-y-6">
                 <div className="text-center">
-                    <div className="w-14 h-14 bg-[#FFB800] rounded-[16px] flex items-center justify-center mx-auto mb-4">
+                    <div className="w-14 h-14 bg-[#FFB800]/80 backdrop-blur rounded-[16px] flex items-center justify-center mx-auto mb-4 shadow-lg">
                         <Shield className="w-7 h-7 text-[#18112E]" />
                     </div>
-                    <h1 className="text-2xl font-bold text-[#18112E]">Admin Access</h1>
-                    <p className="text-sm text-neutral-500 font-medium mt-1">Enter the admin password to continue.</p>
+                    <h1 className="text-2xl font-bold text-white drop-shadow-sm">Admin Access</h1>
+                    <p className="text-sm text-white/70 font-medium mt-1">Enter the admin password to continue.</p>
                 </div>
                 {error && (
-                    <div className="p-3 bg-red-50 text-red-600 rounded-[12px] text-sm font-bold text-center">{error}</div>
+                    <div className="p-3 bg-red-500/20 backdrop-blur text-red-200 rounded-[12px] text-sm font-bold text-center border border-red-500/20">{error}</div>
                 )}
-                <input type="password" placeholder="Password" value={input} onChange={(e) => setInput(e.target.value)} className="w-full bg-[#F8F9FA] border-2 border-transparent focus:border-[#FFB800] focus:bg-white rounded-[12px] px-4 py-3 text-center text-lg font-bold text-[#18112E] outline-none transition-all tracking-widest" autoFocus />
-                <button type="submit" className="w-full bg-[#FFB800] text-[#18112E] font-bold py-3 rounded-[12px] hover:bg-[#ffcc33] transition-all shadow-md">Unlock</button>
+                <input type="password" placeholder="Password" value={input} onChange={(e) => setInput(e.target.value)} className="w-full bg-white/10 backdrop-blur border border-white/10 focus:border-[#FFB800]/50 focus:bg-white/20 rounded-[12px] px-4 py-3 text-center text-lg font-bold text-white placeholder-white/40 outline-none transition-all tracking-widest" autoFocus />
+                <button type="submit" className="w-full bg-[#FFB800]/80 backdrop-blur text-[#18112E] font-bold py-3 rounded-[12px] hover:bg-[#FFB800] transition-all shadow-lg shadow-black/10">Unlock</button>
             </form>
         </div>
     );
@@ -718,7 +721,7 @@ function MusicBar() {
     return (
         <>
             {!isYt && <audio ref={audioRef} src={url} loop preload="auto" />}
-            <div className={`fixed bottom-4 right-4 z-50 flex items-center gap-3 bg-white/80 backdrop-blur-xl border-2 border-[#18112E] rounded-[16px] px-4 py-3 shadow-[4px_4px_0_#18112E] transition-all duration-300 hover:-translate-y-1 ${playing ? 'bg-[#FFB800]/90 shadow-[4px_6px_0_#18112E]' : ''}`}>
+            <div className={`fixed bottom-4 right-4 z-50 flex items-center gap-3 bg-white/20 backdrop-blur-2xl border border-white/10 rounded-[16px] px-4 py-3 shadow-2xl shadow-black/10 transition-all duration-300 hover:-translate-y-1 ${playing ? 'bg-[#FFB800]/30 border-[#FFB800]/30' : ''}`}>
                 <div className="relative">
                     {playing && !error && (
                         <span className="absolute inset-0 rounded-[10px] bg-[#FFB800] animate-ping opacity-30" />
@@ -766,16 +769,16 @@ export default function AdminPanel() {
             )}
             {showBg && (getBgVid() || getBgImg()) && <div className="fixed inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60 z-[1]" />}
             <div className="relative z-10 min-h-screen">
-            <header className="h-[60px] bg-white/70 backdrop-blur-xl border-b border-white/20 px-4 md:px-6 flex items-center justify-between sticky top-0 z-50 shadow-sm">
-                <span className="text-lg font-extrabold tracking-tight text-[#18112E]">Admin<span className="text-[#FFB800]">.</span></span>
+            <header className="h-[60px] bg-white/20 backdrop-blur-2xl border-b border-white/10 px-4 md:px-6 flex items-center justify-between sticky top-0 z-50 shadow-lg shadow-black/5">
+                <span className="text-lg font-extrabold tracking-tight text-[#18112E] drop-shadow-sm">Admin<span className="text-[#FFB800]">.</span></span>
                 <a href="/" className="text-xs font-bold text-[#18112E]/60 hover:text-[#18112E] transition-colors">View Site</a>
             </header>
 
             <div className="max-w-[1200px] mx-auto p-4 md:p-8">
-                <div className="flex items-center justify-between pb-4 border-b border-white/20 mb-6">
+                <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-6">
                     <div>
-                        <h1 className="text-2xl md:text-3xl font-bold text-[#18112E] tracking-tight">Control Panel</h1>
-                        <p className="text-[#18112E]/70 mt-1 font-medium text-sm">Manage your portfolio — no database needed.</p>
+                        <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)] tracking-tight">Control Panel</h1>
+                        <p className="text-white/70 mt-1 font-medium text-sm drop-shadow-sm">Manage your portfolio — no database needed.</p>
                     </div>
                 </div>
 
@@ -783,15 +786,15 @@ export default function AdminPanel() {
                     {TABS.map((tab) => {
                         const isActive = activeTab === tab.id;
                         return (
-                            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-[12px] text-sm font-bold transition-all whitespace-nowrap shrink-0 ${isActive ? 'bg-[#FFB800]/90 backdrop-blur-md text-[#18112E] shadow-md' : 'bg-white/60 backdrop-blur-md text-[#18112E]/70 border border-white/30 hover:bg-white/80 hover:border-[#FFB800] hover:text-[#18112E]'}`}>
+                            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-[12px] text-sm font-bold transition-all whitespace-nowrap shrink-0 backdrop-blur-2xl ${isActive ? 'bg-[#FFB800]/80 text-[#18112E] shadow-lg shadow-black/10' : 'bg-white/15 text-white/80 border border-white/10 hover:bg-white/30 hover:border-[#FFB800]/50 hover:text-white'}`}>
                                 <tab.icon className="w-4 h-4" /> {tab.label}
                             </button>
                         );
                     })}
                 </div>
 
-                <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.15 }}>
-                    <div className="bg-white/70 backdrop-blur-xl border border-white/30 rounded-[20px] p-6 shadow-lg shadow-black/10">
+                <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+                    <div className="bg-white/15 backdrop-blur-2xl border border-white/10 rounded-[24px] p-6 shadow-2xl shadow-black/10">
                         {activeTab === 'profile' && <ProfileTab />}
                         {activeTab === 'skills' && <SkillsTab />}
                         {activeTab === 'projects' && <ProjectsTab />}
@@ -803,10 +806,10 @@ export default function AdminPanel() {
             </div>
             {showMusic && <MusicBar />}
             <div className="fixed bottom-4 left-4 z-50 flex gap-2">
-                <button onClick={() => setShowBg(!showBg)} className="w-10 h-10 rounded-[12px] bg-white/80 backdrop-blur-md border-2 border-[#18112E] shadow-[2px_2px_0_#18112E] flex items-center justify-center hover:bg-[#FFB800] transition-all text-[#18112E]" title="Toggle Background">
+                <button onClick={() => setShowBg(!showBg)} className="w-10 h-10 rounded-[12px] bg-white/20 backdrop-blur-2xl border border-white/10 shadow-lg shadow-black/10 flex items-center justify-center hover:bg-white/40 transition-all text-white/80 hover:text-white" title="Toggle Background">
                     {showBg ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                 </button>
-                <button onClick={() => setShowMusic(!showMusic)} className="w-10 h-10 rounded-[12px] bg-white/80 backdrop-blur-md border-2 border-[#18112E] shadow-[2px_2px_0_#18112E] flex items-center justify-center hover:bg-[#FFB800] transition-all text-[#18112E]" title="Toggle Music">
+                <button onClick={() => setShowMusic(!showMusic)} className="w-10 h-10 rounded-[12px] bg-white/20 backdrop-blur-2xl border border-white/10 shadow-lg shadow-black/10 flex items-center justify-center hover:bg-white/40 transition-all text-white/80 hover:text-white" title="Toggle Music">
                     {showMusic ? <Music className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
                 </button>
             </div>
