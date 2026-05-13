@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const DATA_FILE = resolve(__dirname, 'data.json');
+const DATA_FILE = resolve(__dirname, 'public', 'data.json');
 
 const COLORS = {
   reset: '\x1b[0m',

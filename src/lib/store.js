@@ -1,12 +1,7 @@
 import { create } from 'zustand';
 
-// data.json is imported at build time — edit it with `node panel.mjs`
-import defaultData from '../../data.json';
-
 let nextId = 100;
 function genId() { return String(nextId++); }
-
-function clone(obj) { return JSON.parse(JSON.stringify(obj)); }
 
 export const useStore = create((set, get) => ({
   profile: null,
@@ -16,11 +11,14 @@ export const useStore = create((set, get) => ({
   messages: [],
   loading: true,
 
-  fetchAll: () => {
-    set({
-      ...clone(defaultData),
-      loading: false,
-    });
+  fetchAll: async () => {
+    try {
+      const res = await fetch('/data.json');
+      const data = await res.json();
+      set({ ...data, loading: false });
+    } catch {
+      set({ loading: false });
+    }
   },
 
   updateProfile: (updates) => {
