@@ -3,7 +3,7 @@ import { useStore } from '@/lib/store';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Shield, User, Sparkles, FolderKanban, Award, MessageSquare, Settings,
-    Plus, Pencil, Trash2, X, Save, Image as ImageIcon, Music, Play, Pause, Eye, EyeOff, VolumeX,
+    Plus, Pencil, Trash2, X, Save, Image as ImageIcon, Music, Play, Pause, Eye, EyeOff, VolumeX, AlertCircle,
     Github, ExternalLink, UploadCloud, Check, Upload
 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
@@ -686,12 +686,14 @@ function MusicBar() {
     const url = getMusicUrl();
     const name = getMusicName() || 'Music';
     const [playing, setPlaying] = useState(false);
+    const [error, setError] = useState(false);
     const audioRef = useRef(null);
     const iframeRef = useRef(null);
     const isYt = isYoutubeUrl(url);
     const vidId = isYt ? getYoutubeEmbed(url).split('/embed/')[1]?.split('?')[0] : null;
 
     const toggle = () => {
+        if (error) { setError(false); }
         if (isYt && iframeRef.current) {
             iframeRef.current.contentWindow.postMessage(
                 JSON.stringify({ event: 'command', func: playing ? 'pauseVideo' : 'playVideo', args: '' }),
@@ -703,7 +705,7 @@ function MusicBar() {
         const el = audioRef.current;
         if (!el) return;
         if (playing) { el.pause(); }
-        else { el.play().catch(() => {}); }
+        else { el.play().catch(() => { setError(true); setPlaying(false); }); }
         setPlaying(!playing);
     };
 
@@ -716,11 +718,23 @@ function MusicBar() {
             ) : (
                 <audio ref={audioRef} src={url} loop preload="auto" />
             )}
-            <div className={`fixed bottom-4 right-4 z-50 flex items-center gap-3 bg-white/80 backdrop-blur-md border-2 border-[#18112E] rounded-[16px] px-4 py-3 shadow-[4px_4px_0_#18112E] transition-all ${playing ? 'bg-[#FFB800]/80' : ''}`}>
-                <button onClick={toggle} className="w-9 h-9 rounded-[10px] bg-[#18112E] text-white flex items-center justify-center hover:bg-[#FFB800] hover:text-[#18112E] transition-all">
-                    {playing ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+            <div className={`fixed bottom-4 right-4 z-50 flex items-center gap-3 bg-white/80 backdrop-blur-xl border-2 border-[#18112E] rounded-[16px] px-4 py-3 shadow-[4px_4px_0_#18112E] transition-all duration-300 hover:-translate-y-1 ${playing ? 'bg-[#FFB800]/90 shadow-[4px_6px_0_#18112E]' : ''}`}>
+                <button onClick={toggle} className="w-9 h-9 rounded-[10px] bg-[#18112E] text-white flex items-center justify-center hover:bg-[#FFB800] hover:text-[#18112E] transition-all active:scale-90">
+                    {error ? <AlertCircle className="w-4 h-4" /> : playing ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                 </button>
-                <span className="text-sm font-bold text-[#18112E] max-w-[120px] truncate">{name}</span>
+                <div className="flex items-center gap-2">
+                    {playing && !error && (
+                        <span className="flex items-end gap-[2px] h-4">
+                            <span className="w-[3px] bg-[#18112E] rounded-full animate-bounce" style={{ animationDelay: '0ms', height: '60%' }} />
+                            <span className="w-[3px] bg-[#18112E] rounded-full animate-bounce" style={{ animationDelay: '150ms', height: '100%' }} />
+                            <span className="w-[3px] bg-[#18112E] rounded-full animate-bounce" style={{ animationDelay: '300ms', height: '40%' }} />
+                            <span className="w-[3px] bg-[#18112E] rounded-full animate-bounce" style={{ animationDelay: '75ms', height: '80%' }} />
+                        </span>
+                    )}
+                    <span className={`text-sm font-bold max-w-[120px] truncate ${error ? 'text-red-500' : 'text-[#18112E]'}`}>
+                        {error ? 'Failed to play' : name}
+                    </span>
+                </div>
             </div>
         </>
     );
@@ -740,6 +754,7 @@ export default function AdminPanel() {
                 <video src={getBgVid()} autoPlay loop muted playsInline className="fixed inset-0 w-full h-full object-cover z-0" />
             ))}
             {showBg && getBgImg() && !getBgVid() && <div className="fixed inset-0 bg-cover bg-center z-0" style={{ backgroundImage: `url(${getBgImg()})` }} />}
+            {showBg && (getBgVid() || getBgImg()) && <div className="fixed inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/40 z-[1]" />}
             <div className="relative z-10 min-h-screen">
             <header className="h-[60px] bg-white/60 backdrop-blur-xl border-b border-white/20 px-4 md:px-6 flex items-center justify-between sticky top-0 z-50 shadow-sm">
                 <span className="text-lg font-extrabold tracking-tight text-[#18112E]">Admin<span className="text-[#FFB800]">.</span></span>
