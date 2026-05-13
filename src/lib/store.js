@@ -1,5 +1,27 @@
 import { create } from 'zustand';
 
+const STORAGE_KEY = 'portfolio_data';
+
+function loadSaved() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return null;
+}
+
+function save(state) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      profile: state.profile,
+      skills: state.skills,
+      projects: state.projects,
+      achievements: state.achievements,
+      messages: state.messages,
+    }));
+  } catch {}
+}
+
 let nextId = 100;
 function genId() { return String(nextId++); }
 
@@ -12,65 +34,119 @@ export const useStore = create((set, get) => ({
   loading: true,
 
   fetchAll: async () => {
+    const saved = loadSaved();
+    if (saved) {
+      set({ ...saved, loading: false });
+      return;
+    }
     try {
       const res = await fetch('/data.json');
       const data = await res.json();
       set({ ...data, loading: false });
+      save(data);
     } catch {
       set({ loading: false });
     }
   },
 
   updateProfile: (updates) => {
-    set((s) => ({ profile: { ...s.profile, ...updates } }));
+    set((s) => {
+      const profile = { ...s.profile, ...updates };
+      save({ ...s, profile });
+      return { profile };
+    });
   },
 
   addSkill: (skill) => {
     const newSkill = { ...skill, id: genId() };
-    set((s) => ({ skills: [...s.skills, newSkill] }));
+    set((s) => {
+      const skills = [...s.skills, newSkill];
+      save({ ...s, skills });
+      return { skills };
+    });
   },
 
   updateSkill: (id, updates) => {
-    set((s) => ({ skills: s.skills.map((sk) => (sk.id === id ? { ...sk, ...updates } : sk)) }));
+    set((s) => {
+      const skills = s.skills.map((sk) => (sk.id === id ? { ...sk, ...updates } : sk));
+      save({ ...s, skills });
+      return { skills };
+    });
   },
 
   deleteSkill: (id) => {
-    set((s) => ({ skills: s.skills.filter((sk) => sk.id !== id) }));
+    set((s) => {
+      const skills = s.skills.filter((sk) => sk.id !== id);
+      save({ ...s, skills });
+      return { skills };
+    });
   },
 
   addProject: (project) => {
     const newProject = { ...project, id: genId() };
-    set((s) => ({ projects: [...s.projects, newProject] }));
+    set((s) => {
+      const projects = [...s.projects, newProject];
+      save({ ...s, projects });
+      return { projects };
+    });
   },
 
   updateProject: (id, updates) => {
-    set((s) => ({ projects: s.projects.map((p) => (p.id === id ? { ...p, ...updates } : p)) }));
+    set((s) => {
+      const projects = s.projects.map((p) => (p.id === id ? { ...p, ...updates } : p));
+      save({ ...s, projects });
+      return { projects };
+    });
   },
 
   deleteProject: (id) => {
-    set((s) => ({ projects: s.projects.filter((p) => p.id !== id) }));
+    set((s) => {
+      const projects = s.projects.filter((p) => p.id !== id);
+      save({ ...s, projects });
+      return { projects };
+    });
   },
 
   addAchievement: (achievement) => {
     const newAchievement = { ...achievement, id: genId() };
-    set((s) => ({ achievements: [...s.achievements, newAchievement] }));
+    set((s) => {
+      const achievements = [...s.achievements, newAchievement];
+      save({ ...s, achievements });
+      return { achievements };
+    });
   },
 
   updateAchievement: (id, updates) => {
-    set((s) => ({ achievements: s.achievements.map((a) => (a.id === id ? { ...a, ...updates } : a)) }));
+    set((s) => {
+      const achievements = s.achievements.map((a) => (a.id === id ? { ...a, ...updates } : a));
+      save({ ...s, achievements });
+      return { achievements };
+    });
   },
 
   deleteAchievement: (id) => {
-    set((s) => ({ achievements: s.achievements.filter((a) => a.id !== id) }));
+    set((s) => {
+      const achievements = s.achievements.filter((a) => a.id !== id);
+      save({ ...s, achievements });
+      return { achievements };
+    });
   },
 
   addMessage: (message) => {
     const newMessage = { ...message, id: genId(), createdAt: new Date().toISOString() };
-    set((s) => ({ messages: [newMessage, ...s.messages] }));
+    set((s) => {
+      const messages = [newMessage, ...s.messages];
+      save({ ...s, messages });
+      return { messages };
+    });
   },
 
   deleteMessage: (id) => {
-    set((s) => ({ messages: s.messages.filter((m) => m.id !== id) }));
+    set((s) => {
+      const messages = s.messages.filter((m) => m.id !== id);
+      save({ ...s, messages });
+      return { messages };
+    });
   },
 
   uploadImage: async (file) => {
