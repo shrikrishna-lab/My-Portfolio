@@ -687,14 +687,16 @@ function MusicBar() {
     const name = getMusicName() || 'Music';
     const [playing, setPlaying] = useState(false);
     const audioRef = useRef(null);
-    const ytRef = useRef(null);
-    const ytReady = useRef(false);
+    const iframeRef = useRef(null);
     const isYt = isYoutubeUrl(url);
+    const vidId = isYt ? getYoutubeEmbed(url).split('/embed/')[1]?.split('?')[0] : null;
 
     const toggle = () => {
-        if (isYt && ytRef.current) {
-            if (playing) { ytRef.current.pauseVideo(); }
-            else { ytRef.current.playVideo(); }
+        if (isYt && iframeRef.current) {
+            iframeRef.current.contentWindow.postMessage(
+                JSON.stringify({ event: 'command', func: playing ? 'pauseVideo' : 'playVideo', args: '' }),
+                '*'
+            );
             setPlaying(!playing);
             return;
         }
@@ -705,44 +707,15 @@ function MusicBar() {
         setPlaying(!playing);
     };
 
-    useEffect(() => {
-        if (!url) return;
-        if (isYt) {
-            if (!window.YT) {
-                const tag = document.createElement('script');
-                tag.src = 'https://www.youtube.com/iframe_api';
-                document.body.appendChild(tag);
-            }
-            const onReady = () => { ytReady.current = true; };
-            if (window.YT && window.YT.Player) {
-                ytRef.current = new window.YT.Player('yt-music-player', {
-                    height: '0', width: '0',
-                    videoId: getYoutubeEmbed(url).split('/embed/')[1]?.split('?')[0],
-                    playerVars: { autoplay: 0, controls: 0, loop: 1, playlist: getYoutubeEmbed(url).split('/embed/')[1]?.split('?')[0] },
-                    events: { onReady },
-                });
-            } else {
-                window.onYouTubeIframeAPIReady = () => {
-                    ytRef.current = new window.YT.Player('yt-music-player', {
-                        height: '0', width: '0',
-                        videoId: getYoutubeEmbed(url).split('/embed/')[1]?.split('?')[0],
-                        playerVars: { autoplay: 0, controls: 0, loop: 1, playlist: getYoutubeEmbed(url).split('/embed/')[1]?.split('?')[0] },
-                        events: { onReady },
-                    });
-                };
-            }
-        }
-        return () => {
-            if (ytRef.current && ytRef.current.destroy) ytRef.current.destroy();
-            if (audioRef.current) audioRef.current.pause();
-        };
-    }, [url, isYt]);
-
     if (!url) return null;
 
     return (
         <>
-            {isYt ? <div id="yt-music-player" className="hidden" /> : <audio ref={audioRef} src={url} loop preload="auto" />}
+            {isYt && vidId ? (
+                <iframe ref={iframeRef} src={`https://www.youtube.com/embed/${vidId}?autoplay=0&controls=0&loop=1&playlist=${vidId}&enablejsapi=1`} className="hidden" title="yt" />
+            ) : (
+                <audio ref={audioRef} src={url} loop preload="auto" />
+            )}
             <div className={`fixed bottom-4 right-4 z-50 flex items-center gap-3 bg-white/80 backdrop-blur-md border-2 border-[#18112E] rounded-[16px] px-4 py-3 shadow-[4px_4px_0_#18112E] transition-all ${playing ? 'bg-[#FFB800]/80' : ''}`}>
                 <button onClick={toggle} className="w-9 h-9 rounded-[10px] bg-[#18112E] text-white flex items-center justify-center hover:bg-[#FFB800] hover:text-[#18112E] transition-all">
                     {playing ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
