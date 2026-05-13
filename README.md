@@ -1,104 +1,145 @@
-# Portfolio CMS
+<div align="center">
+  <br>
+  <h1>Portfolio CMS</h1>
+  <p>
+    <strong>A dynamic developer portfolio with a built-in admin panel.</strong>
+  </p>
+  <p>
+    No database · No authentication · Zero configuration
+  </p>
+  <br>
+</div>
 
-A dynamic developer portfolio built with React, featuring a built-in admin dashboard for managing content — all running locally with no backend server.
+---
 
-## Features
+## ✨ Features
 
 ### Public Portfolio
-- Hero section with animated background
-- Skills grid with icon selection
-- Project showcase with GitHub/live links
-- Achievements timeline
-- Contact form
-- Startup vision section
-- 3D-like visual effects (Framer Motion)
+| Section | Description |
+|---|---|
+| **Hero** | Animated intro with parallax background |
+| **Skills** | Categorized grid with icon picker |
+| **Projects** | Cards with image, tech stack, links |
+| **Achievements** | Interactive milestone cards |
+| **Startup Vision** | Mission & vision statement |
+| **Contact** | Form with email & location info |
+| **Footer** | Social links & copyright |
 
-### Admin Panel
-- Dashboard with interactive node map
-- **Projects** — CRUD with image upload
-- **Skills** — CRUD with icon picker & categories
-- **Achievements** — CRUD with image support
-- **Messages** — view & delete contact submissions
-- **Pages** — edit hero, about, startup vision, social links
-- **Settings** — system info panel
+### Admin Panel — `/admin`
+| Tab | What you can do |
+|---|---|
+| **Profile** | Edit name, title, bio, social links, hero image |
+| **Skills** | Add / Edit / Delete skills with icon & category |
+| **Projects** | Add / Edit / Delete with image upload & URLs |
+| **Achievements** | Add / Edit / Delete with date & image |
+| **Messages** | View & delete contact form submissions |
+| **Settings** | Connect GitHub & deploy to production |
 
-## Tech Stack
+---
 
-- **Framework:** React 19 + Vite 7
-- **Styling:** Tailwind CSS 3 + shadcn/ui (Radix primitives)
-- **State:** Zustand 5 (persisted to localStorage)
-- **Animation:** Framer Motion
-- **Icons:** Lucide React
-- **Routing:** React Router DOM 7
-
-No backend server or database required — all data is stored locally in your browser.
-
-## Getting Started
+## 🚀 Quick Start
 
 ```bash
 npm install
 npm run dev
 ```
 
-Opens at `http://localhost:5173`
+Open **http://localhost:5173** — visit `/admin` to manage content.
 
-## Admin Panel
+---
 
-Navigate to `/admin/login` and sign in with:
+## 🛠 Tech Stack
 
-| Field    | Value                                |
-| -------- | ------------------------------------ |
-| Email    | xxxxxxxx@admin.com         |
-| Password | xxxxxxxxxxxxxx                   |
+```
+React 19       → UI framework
+Vite 7         → Build tool
+Tailwind CSS 3 → Styling
+Zustand 5      → State management (localStorage)
+Framer Motion  → Animations
+Lucide React   → Icons
+React Router 7 → Routing
+```
 
-Once logged in, all changes are saved automatically to `localStorage`.
+No backend server. No database. Everything runs in the browser.
 
-## Build
+---
+
+## 📦 Build for Production
 
 ```bash
 npm run build
 npm run preview
 ```
 
-## Project Structure
+Deploy the `dist/` folder to any static host.
+
+---
+
+## 🌐 Deploy to Production
+
+Edit content in the admin panel, then push it live for all users:
+
+1. Generate a **GitHub classic token** with `repo` scope at:
+   `https://github.com/settings/tokens`
+
+2. Go to `/admin` → **Settings** tab → paste token → **Save**
+
+3. Click **Deploy to Production** — commits to GitHub, Vercel auto-redeploys
+
+---
+
+## 📁 Project Structure
 
 ```
 src/
-├── App.jsx                   # Root with routes & auth guard
-├── main.jsx                  # Entry point
+├── App.jsx                  # Routes (public + admin)
+├── main.jsx                 # Entry point
 ├── lib/
-│   ├── store.js              # Zustand store (all state + CRUD)
-│   ├── supabase.js           # Supabase client (deprecated)
-│   └── utils.js              # cn() utility
-├── components/
-│   ├── public/               # Portfolio sections
-│   │   ├── Hero.jsx
-│   │   ├── About.jsx
-│   │   ├── Skills.jsx
-│   │   ├── Projects.jsx
-│   │   ├── Achievements.jsx
-│   │   ├── StartupVision.jsx
-│   │   ├── Contact.jsx
-│   │   ├── Navbar.jsx
-│   │   ├── Footer.jsx
-│   │   └── BackgroundScene.jsx
-│   └── ui/                   # shadcn/ui primitives
-└── pages/
-    ├── public/
-    │   ├── Home.jsx
-    │   └── PublicLayout.jsx
-    └── admin/
-        ├── AdminLogin.jsx
-        ├── AdminLayout.jsx
-        ├── Dashboard.jsx
-        ├── ProjectsMgmt.jsx
-        ├── SkillsMgmt.jsx
-        ├── AchievementsMgmt.jsx
-        ├── MessagesDashboard.jsx
-        ├── PagesMgmt.jsx
-        └── Settings.jsx
+│   └── store.js             # Zustand store (all CRUD + localStorage)
+├── components/public/       # Portfolio sections
+│   ├── Hero.jsx
+│   ├── About.jsx
+│   ├── Skills.jsx
+│   ├── Projects.jsx
+│   ├── Achievements.jsx
+│   ├── StartupVision.jsx
+│   ├── Contact.jsx
+│   ├── Navbar.jsx
+│   ├── Footer.jsx
+│   └── BackgroundScene.jsx
+├── pages/
+│   ├── public/
+│   │   ├── Home.jsx
+│   │   └── PublicLayout.jsx
+│   └── admin/
+│       └── AdminPanel.jsx   # Single-page admin panel
+├── public/
+│   └── data.json            # Portfolio content (editable)
+└── panel.mjs                # Optional CLI tool for terminal editing
 ```
 
-## License
+---
+
+## ⌨️ Terminal CLI (Optional)
+
+```bash
+node panel.mjs
+```
+
+Manage portfolio content directly from the terminal — useful for bulk edits or scripting.
+
+---
+
+## 🔒 Security Notes
+
+- **No credentials** are stored in this repository
+- Admin panel has **no authentication** — only deploy to trusted environments
+- GitHub token is stored in **your browser's localStorage**, never committed
+- Contact form messages are saved to **localStorage only**
+- Image uploads use **data URLs** — no external storage service
+
+---
+
+## 📄 License
 
 MIT
