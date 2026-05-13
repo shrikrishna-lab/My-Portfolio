@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useStore } from '@/lib/store';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    User, Sparkles, FolderKanban, Award, MessageSquare,
+    User, Sparkles, FolderKanban, Award, MessageSquare, Settings,
     Plus, Pencil, Trash2, X, Save, Image as ImageIcon,
     Github, ExternalLink, UploadCloud, Check, Upload
 } from 'lucide-react';
@@ -20,6 +20,7 @@ const TABS = [
     { id: 'projects', label: 'Projects', icon: FolderKanban },
     { id: 'achievements', label: 'Achievements', icon: Award },
     { id: 'messages', label: 'Messages', icon: MessageSquare },
+    { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
 const emptySkill = { name: '', icon: 'Code', category: 'Frontend' };
