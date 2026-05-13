@@ -3,7 +3,7 @@ import { useStore } from '@/lib/store';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Shield, User, Sparkles, FolderKanban, Award, MessageSquare, Settings, Lock,
-    Plus, Pencil, Trash2, X, Save, Image as ImageIcon,
+    Plus, Pencil, Trash2, X, Save, Image as ImageIcon, Music, Play, Pause,
     Github, ExternalLink, UploadCloud, Check, Upload
 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
@@ -14,12 +14,18 @@ const BRANCH = 'main';
 const TOKEN_KEY = 'github_token';
 const PIN_KEY = 'admin_pin';
 const UNLOCK_KEY = 'admin_unlocked';
+const MUSIC_URL_KEY = 'music_url';
+const MUSIC_NAME_KEY = 'music_name';
 
 function getToken() { try { return localStorage.getItem(TOKEN_KEY) || ''; } catch { return ''; } }
 function getPin() { try { return localStorage.getItem(PIN_KEY) || ''; } catch { return ''; } }
 function setPin(pin) { try { localStorage.setItem(PIN_KEY, pin); } catch {} }
 function isUnlocked() { try { return sessionStorage.getItem(UNLOCK_KEY) === 'true'; } catch { return false; } }
 function setUnlocked(v) { try { sessionStorage.setItem(UNLOCK_KEY, v ? 'true' : ''); } catch {} }
+function getMusicUrl() { try { return localStorage.getItem(MUSIC_URL_KEY) || ''; } catch { return ''; } }
+function getMusicName() { try { return localStorage.getItem(MUSIC_NAME_KEY) || ''; } catch { return ''; } }
+function setMusicUrl(v) { try { localStorage.setItem(MUSIC_URL_KEY, v); } catch {} }
+function setMusicName(v) { try { localStorage.setItem(MUSIC_NAME_KEY, v); } catch {} }
 
 const TABS = [
     { id: 'profile', label: 'Profile', icon: User },
@@ -574,6 +580,27 @@ function SettingsTab() {
 
             <hr className="border-neutral-200" />
 
+            <h2 className="text-xl font-bold text-[#18112E]">Music Player</h2>
+            <p className="text-sm text-neutral-500 font-medium">Set a song to play in the admin panel. Paste any audio URL (MP3, etc.).</p>
+
+            <div className="bg-[#F8F9FA] border border-neutral-200 rounded-[16px] p-5 space-y-4">
+                <div>
+                    <label className="text-xs font-bold text-[#18112E] block mb-1.5">Song Name</label>
+                    <input type="text" defaultValue={getMusicName()} onChange={(e) => setMusicName(e.target.value)} placeholder="My Song" className="w-full bg-white border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
+                </div>
+                <div>
+                    <label className="text-xs font-bold text-[#18112E] block mb-1.5">Audio URL</label>
+                    <input type="text" defaultValue={getMusicUrl()} onChange={(e) => setMusicUrl(e.target.value)} placeholder="https://example.com/song.mp3" className="w-full bg-white border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
+                </div>
+                {getMusicUrl() && (
+                    <div className="flex items-center gap-3 text-sm text-green-600 font-medium">
+                        <Music className="w-4 h-4" /> Song set — refresh the admin panel to see the player.
+                    </div>
+                )}
+            </div>
+
+            <hr className="border-neutral-200" />
+
             <h2 className="text-xl font-bold text-[#18112E]">Admin PIN</h2>
             <p className="text-sm text-neutral-500 font-medium">Set a PIN to protect the admin panel. Anyone visiting /admin will need it.</p>
 
@@ -605,6 +632,46 @@ function SettingsTab() {
                     {msg.text}
                 </div>
             )}
+        </div>
+    );
+}
+
+function MusicBar() {
+    const url = getMusicUrl();
+    const name = getMusicName() || 'Music';
+    const [playing, setPlaying] = useState(false);
+    const audioRef = useRef(null);
+
+    if (!url) return null;
+
+    const toggle = () => {
+        if (!audioRef.current) {
+            audioRef.current = new Audio(url);
+            audioRef.current.loop = true;
+        }
+        if (playing) {
+            audioRef.current.pause();
+        } else {
+            audioRef.current.play().catch(() => {});
+        }
+        setPlaying(!playing);
+    };
+
+    useEffect(() => {
+        return () => {
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current = null;
+            }
+        };
+    }, []);
+
+    return (
+        <div className={`fixed bottom-4 right-4 z-50 flex items-center gap-3 bg-white border-2 border-[#18112E] rounded-[16px] px-4 py-3 shadow-[4px_4px_0_#18112E] transition-all ${playing ? 'bg-[#FFB800]' : ''}`}>
+            <button onClick={toggle} className="w-9 h-9 rounded-[10px] bg-[#18112E] text-white flex items-center justify-center hover:bg-[#FFB800] hover:text-[#18112E] transition-all">
+                {playing ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+            </button>
+            <span className="text-sm font-bold text-[#18112E] max-w-[120px] truncate">{name}</span>
         </div>
     );
 }
@@ -650,6 +717,7 @@ export default function AdminPanel() {
                     </div>
                 </motion.div>
             </div>
+            <MusicBar />
         </div>
         </PinGate>
     );
