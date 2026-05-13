@@ -743,13 +743,18 @@ export default function AdminPanel() {
         <PasswordGate>
         <div className="min-h-screen font-sans relative" style={{ background: getBgVid() || getBgImg() ? undefined : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
             {showBg && getBgVid() && (isYoutubeUrl(getBgVid()) ? (
-                <iframe src={getYoutubeEmbed(getBgVid())} className="fixed inset-0 w-full h-full z-0 pointer-events-none" allow="autoplay; fullscreen" />
+                <iframe src={getYoutubeEmbed(getBgVid())} className="fixed inset-0 w-full h-full z-0 pointer-events-none" allow="autoplay; fullscreen" title="bg" />
             ) : (
-                <video src={getBgVid()} autoPlay loop muted playsInline className="fixed inset-0 w-full h-full object-cover z-0" />
+                <video src={getBgVid()} autoPlay loop muted playsInline className="fixed inset-0 w-full h-full object-cover z-0" onError={(e) => { e.target.style.display = 'none'; }} />
             ))}
-            {showBg && getBgImg() && !getBgVid() && <div className="fixed inset-0 bg-cover bg-center z-0" style={{ backgroundImage: `url(${getBgImg()})` }} />}
-            {showBg && (getBgVid() || getBgImg()) && <div className="fixed inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/40 z-[1]" />}
-            <div className="relative z-10 min-h-screen" style={{ background: getBgVid() || getBgImg() ? undefined : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+            {showBg && getBgImg() && !getBgVid() && (
+                <img src={getBgImg()} className="fixed inset-0 w-full h-full object-cover z-0" alt="" onError={(e) => { e.target.style.display = 'none'; }} />
+            )}
+            {!getBgVid() && !getBgImg() && (
+                <div className="fixed inset-0 z-0 bg-gradient-to-br from-[#667eea] via-[#764ba2] to-[#f093fb] animate-pulse" style={{ animationDuration: '8s' }} />
+            )}
+            {showBg && (getBgVid() || getBgImg()) && <div className="fixed inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60 z-[1]" />}
+            <div className="relative z-10 min-h-screen">
             <header className="h-[60px] bg-white/70 backdrop-blur-xl border-b border-white/20 px-4 md:px-6 flex items-center justify-between sticky top-0 z-50 shadow-sm">
                 <span className="text-lg font-extrabold tracking-tight text-[#18112E]">Admin<span className="text-[#FFB800]">.</span></span>
                 <a href="/" className="text-xs font-bold text-[#18112E]/60 hover:text-[#18112E] transition-colors">View Site</a>
