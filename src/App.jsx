@@ -4,13 +4,7 @@ import PublicLayout from './pages/public/PublicLayout';
 import Home from './pages/public/Home';
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminLogin from './pages/admin/AdminLogin';
-import Dashboard from './pages/admin/Dashboard';
-import ProjectsMgmt from './pages/admin/ProjectsMgmt';
-import SkillsMgmt from './pages/admin/SkillsMgmt';
-import PagesMgmt from './pages/admin/PagesMgmt';
-import AchievementsMgmt from './pages/admin/AchievementsMgmt';
-import MessagesDashboard from './pages/admin/MessagesDashboard';
-import Settings from './pages/admin/Settings';
+import UnifiedPanel from './pages/admin/UnifiedPanel';
 import { useStore } from './lib/store';
 
 const ProtectedRoute = ({ children }) => {
@@ -51,13 +45,7 @@ export default function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<Dashboard />} />
-          <Route path="projects" element={<ProjectsMgmt />} />
-          <Route path="skills" element={<SkillsMgmt />} />
-          <Route path="pages" element={<PagesMgmt />} />
-          <Route path="achievements" element={<AchievementsMgmt />} />
-          <Route path="messages" element={<MessagesDashboard />} />
-          <Route path="settings" element={<Settings />} />
+          <Route index element={<UnifiedPanel />} />
         </Route>
       </Routes>
     </Router>
