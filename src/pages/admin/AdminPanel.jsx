@@ -48,20 +48,25 @@ function ProfileTab() {
         setTimeout(() => setSaved(false), 2000);
     };
 
-    const Field = ({ label, field, multiline }) => {
+    const cls = "w-full bg-[#F8F9FA] border-2 border-transparent focus:border-[#FFB800] focus:bg-white rounded-[12px] px-4 py-3 text-[#18112E] font-medium transition-all focus:outline-none placeholder-neutral-400";
+
+    function set(field, value) {
+        setForm((prev) => ({ ...prev, [field]: value }));
+    }
+
+    function Field({ label, field, multiline }) {
         const val = form[field] || '';
-        const cls = "w-full bg-[#F8F9FA] border-2 border-transparent focus:border-[#FFB800] focus:bg-white rounded-[12px] px-4 py-3 text-[#18112E] font-medium transition-all focus:outline-none placeholder-neutral-400";
         return (
             <div>
                 <label className="text-xs font-bold text-[#18112E] mb-1.5 block">{label}</label>
                 {multiline ? (
-                    <textarea rows={4} value={val} onChange={(e) => setForm({ ...form, [field]: e.target.value })} className={`${cls} resize-y min-h-[100px]`} />
+                    <textarea rows={4} value={val} onChange={(e) => set(field, e.target.value)} className={`${cls} resize-y min-h-[100px]`} />
                 ) : (
-                    <input type="text" value={val} onChange={(e) => setForm({ ...form, [field]: e.target.value })} className={cls} />
+                    <input type="text" value={val} onChange={(e) => set(field, e.target.value)} className={cls} />
                 )}
             </div>
         );
-    };
+    }
 
     if (!profile) return <div className="text-center py-12 text-neutral-400 font-bold">Loading...</div>;
 
@@ -74,24 +79,24 @@ function ProfileTab() {
                 </button>
             </div>
             <div className="grid md:grid-cols-2 gap-4">
-                <Field label="Full Name" field="name" />
-                <Field label="Headline Title" field="title" />
-                <div className="md:col-span-2"><Field label="Brief Introduction" field="intro" multiline /></div>
-                <div className="md:col-span-2"><Field label="Hero Image URL" field="characterImage" /></div>
+                {Field({ label: 'Full Name', field: 'name' })}
+                {Field({ label: 'Headline Title', field: 'title' })}
+                <div className="md:col-span-2">{Field({ label: 'Brief Introduction', field: 'intro', multiline: true })}</div>
+                <div className="md:col-span-2">{Field({ label: 'Hero Image URL', field: 'characterImage' })}</div>
             </div>
             <hr className="border-neutral-100" />
             <h2 className="text-xl font-bold text-[#18112E]">About</h2>
-            <Field label="About You" field="aboutStory" multiline />
+            {Field({ label: 'About You', field: 'aboutStory', multiline: true })}
             <hr className="border-neutral-100" />
             <h2 className="text-xl font-bold text-[#18112E]">Startup Vision</h2>
-            <Field label="Mission Statement" field="startupVision" multiline />
+            {Field({ label: 'Mission Statement', field: 'startupVision', multiline: true })}
             <hr className="border-neutral-100" />
             <h2 className="text-xl font-bold text-[#18112E]">Social Links</h2>
             <div className="grid md:grid-cols-2 gap-4">
-                <Field label="Email" field="email" />
-                <Field label="GitHub" field="github" />
-                <Field label="LinkedIn" field="linkedin" />
-                <Field label="Twitter / X" field="twitter" />
+                {Field({ label: 'Email', field: 'email' })}
+                {Field({ label: 'GitHub', field: 'github' })}
+                {Field({ label: 'LinkedIn', field: 'linkedin' })}
+                {Field({ label: 'Twitter / X', field: 'twitter' })}
             </div>
             <div className="flex justify-end pt-2">
                 <button onClick={handleSave} className="flex items-center gap-2 bg-[#FFB800] text-[#18112E] px-6 py-3 rounded-[12px] font-bold hover:bg-[#ffcc33] transition-all shadow-md text-sm">
