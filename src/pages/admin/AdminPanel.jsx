@@ -687,74 +687,19 @@ function MusicBar() {
     const name = getMusicName() || 'Music';
     const [playing, setPlaying] = useState(false);
     const [error, setError] = useState(false);
-    const [ytLoading, setYtLoading] = useState(false);
     const audioRef = useRef(null);
-    const playerRef = useRef(null);
-    const playerReady = useRef(false);
     const isYt = isYoutubeUrl(url);
-    const vidId = isYt ? (() => {
-        const u = url;
-        if (u.includes('youtu.be/')) return u.split('youtu.be/')[1]?.split(/[?#]/)[0] || '';
-        if (u.includes('youtube.com/embed/')) return u.split('embed/')[1]?.split(/[?#]/)[0] || '';
-        try { return new URL(u).searchParams.get('v') || ''; } catch { return ''; }
-    })() : null;
-
-    useEffect(() => {
-        if (!isYt || !vidId || playerRef.current) return;
-        setYtLoading(true);
-        const id = 'yt-player-' + Math.random().toString(36).slice(2);
-        const div = document.createElement('div');
-        div.id = id;
-        div.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0;pointer-events:none';
-        document.body.appendChild(div);
-
-        const createPlayer = () => {
-            if (!window.YT || !window.YT.Player) { setTimeout(createPlayer, 200); return; }
-            playerRef.current = new window.YT.Player(id, {
-                videoId: vidId,
-                height: '1', width: '1',
-                playerVars: { autoplay: 0, controls: 0, loop: 1, playlist: vidId, rel: 0, showinfo: 0 },
-                events: {
-                    onReady: () => { playerReady.current = true; setYtLoading(false); },
-                    onError: () => { setError(true); setYtLoading(false); },
-                },
-            });
-        };
-
-        if (window.YT && window.YT.Player) {
-            createPlayer();
-        } else {
-            const orig = window.onYouTubeIframeAPIReady;
-            window.onYouTubeIframeAPIReady = () => { if (orig) orig(); createPlayer(); };
-            if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
-                const s = document.createElement('script');
-                s.src = 'https://www.youtube.com/iframe_api';
-                document.body.appendChild(s);
-            }
-        }
-
-        return () => {
-            if (playerRef.current && playerRef.current.destroy) { playerRef.current.destroy(); playerRef.current = null; }
-            playerReady.current = false;
-            const el = document.getElementById(id);
-            if (el) el.remove();
-        };
-    }, [isYt, vidId]);
 
     const toggle = () => {
         if (error) setError(false);
         if (isYt) {
-            if (!playerReady.current) return;
-            if (playing) { playerRef.current.pauseVideo(); }
-            else { playerRef.current.playVideo(); }
-            setPlaying(!playing);
+            window.open(url, '_blank');
             return;
         }
         const el = audioRef.current;
         if (!el) return;
-        if (playing) { el.pause(); }
-        else { el.play().catch(() => { setError(true); setPlaying(false); }); }
-        setPlaying(!playing);
+        if (playing) { el.pause(); setPlaying(false); }
+        else { el.play().then(() => setPlaying(true)).catch(() => { setError(true); setPlaying(false); }); }
     };
 
     if (!url) return null;
@@ -767,8 +712,8 @@ function MusicBar() {
                     {playing && !error && (
                         <span className="absolute inset-0 rounded-[10px] bg-[#FFB800] animate-ping opacity-30" />
                     )}
-                    <button onClick={toggle} disabled={ytLoading} className={`relative w-9 h-9 rounded-[10px] flex items-center justify-center transition-all active:scale-90 disabled:opacity-50 ${playing ? 'bg-[#FFB800] text-[#18112E]' : 'bg-[#18112E] text-white hover:bg-[#FFB800] hover:text-[#18112E]'}`}>
-                        {error ? <AlertCircle className="w-4 h-4" /> : ytLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : playing ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                    <button onClick={toggle} className="relative w-9 h-9 rounded-[10px] flex items-center justify-center transition-all active:scale-90 bg-[#18112E] text-white hover:bg-[#FFB800] hover:text-[#18112E]">
+                        {error ? <AlertCircle className="w-4 h-4" /> : playing ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                     </button>
                 </div>
                 <div className="flex items-center gap-2">
@@ -781,7 +726,7 @@ function MusicBar() {
                         </span>
                     )}
                     <span className={`text-sm font-bold max-w-[120px] truncate ${error ? 'text-red-500' : 'text-[#18112E]'}`}>
-                        {error ? 'Failed to play' : ytLoading ? 'Loading...' : name}
+                        {error ? 'Failed to play' : isYt ? 'Open in YouTube' : name}
                     </span>
                 </div>
             </div>
