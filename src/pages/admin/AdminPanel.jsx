@@ -2,8 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { useStore } from '@/lib/store';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    Shield, User, Sparkles, FolderKanban, Award, MessageSquare, Settings, Lock,
-    Plus, Pencil, Trash2, X, Save, Image as ImageIcon, Music, Play, Pause,
+    Shield, User, Sparkles, FolderKanban, Award, MessageSquare, Settings,
+    Plus, Pencil, Trash2, X, Save, Image as ImageIcon, Music, Play, Pause, Eye, EyeOff, VolumeX,
     Github, ExternalLink, UploadCloud, Check, Upload
 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
@@ -12,20 +12,21 @@ const REPO = 'shrikrishna-lab/My-Portfolio';
 const FILE_PATH = 'public/data.json';
 const BRANCH = 'main';
 const TOKEN_KEY = 'github_token';
-const PIN_KEY = 'admin_pin';
-const UNLOCK_KEY = 'admin_unlocked';
+const ADMIN_PASSWORD = 'admin123';
 const MUSIC_URL_KEY = 'music_url';
 const MUSIC_NAME_KEY = 'music_name';
+const BG_IMG_KEY = 'bg_image';
+const BG_VID_KEY = 'bg_video';
 
 function getToken() { try { return localStorage.getItem(TOKEN_KEY) || ''; } catch { return ''; } }
-function getPin() { try { return localStorage.getItem(PIN_KEY) || ''; } catch { return ''; } }
-function setPin(pin) { try { localStorage.setItem(PIN_KEY, pin); } catch {} }
-function isUnlocked() { try { return sessionStorage.getItem(UNLOCK_KEY) === 'true'; } catch { return false; } }
-function setUnlocked(v) { try { sessionStorage.setItem(UNLOCK_KEY, v ? 'true' : ''); } catch {} }
 function getMusicUrl() { try { return localStorage.getItem(MUSIC_URL_KEY) || ''; } catch { return ''; } }
 function getMusicName() { try { return localStorage.getItem(MUSIC_NAME_KEY) || ''; } catch { return ''; } }
 function setMusicUrl(v) { try { localStorage.setItem(MUSIC_URL_KEY, v); } catch {} }
 function setMusicName(v) { try { localStorage.setItem(MUSIC_NAME_KEY, v); } catch {} }
+function getBgImg() { try { return localStorage.getItem(BG_IMG_KEY) || ''; } catch { return ''; } }
+function getBgVid() { try { return localStorage.getItem(BG_VID_KEY) || ''; } catch { return ''; } }
+function setBgImg(v) { try { localStorage.setItem(BG_IMG_KEY, v); } catch {} }
+function setBgVid(v) { try { localStorage.setItem(BG_VID_KEY, v); } catch {} }
 
 const TABS = [
     { id: 'profile', label: 'Profile', icon: User },
@@ -477,38 +478,41 @@ function MessagesTab() {
     );
 }
 
-function PinGate({ children }) {
-    const [pin, setPin] = useState('');
+function PasswordGate({ children }) {
+    const [input, setInput] = useState('');
     const [error, setError] = useState('');
-    const savedPin = getPin();
+    const [authed, setAuthed] = useState(() => {
+        try { return sessionStorage.getItem('admin_auth') === 'true'; } catch { return false; }
+    });
 
-    if (!savedPin || isUnlocked()) return children;
+    if (authed) return children;
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (pin === savedPin) {
-            setUnlocked(true);
+        if (input === ADMIN_PASSWORD) {
+            try { sessionStorage.setItem('admin_auth', 'true'); } catch {}
+            setAuthed(true);
             setError('');
         } else {
-            setError('Wrong PIN.');
-            setPin('');
+            setError('Wrong password.');
+            setInput('');
         }
     };
 
     return (
-        <div className="min-h-screen bg-[#F8F9FA] flex items-center justify-center p-4 font-sans">
-            <form onSubmit={handleSubmit} className="bg-white border border-neutral-100 rounded-[24px] p-8 shadow-sm w-full max-w-sm space-y-6">
+        <div className="min-h-screen bg-[#F8F9FA] flex items-center justify-center p-4 font-sans" style={getBgImg() ? { backgroundImage: `url(${getBgImg()})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}>
+            <form onSubmit={handleSubmit} className="bg-white/95 backdrop-blur border border-neutral-100 rounded-[24px] p-8 shadow-sm w-full max-w-sm space-y-6">
                 <div className="text-center">
                     <div className="w-14 h-14 bg-[#FFB800] rounded-[16px] flex items-center justify-center mx-auto mb-4">
                         <Shield className="w-7 h-7 text-[#18112E]" />
                     </div>
                     <h1 className="text-2xl font-bold text-[#18112E]">Admin Access</h1>
-                    <p className="text-sm text-neutral-500 font-medium mt-1">Enter the PIN to continue.</p>
+                    <p className="text-sm text-neutral-500 font-medium mt-1">Enter the admin password to continue.</p>
                 </div>
                 {error && (
                     <div className="p-3 bg-red-50 text-red-600 rounded-[12px] text-sm font-bold text-center">{error}</div>
                 )}
-                <input type="password" placeholder="Enter PIN" value={pin} onChange={(e) => setPin(e.target.value)} className="w-full bg-[#F8F9FA] border-2 border-transparent focus:border-[#FFB800] focus:bg-white rounded-[12px] px-4 py-3 text-center text-lg font-bold text-[#18112E] outline-none transition-all tracking-widest" autoFocus />
+                <input type="password" placeholder="Password" value={input} onChange={(e) => setInput(e.target.value)} className="w-full bg-[#F8F9FA] border-2 border-transparent focus:border-[#FFB800] focus:bg-white rounded-[12px] px-4 py-3 text-center text-lg font-bold text-[#18112E] outline-none transition-all tracking-widest" autoFocus />
                 <button type="submit" className="w-full bg-[#FFB800] text-[#18112E] font-bold py-3 rounded-[12px] hover:bg-[#ffcc33] transition-all shadow-md">Unlock</button>
             </form>
         </div>
@@ -517,7 +521,7 @@ function PinGate({ children }) {
 
 function SettingsTab() {
     const [tokenInput, setTokenInput] = useState(getToken());
-    const [pinInput, setPinInput] = useState('');
+
     const [deploying, setDeploying] = useState(false);
     const [msg, setMsg] = useState({ text: '', type: '' });
     const store = useStore;
@@ -581,51 +585,49 @@ function SettingsTab() {
             <hr className="border-neutral-200" />
 
             <h2 className="text-xl font-bold text-[#18112E]">Music Player</h2>
-            <p className="text-sm text-neutral-500 font-medium">Set a song to play in the admin panel. Paste any audio URL (MP3, etc.).</p>
+            <p className="text-sm text-neutral-500 font-medium">Set a song to play in the admin panel.</p>
 
             <div className="bg-[#F8F9FA] border border-neutral-200 rounded-[16px] p-5 space-y-4">
                 <div>
                     <label className="text-xs font-bold text-[#18112E] block mb-1.5">Song Name</label>
-                    <input type="text" defaultValue={getMusicName()} onChange={(e) => setMusicName(e.target.value)} placeholder="My Song" className="w-full bg-white border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
+                    <input type="text" defaultValue={getMusicName()} onChange={(e) => { setMusicName(e.target.value); window.location.reload(); }} placeholder="My Song" className="w-full bg-white border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
                 </div>
                 <div>
                     <label className="text-xs font-bold text-[#18112E] block mb-1.5">Audio URL</label>
-                    <input type="text" defaultValue={getMusicUrl()} onChange={(e) => setMusicUrl(e.target.value)} placeholder="https://example.com/song.mp3" className="w-full bg-white border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
+                    <input type="text" defaultValue={getMusicUrl()} onChange={(e) => { setMusicUrl(e.target.value); window.location.reload(); }} placeholder="https://example.com/song.mp3" className="w-full bg-white border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
                 </div>
                 {getMusicUrl() && (
                     <div className="flex items-center gap-3 text-sm text-green-600 font-medium">
-                        <Music className="w-4 h-4" /> Song set — refresh the admin panel to see the player.
+                        <Music className="w-4 h-4" /> Song set. Music button appears at bottom-right.
                     </div>
                 )}
             </div>
 
             <hr className="border-neutral-200" />
 
-            <h2 className="text-xl font-bold text-[#18112E]">Admin PIN</h2>
-            <p className="text-sm text-neutral-500 font-medium">Set a PIN to protect the admin panel. Anyone visiting /admin will need it.</p>
+            <h2 className="text-xl font-bold text-[#18112E]">Background</h2>
+            <p className="text-sm text-neutral-500 font-medium">Set a background image or video for the admin panel.</p>
 
             <div className="bg-[#F8F9FA] border border-neutral-200 rounded-[16px] p-5 space-y-4">
-                <div className="flex gap-2">
-                    <input type="text" value={pinInput} onChange={(e) => setPinInput(e.target.value)} placeholder={getPin() ? 'Enter new PIN to change' : 'Set a PIN (e.g. 1234)'} maxLength={10} className="flex-1 bg-white border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
-                    <button onClick={() => {
-                        if (!pinInput.trim()) { setMsg({ text: 'Enter a PIN first.', type: 'error' }); return; }
-                        setPin(pinInput.trim());
-                        setPinInput('');
-                        setMsg({ text: 'PIN saved. Close this tab to test it.', type: 'success' });
-                        setTimeout(() => setMsg({ text: '', type: '' }), 4000);
-                    }} className="bg-[#18112E] text-white px-5 py-3 rounded-[12px] text-sm font-bold hover:bg-[#FFB800] hover:text-[#18112E] transition-all">Set PIN</button>
-                    {getPin() && (
-                        <button onClick={() => {
-                            setPin('');
-                            setMsg({ text: 'PIN removed. Admin panel is now open.', type: 'success' });
-                            setTimeout(() => setMsg({ text: '', type: '' }), 3000);
-                        }} className="bg-red-50 text-red-600 px-5 py-3 rounded-[12px] text-sm font-bold hover:bg-red-100 transition-all">Remove</button>
-                    )}
+                <div>
+                    <label className="text-xs font-bold text-[#18112E] block mb-1.5">Background Image URL</label>
+                    <input type="text" defaultValue={getBgImg()} onChange={(e) => { setBgImg(e.target.value); window.location.reload(); }} placeholder="https://example.com/bg.jpg" className="w-full bg-white border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
                 </div>
-                {getPin() && (
-                    <p className="text-[11px] text-green-600 font-medium">PIN is active. Session unlocks per browser tab.</p>
+                <div>
+                    <label className="text-xs font-bold text-[#18112E] block mb-1.5">Background Video URL (overrides image)</label>
+                    <input type="text" defaultValue={getBgVid()} onChange={(e) => { setBgVid(e.target.value); window.location.reload(); }} placeholder="https://example.com/bg.mp4" className="w-full bg-white border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
+                </div>
+                {(getBgImg() || getBgVid()) && (
+                    <div className="flex items-center gap-3 text-sm text-green-600 font-medium">
+                        <ImageIcon className="w-4 h-4" /> Background set. Toggle it from the floating buttons.
+                    </div>
                 )}
             </div>
+
+            <hr className="border-neutral-200" />
+
+            <h2 className="text-xl font-bold text-[#18112E]">Admin Password</h2>
+            <p className="text-sm text-neutral-500 font-medium">The password is hardcoded — change it in <code className="bg-neutral-200 px-1.5 py-0.5 rounded text-xs">AdminPanel.jsx</code> (look for <code className="bg-neutral-200 px-1.5 py-0.5 rounded text-xs">ADMIN_PASSWORD</code>) and redeploy. Current password works on all devices.</p>
 
             {msg.text && (
                 <div className={`rounded-[12px] p-4 text-sm font-bold ${msg.type === 'error' ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-700'}`}>
@@ -678,11 +680,16 @@ function MusicBar() {
 
 export default function AdminPanel() {
     const [activeTab, setActiveTab] = useState('profile');
+    const [showBg, setShowBg] = useState(true);
+    const [showMusic, setShowMusic] = useState(true);
 
     return (
-        <PinGate>
-        <div className="min-h-screen bg-[#F8F9FA] font-sans">
-            <header className="h-[60px] bg-white border-b border-neutral-100 px-4 md:px-6 flex items-center justify-between sticky top-0 z-50 shadow-sm">
+        <PasswordGate>
+        <div className="min-h-screen bg-[#F8F9FA] font-sans relative">
+            {showBg && getBgVid() && <video src={getBgVid()} autoPlay loop muted playsInline className="fixed inset-0 w-full h-full object-cover z-0" />}
+            {showBg && getBgImg() && !getBgVid() && <div className="fixed inset-0 bg-cover bg-center z-0" style={{ backgroundImage: `url(${getBgImg()})` }} />}
+            <div className="relative z-10">
+            <header className="h-[60px] bg-white/90 backdrop-blur border-b border-neutral-100 px-4 md:px-6 flex items-center justify-between sticky top-0 z-50 shadow-sm">
                 <span className="text-lg font-extrabold tracking-tight text-[#18112E]">Admin<span className="text-[#FFB800]">.</span></span>
                 <a href="/" className="text-xs font-bold text-neutral-500 hover:text-[#18112E] transition-colors">View Site</a>
             </header>
@@ -699,7 +706,7 @@ export default function AdminPanel() {
                     {TABS.map((tab) => {
                         const isActive = activeTab === tab.id;
                         return (
-                            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-[12px] text-sm font-bold transition-all whitespace-nowrap shrink-0 ${isActive ? 'bg-[#FFB800] text-[#18112E] shadow-md' : 'bg-white text-neutral-500 border border-neutral-100 hover:border-[#FFB800] hover:text-[#18112E]'}`}>
+                            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-[12px] text-sm font-bold transition-all whitespace-nowrap shrink-0 ${isActive ? 'bg-[#FFB800] text-[#18112E] shadow-md' : 'bg-white/90 backdrop-blur text-neutral-500 border border-neutral-100 hover:border-[#FFB800] hover:text-[#18112E]'}`}>
                                 <tab.icon className="w-4 h-4" /> {tab.label}
                             </button>
                         );
@@ -707,7 +714,7 @@ export default function AdminPanel() {
                 </div>
 
                 <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.15 }}>
-                    <div className="bg-white border border-neutral-100 rounded-[20px] p-6 shadow-sm">
+                    <div className="bg-white/95 backdrop-blur border border-neutral-100 rounded-[20px] p-6 shadow-sm">
                         {activeTab === 'profile' && <ProfileTab />}
                         {activeTab === 'skills' && <SkillsTab />}
                         {activeTab === 'projects' && <ProjectsTab />}
@@ -717,8 +724,17 @@ export default function AdminPanel() {
                     </div>
                 </motion.div>
             </div>
-            <MusicBar />
+            {showMusic && <MusicBar />}
+            <div className="fixed bottom-4 left-4 z-50 flex gap-2">
+                <button onClick={() => setShowBg(!showBg)} className="w-10 h-10 rounded-[12px] bg-white border-2 border-[#18112E] shadow-[2px_2px_0_#18112E] flex items-center justify-center hover:bg-[#FFB800] transition-all text-[#18112E]" title="Toggle Background">
+                    {showBg ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                </button>
+                <button onClick={() => setShowMusic(!showMusic)} className="w-10 h-10 rounded-[12px] bg-white border-2 border-[#18112E] shadow-[2px_2px_0_#18112E] flex items-center justify-center hover:bg-[#FFB800] transition-all text-[#18112E]" title="Toggle Music">
+                    {showMusic ? <Music className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+                </button>
+            </div>
+            </div>
         </div>
-        </PinGate>
+        </PasswordGate>
     );
 }
