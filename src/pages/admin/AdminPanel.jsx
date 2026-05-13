@@ -687,8 +687,17 @@ function MusicBar() {
     const name = getMusicName() || 'Music';
     const [playing, setPlaying] = useState(false);
     const audioRef = useRef(null);
+    const ytRef = useRef(null);
+    const ytReady = useRef(false);
+    const isYt = isYoutubeUrl(url);
 
     const toggle = () => {
+        if (isYt && ytRef.current) {
+            if (playing) { ytRef.current.pauseVideo(); }
+            else { ytRef.current.playVideo(); }
+            setPlaying(!playing);
+            return;
+        }
         const el = audioRef.current;
         if (!el) return;
         if (playing) { el.pause(); }
@@ -697,19 +706,44 @@ function MusicBar() {
     };
 
     useEffect(() => {
-        const el = audioRef.current;
-        if (!el) return;
-        const onEnd = () => { el.currentTime = 0; el.play().catch(() => {}); };
-        el.addEventListener('ended', onEnd);
-        return () => { el.removeEventListener('ended', onEnd); el.pause(); };
-    }, []);
+        if (!url) return;
+        if (isYt) {
+            if (!window.YT) {
+                const tag = document.createElement('script');
+                tag.src = 'https://www.youtube.com/iframe_api';
+                document.body.appendChild(tag);
+            }
+            const onReady = () => { ytReady.current = true; };
+            if (window.YT && window.YT.Player) {
+                ytRef.current = new window.YT.Player('yt-music-player', {
+                    height: '0', width: '0',
+                    videoId: getYoutubeEmbed(url).split('/embed/')[1]?.split('?')[0],
+                    playerVars: { autoplay: 0, controls: 0, loop: 1, playlist: getYoutubeEmbed(url).split('/embed/')[1]?.split('?')[0] },
+                    events: { onReady },
+                });
+            } else {
+                window.onYouTubeIframeAPIReady = () => {
+                    ytRef.current = new window.YT.Player('yt-music-player', {
+                        height: '0', width: '0',
+                        videoId: getYoutubeEmbed(url).split('/embed/')[1]?.split('?')[0],
+                        playerVars: { autoplay: 0, controls: 0, loop: 1, playlist: getYoutubeEmbed(url).split('/embed/')[1]?.split('?')[0] },
+                        events: { onReady },
+                    });
+                };
+            }
+        }
+        return () => {
+            if (ytRef.current && ytRef.current.destroy) ytRef.current.destroy();
+            if (audioRef.current) audioRef.current.pause();
+        };
+    }, [url, isYt]);
 
     if (!url) return null;
 
     return (
         <>
-            <audio ref={audioRef} src={url} loop preload="auto" />
-            <div className={`fixed bottom-4 right-4 z-50 flex items-center gap-3 bg-white border-2 border-[#18112E] rounded-[16px] px-4 py-3 shadow-[4px_4px_0_#18112E] transition-all ${playing ? 'bg-[#FFB800]' : ''}`}>
+            {isYt ? <div id="yt-music-player" className="hidden" /> : <audio ref={audioRef} src={url} loop preload="auto" />}
+            <div className={`fixed bottom-4 right-4 z-50 flex items-center gap-3 bg-white/80 backdrop-blur-md border-2 border-[#18112E] rounded-[16px] px-4 py-3 shadow-[4px_4px_0_#18112E] transition-all ${playing ? 'bg-[#FFB800]/80' : ''}`}>
                 <button onClick={toggle} className="w-9 h-9 rounded-[10px] bg-[#18112E] text-white flex items-center justify-center hover:bg-[#FFB800] hover:text-[#18112E] transition-all">
                     {playing ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                 </button>
@@ -733,17 +767,17 @@ export default function AdminPanel() {
                 <video src={getBgVid()} autoPlay loop muted playsInline className="fixed inset-0 w-full h-full object-cover z-0" />
             ))}
             {showBg && getBgImg() && !getBgVid() && <div className="fixed inset-0 bg-cover bg-center z-0" style={{ backgroundImage: `url(${getBgImg()})` }} />}
-            <div className="relative z-10">
-            <header className="h-[60px] bg-white/90 backdrop-blur border-b border-neutral-100 px-4 md:px-6 flex items-center justify-between sticky top-0 z-50 shadow-sm">
+            <div className="relative z-10 min-h-screen">
+            <header className="h-[60px] bg-white/60 backdrop-blur-xl border-b border-white/20 px-4 md:px-6 flex items-center justify-between sticky top-0 z-50 shadow-sm">
                 <span className="text-lg font-extrabold tracking-tight text-[#18112E]">Admin<span className="text-[#FFB800]">.</span></span>
-                <a href="/" className="text-xs font-bold text-neutral-500 hover:text-[#18112E] transition-colors">View Site</a>
+                <a href="/" className="text-xs font-bold text-neutral-600 hover:text-[#18112E] transition-colors">View Site</a>
             </header>
 
             <div className="max-w-[1200px] mx-auto p-4 md:p-8">
-                <div className="flex items-center justify-between pb-4 border-b border-neutral-200 mb-6">
+                <div className="flex items-center justify-between pb-4 border-b border-white/20 mb-6">
                     <div>
-                        <h1 className="text-2xl md:text-3xl font-bold text-[#18112E] tracking-tight">Control Panel</h1>
-                        <p className="text-neutral-500 mt-1 font-medium text-sm">Manage your portfolio — no database needed.</p>
+                        <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow-[2px_2px_0_rgba(24,17,46,0.5)] tracking-tight">Control Panel</h1>
+                        <p className="text-white/80 mt-1 font-medium text-sm drop-shadow-sm">Manage your portfolio — no database needed.</p>
                     </div>
                 </div>
 
@@ -751,7 +785,7 @@ export default function AdminPanel() {
                     {TABS.map((tab) => {
                         const isActive = activeTab === tab.id;
                         return (
-                            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-[12px] text-sm font-bold transition-all whitespace-nowrap shrink-0 ${isActive ? 'bg-[#FFB800] text-[#18112E] shadow-md' : 'bg-white/90 backdrop-blur text-neutral-500 border border-neutral-100 hover:border-[#FFB800] hover:text-[#18112E]'}`}>
+                            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-[12px] text-sm font-bold transition-all whitespace-nowrap shrink-0 ${isActive ? 'bg-[#FFB800]/90 backdrop-blur-md text-[#18112E] shadow-md' : 'bg-white/30 backdrop-blur-md text-white border border-white/20 hover:bg-white/50 hover:border-[#FFB800] hover:text-[#18112E]'}`}>
                                 <tab.icon className="w-4 h-4" /> {tab.label}
                             </button>
                         );
@@ -759,7 +793,7 @@ export default function AdminPanel() {
                 </div>
 
                 <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.15 }}>
-                    <div className="bg-white/95 backdrop-blur border border-neutral-100 rounded-[20px] p-6 shadow-sm">
+                    <div className="bg-white/70 backdrop-blur-xl border border-white/20 rounded-[20px] p-6 shadow-lg shadow-black/10">
                         {activeTab === 'profile' && <ProfileTab />}
                         {activeTab === 'skills' && <SkillsTab />}
                         {activeTab === 'projects' && <ProjectsTab />}
@@ -771,10 +805,10 @@ export default function AdminPanel() {
             </div>
             {showMusic && <MusicBar />}
             <div className="fixed bottom-4 left-4 z-50 flex gap-2">
-                <button onClick={() => setShowBg(!showBg)} className="w-10 h-10 rounded-[12px] bg-white border-2 border-[#18112E] shadow-[2px_2px_0_#18112E] flex items-center justify-center hover:bg-[#FFB800] transition-all text-[#18112E]" title="Toggle Background">
+                <button onClick={() => setShowBg(!showBg)} className="w-10 h-10 rounded-[12px] bg-white/80 backdrop-blur-md border-2 border-[#18112E] shadow-[2px_2px_0_#18112E] flex items-center justify-center hover:bg-[#FFB800] transition-all text-[#18112E]" title="Toggle Background">
                     {showBg ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                 </button>
-                <button onClick={() => setShowMusic(!showMusic)} className="w-10 h-10 rounded-[12px] bg-white border-2 border-[#18112E] shadow-[2px_2px_0_#18112E] flex items-center justify-center hover:bg-[#FFB800] transition-all text-[#18112E]" title="Toggle Music">
+                <button onClick={() => setShowMusic(!showMusic)} className="w-10 h-10 rounded-[12px] bg-white/80 backdrop-blur-md border-2 border-[#18112E] shadow-[2px_2px_0_#18112E] flex items-center justify-center hover:bg-[#FFB800] transition-all text-[#18112E]" title="Toggle Music">
                     {showMusic ? <Music className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
                 </button>
             </div>
