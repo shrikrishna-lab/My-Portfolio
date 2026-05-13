@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useStore } from '@/lib/store';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    User, Sparkles, FolderKanban, Award, MessageSquare, Settings,
+    Shield, User, Sparkles, FolderKanban, Award, MessageSquare, Settings, Lock,
     Plus, Pencil, Trash2, X, Save, Image as ImageIcon,
     Github, ExternalLink, UploadCloud, Check, Upload
 } from 'lucide-react';
@@ -12,7 +12,14 @@ const REPO = 'shrikrishna-lab/My-Portfolio';
 const FILE_PATH = 'public/data.json';
 const BRANCH = 'main';
 const TOKEN_KEY = 'github_token';
+const PIN_KEY = 'admin_pin';
+const UNLOCK_KEY = 'admin_unlocked';
+
 function getToken() { try { return localStorage.getItem(TOKEN_KEY) || ''; } catch { return ''; } }
+function getPin() { try { return localStorage.getItem(PIN_KEY) || ''; } catch { return ''; } }
+function setPin(pin) { try { localStorage.setItem(PIN_KEY, pin); } catch {} }
+function isUnlocked() { try { return sessionStorage.getItem(UNLOCK_KEY) === 'true'; } catch { return false; } }
+function setUnlocked(v) { try { sessionStorage.setItem(UNLOCK_KEY, v ? 'true' : ''); } catch {} }
 
 const TABS = [
     { id: 'profile', label: 'Profile', icon: User },
@@ -65,9 +72,9 @@ function ProfileTab() {
                 ) : (
                     <input type="text" value={val} onChange={(e) => set(field, e.target.value)} className={cls} />
                 )}
-            </div>
-        );
-    }
+        </div>
+    );
+}
 
     if (!profile) return <div className="text-center py-12 text-neutral-400 font-bold">Loading...</div>;
 
@@ -464,8 +471,47 @@ function MessagesTab() {
     );
 }
 
+function PinGate({ children }) {
+    const [pin, setPin] = useState('');
+    const [error, setError] = useState('');
+    const savedPin = getPin();
+
+    if (!savedPin || isUnlocked()) return children;
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (pin === savedPin) {
+            setUnlocked(true);
+            setError('');
+        } else {
+            setError('Wrong PIN.');
+            setPin('');
+        }
+    };
+
+    return (
+        <div className="min-h-screen bg-[#F8F9FA] flex items-center justify-center p-4 font-sans">
+            <form onSubmit={handleSubmit} className="bg-white border border-neutral-100 rounded-[24px] p-8 shadow-sm w-full max-w-sm space-y-6">
+                <div className="text-center">
+                    <div className="w-14 h-14 bg-[#FFB800] rounded-[16px] flex items-center justify-center mx-auto mb-4">
+                        <Shield className="w-7 h-7 text-[#18112E]" />
+                    </div>
+                    <h1 className="text-2xl font-bold text-[#18112E]">Admin Access</h1>
+                    <p className="text-sm text-neutral-500 font-medium mt-1">Enter the PIN to continue.</p>
+                </div>
+                {error && (
+                    <div className="p-3 bg-red-50 text-red-600 rounded-[12px] text-sm font-bold text-center">{error}</div>
+                )}
+                <input type="password" placeholder="Enter PIN" value={pin} onChange={(e) => setPin(e.target.value)} className="w-full bg-[#F8F9FA] border-2 border-transparent focus:border-[#FFB800] focus:bg-white rounded-[12px] px-4 py-3 text-center text-lg font-bold text-[#18112E] outline-none transition-all tracking-widest" autoFocus />
+                <button type="submit" className="w-full bg-[#FFB800] text-[#18112E] font-bold py-3 rounded-[12px] hover:bg-[#ffcc33] transition-all shadow-md">Unlock</button>
+            </form>
+        </div>
+    );
+}
+
 function SettingsTab() {
     const [tokenInput, setTokenInput] = useState(getToken());
+    const [pinInput, setPinInput] = useState('');
     const [deploying, setDeploying] = useState(false);
     const [msg, setMsg] = useState({ text: '', type: '' });
     const store = useStore;
@@ -526,6 +572,34 @@ function SettingsTab() {
                 </div>
             </div>
 
+            <hr className="border-neutral-200" />
+
+            <h2 className="text-xl font-bold text-[#18112E]">Admin PIN</h2>
+            <p className="text-sm text-neutral-500 font-medium">Set a PIN to protect the admin panel. Anyone visiting /admin will need it.</p>
+
+            <div className="bg-[#F8F9FA] border border-neutral-200 rounded-[16px] p-5 space-y-4">
+                <div className="flex gap-2">
+                    <input type="text" value={pinInput} onChange={(e) => setPinInput(e.target.value)} placeholder={getPin() ? 'Enter new PIN to change' : 'Set a PIN (e.g. 1234)'} maxLength={10} className="flex-1 bg-white border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
+                    <button onClick={() => {
+                        if (!pinInput.trim()) { setMsg({ text: 'Enter a PIN first.', type: 'error' }); return; }
+                        setPin(pinInput.trim());
+                        setPinInput('');
+                        setMsg({ text: 'PIN saved. Close this tab to test it.', type: 'success' });
+                        setTimeout(() => setMsg({ text: '', type: '' }), 4000);
+                    }} className="bg-[#18112E] text-white px-5 py-3 rounded-[12px] text-sm font-bold hover:bg-[#FFB800] hover:text-[#18112E] transition-all">Set PIN</button>
+                    {getPin() && (
+                        <button onClick={() => {
+                            setPin('');
+                            setMsg({ text: 'PIN removed. Admin panel is now open.', type: 'success' });
+                            setTimeout(() => setMsg({ text: '', type: '' }), 3000);
+                        }} className="bg-red-50 text-red-600 px-5 py-3 rounded-[12px] text-sm font-bold hover:bg-red-100 transition-all">Remove</button>
+                    )}
+                </div>
+                {getPin() && (
+                    <p className="text-[11px] text-green-600 font-medium">PIN is active. Session unlocks per browser tab.</p>
+                )}
+            </div>
+
             {msg.text && (
                 <div className={`rounded-[12px] p-4 text-sm font-bold ${msg.type === 'error' ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-700'}`}>
                     {msg.text}
@@ -539,6 +613,7 @@ export default function AdminPanel() {
     const [activeTab, setActiveTab] = useState('profile');
 
     return (
+        <PinGate>
         <div className="min-h-screen bg-[#F8F9FA] font-sans">
             <header className="h-[60px] bg-white border-b border-neutral-100 px-4 md:px-6 flex items-center justify-between sticky top-0 z-50 shadow-sm">
                 <span className="text-lg font-extrabold tracking-tight text-[#18112E]">Admin<span className="text-[#FFB800]">.</span></span>
@@ -576,5 +651,6 @@ export default function AdminPanel() {
                 </motion.div>
             </div>
         </div>
+        </PinGate>
     );
 }
