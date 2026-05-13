@@ -27,6 +27,14 @@ function getBgImg() { try { return localStorage.getItem(BG_IMG_KEY) || ''; } cat
 function getBgVid() { try { return localStorage.getItem(BG_VID_KEY) || ''; } catch { return ''; } }
 function setBgImg(v) { try { localStorage.setItem(BG_IMG_KEY, v); } catch {} }
 function setBgVid(v) { try { localStorage.setItem(BG_VID_KEY, v); } catch {} }
+function isYoutubeUrl(url) { return url && (url.includes('youtube.com/watch') || url.includes('youtu.be/') || url.includes('youtube.com/embed')); }
+function getYoutubeEmbed(url) {
+  let id = '';
+  if (url.includes('youtu.be/')) id = url.split('youtu.be/')[1]?.split('?')[0] || '';
+  else if (url.includes('youtube.com/watch')) id = new URL(url).searchParams.get('v') || '';
+  else if (url.includes('youtube.com/embed')) return url;
+  return id ? `https://www.youtube.com/embed/${id}?autoplay=1&loop=1&mute=1&controls=0&playlist=${id}` : '';
+}
 
 const TABS = [
     { id: 'profile', label: 'Profile', icon: User },
@@ -593,7 +601,7 @@ function SettingsTab() {
                     <input type="text" defaultValue={getMusicName()} onChange={(e) => { setMusicName(e.target.value); window.location.reload(); }} placeholder="My Song" className="w-full bg-white border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
                 </div>
                 <div>
-                    <label className="text-xs font-bold text-[#18112E] block mb-1.5">Audio URL or Upload</label>
+                    <label className="text-xs font-bold text-[#18112E] block mb-1.5">Audio URL or Upload (YouTube not supported for audio)</label>
                     <div className="flex gap-2">
                         <input type="text" defaultValue={getMusicUrl()} onChange={(e) => { setMusicUrl(e.target.value); window.location.reload(); }} placeholder="https://example.com/song.mp3" className="flex-1 bg-white border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
                         <label className="flex items-center gap-1.5 px-4 bg-[#18112E] text-white rounded-[12px] text-xs font-bold cursor-pointer hover:bg-[#FFB800] hover:text-[#18112E] transition-all whitespace-nowrap">
@@ -638,9 +646,9 @@ function SettingsTab() {
                     </div>
                 </div>
                 <div>
-                    <label className="text-xs font-bold text-[#18112E] block mb-1.5">Background Video — URL or Upload (overrides image)</label>
+                    <label className="text-xs font-bold text-[#18112E] block mb-1.5">Background Video — URL or Upload (YouTube supported!)</label>
                     <div className="flex gap-2">
-                        <input type="text" defaultValue={getBgVid()} onChange={(e) => { setBgVid(e.target.value); window.location.reload(); }} placeholder="https://example.com/bg.mp4" className="flex-1 bg-white border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
+                        <input type="text" defaultValue={getBgVid()} onChange={(e) => { setBgVid(e.target.value); window.location.reload(); }} placeholder="https://youtube.com/watch?v=... or https://example.com/bg.mp4" className="flex-1 bg-white border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
                         <label className="flex items-center gap-1.5 px-4 bg-[#18112E] text-white rounded-[12px] text-xs font-bold cursor-pointer hover:bg-[#FFB800] hover:text-[#18112E] transition-all whitespace-nowrap">
                             <UploadCloud className="w-4 h-4" /> Upload
                             <input type="file" accept="video/*" className="hidden" onChange={(e) => {
@@ -722,7 +730,11 @@ export default function AdminPanel() {
     return (
         <PasswordGate>
         <div className="min-h-screen bg-[#F8F9FA] font-sans relative">
-            {showBg && getBgVid() && <video src={getBgVid()} autoPlay loop muted playsInline className="fixed inset-0 w-full h-full object-cover z-0" />}
+            {showBg && getBgVid() && (isYoutubeUrl(getBgVid()) ? (
+                <iframe src={getYoutubeEmbed(getBgVid())} className="fixed inset-0 w-full h-full z-0 pointer-events-none" allow="autoplay; fullscreen" />
+            ) : (
+                <video src={getBgVid()} autoPlay loop muted playsInline className="fixed inset-0 w-full h-full object-cover z-0" />
+            ))}
             {showBg && getBgImg() && !getBgVid() && <div className="fixed inset-0 bg-cover bg-center z-0" style={{ backgroundImage: `url(${getBgImg()})` }} />}
             <div className="relative z-10">
             <header className="h-[60px] bg-white/90 backdrop-blur border-b border-neutral-100 px-4 md:px-6 flex items-center justify-between sticky top-0 z-50 shadow-sm">
