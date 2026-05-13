@@ -714,14 +714,19 @@ function MusicBar() {
     return (
         <>
             {isYt && vidId ? (
-                <iframe ref={iframeRef} src={`https://www.youtube.com/embed/${vidId}?autoplay=0&controls=0&loop=1&playlist=${vidId}&enablejsapi=1`} className="hidden" title="yt" />
+                <iframe ref={iframeRef} src={`https://www.youtube.com/embed/${vidId}?autoplay=0&controls=0&loop=1&playlist=${vidId}&enablejsapi=1`} style={{ position: 'absolute', width: 1, height: 1, opacity: 0, pointerEvents: 'none' }} title="yt" />
             ) : (
                 <audio ref={audioRef} src={url} loop preload="auto" />
             )}
             <div className={`fixed bottom-4 right-4 z-50 flex items-center gap-3 bg-white/80 backdrop-blur-xl border-2 border-[#18112E] rounded-[16px] px-4 py-3 shadow-[4px_4px_0_#18112E] transition-all duration-300 hover:-translate-y-1 ${playing ? 'bg-[#FFB800]/90 shadow-[4px_6px_0_#18112E]' : ''}`}>
-                <button onClick={toggle} className="w-9 h-9 rounded-[10px] bg-[#18112E] text-white flex items-center justify-center hover:bg-[#FFB800] hover:text-[#18112E] transition-all active:scale-90">
-                    {error ? <AlertCircle className="w-4 h-4" /> : playing ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                </button>
+                <div className="relative">
+                    {playing && !error && (
+                        <span className="absolute inset-0 rounded-[10px] bg-[#FFB800] animate-ping opacity-30" />
+                    )}
+                    <button onClick={toggle} className={`relative w-9 h-9 rounded-[10px] flex items-center justify-center transition-all active:scale-90 ${playing ? 'bg-[#FFB800] text-[#18112E]' : 'bg-[#18112E] text-white hover:bg-[#FFB800] hover:text-[#18112E]'}`}>
+                        {error ? <AlertCircle className="w-4 h-4" /> : playing ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                    </button>
+                </div>
                 <div className="flex items-center gap-2">
                     {playing && !error && (
                         <span className="flex items-end gap-[2px] h-4">
@@ -747,7 +752,7 @@ export default function AdminPanel() {
 
     return (
         <PasswordGate>
-        <div className="min-h-screen bg-[#F8F9FA] font-sans relative">
+        <div className="min-h-screen font-sans relative" style={{ background: getBgVid() || getBgImg() ? undefined : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
             {showBg && getBgVid() && (isYoutubeUrl(getBgVid()) ? (
                 <iframe src={getYoutubeEmbed(getBgVid())} className="fixed inset-0 w-full h-full z-0 pointer-events-none" allow="autoplay; fullscreen" />
             ) : (
@@ -755,17 +760,17 @@ export default function AdminPanel() {
             ))}
             {showBg && getBgImg() && !getBgVid() && <div className="fixed inset-0 bg-cover bg-center z-0" style={{ backgroundImage: `url(${getBgImg()})` }} />}
             {showBg && (getBgVid() || getBgImg()) && <div className="fixed inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/40 z-[1]" />}
-            <div className="relative z-10 min-h-screen">
-            <header className="h-[60px] bg-white/60 backdrop-blur-xl border-b border-white/20 px-4 md:px-6 flex items-center justify-between sticky top-0 z-50 shadow-sm">
+            <div className="relative z-10 min-h-screen" style={{ background: getBgVid() || getBgImg() ? undefined : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+            <header className="h-[60px] bg-white/70 backdrop-blur-xl border-b border-white/20 px-4 md:px-6 flex items-center justify-between sticky top-0 z-50 shadow-sm">
                 <span className="text-lg font-extrabold tracking-tight text-[#18112E]">Admin<span className="text-[#FFB800]">.</span></span>
-                <a href="/" className="text-xs font-bold text-neutral-600 hover:text-[#18112E] transition-colors">View Site</a>
+                <a href="/" className="text-xs font-bold text-[#18112E]/60 hover:text-[#18112E] transition-colors">View Site</a>
             </header>
 
             <div className="max-w-[1200px] mx-auto p-4 md:p-8">
                 <div className="flex items-center justify-between pb-4 border-b border-white/20 mb-6">
                     <div>
-                        <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow-[2px_2px_0_rgba(24,17,46,0.5)] tracking-tight">Control Panel</h1>
-                        <p className="text-white/80 mt-1 font-medium text-sm drop-shadow-sm">Manage your portfolio — no database needed.</p>
+                        <h1 className="text-2xl md:text-3xl font-bold text-[#18112E] tracking-tight">Control Panel</h1>
+                        <p className="text-[#18112E]/70 mt-1 font-medium text-sm">Manage your portfolio — no database needed.</p>
                     </div>
                 </div>
 
@@ -773,7 +778,7 @@ export default function AdminPanel() {
                     {TABS.map((tab) => {
                         const isActive = activeTab === tab.id;
                         return (
-                            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-[12px] text-sm font-bold transition-all whitespace-nowrap shrink-0 ${isActive ? 'bg-[#FFB800]/90 backdrop-blur-md text-[#18112E] shadow-md' : 'bg-white/30 backdrop-blur-md text-white border border-white/20 hover:bg-white/50 hover:border-[#FFB800] hover:text-[#18112E]'}`}>
+                            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-[12px] text-sm font-bold transition-all whitespace-nowrap shrink-0 ${isActive ? 'bg-[#FFB800]/90 backdrop-blur-md text-[#18112E] shadow-md' : 'bg-white/60 backdrop-blur-md text-[#18112E]/70 border border-white/30 hover:bg-white/80 hover:border-[#FFB800] hover:text-[#18112E]'}`}>
                                 <tab.icon className="w-4 h-4" /> {tab.label}
                             </button>
                         );
@@ -781,7 +786,7 @@ export default function AdminPanel() {
                 </div>
 
                 <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.15 }}>
-                    <div className="bg-white/70 backdrop-blur-xl border border-white/20 rounded-[20px] p-6 shadow-lg shadow-black/10">
+                    <div className="bg-white/70 backdrop-blur-xl border border-white/30 rounded-[20px] p-6 shadow-lg shadow-black/10">
                         {activeTab === 'profile' && <ProfileTab />}
                         {activeTab === 'skills' && <SkillsTab />}
                         {activeTab === 'projects' && <ProjectsTab />}
