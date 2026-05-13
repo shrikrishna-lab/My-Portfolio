@@ -48,8 +48,8 @@ Navigate to `/admin/login` and sign in with:
 
 | Field    | Value                                |
 | -------- | ------------------------------------ |
-| Email    | handibagshrikrishna@gmail.com         |
-| Password | shrikrishna@admin77                   |
+| Email    | xxxxxxxx@admin.com         |
+| Password | xxxxxxxxxxxxxx                   |
 
 Once logged in, all changes are saved automatically to `localStorage`.
 
