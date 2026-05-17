@@ -12,7 +12,8 @@ function generateShapes(count) {
     }));
 }
 
-const shapes = typeof window !== 'undefined' ? generateShapes(15) : [];
+const shapeCount = typeof window !== 'undefined' && window.innerWidth < 768 ? 6 : 15;
+const shapes = typeof window !== 'undefined' ? generateShapes(shapeCount) : [];
 
 export default function BackgroundScene() {
     const { scrollY } = useScroll();

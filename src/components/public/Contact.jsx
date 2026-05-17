@@ -24,7 +24,7 @@ export default function Contact() {
     };
 
     return (
-        <section id="contact" className="py-32 px-4 relative overflow-hidden bg-[#FFB800] border-t-2 border-[#18112E]">
+        <section id="contact" className="lazy-section py-32 px-4 relative overflow-hidden bg-[#FFB800] border-t-2 border-[#18112E]">
             <div className="absolute bottom-0 left-0 w-full h-[500px] pointer-events-none bg-gradient-to-t from-white/20 to-transparent blur-[100px] -z-10" />
 
             <div className="max-w-6xl mx-auto relative z-10">

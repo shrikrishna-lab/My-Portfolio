@@ -7,7 +7,7 @@ export default function About() {
     if (!profile) return null;
 
     return (
-        <section id="about" className="py-32 px-4 bg-white relative z-10 overflow-hidden border-t border-neutral-100">
+        <section id="about" className="lazy-section py-32 px-4 bg-white relative z-10 overflow-hidden border-t border-neutral-100">
             <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#FFB800]/5 blur-[150px] rounded-full pointer-events-none" />
 
             <div className="max-w-7xl mx-auto relative">
@@ -15,7 +15,7 @@ export default function About() {
                     initial={{ opacity: 0, y: 50 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: '-100px' }}
-                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                    transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                 >
                     <div className="flex items-center gap-3 mb-8">
                         <span className="w-10 h-1 bg-[#FFB800] rounded-full" />
@@ -27,8 +27,17 @@ export default function About() {
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-neutral-400 to-neutral-300">So Far.</span>
                     </h2>
 
-                    <div className="grid lg:grid-cols-12 gap-16 lg:gap-24">
+                    <div className="grid lg:grid-cols-12 gap-8 lg:gap-12">
                         <div className="lg:col-span-7">
+                            <motion.div
+                                className="mb-6 rounded-2xl overflow-hidden shadow-md border border-neutral-100"
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true, margin: '-50px' }}
+                                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                            >
+                                <img src="/portfolio%20image2.png" alt="Portfolio" className="w-full h-48 md:h-64 object-cover object-[50%_30%]" />
+                            </motion.div>
                             <h3 className="text-3xl font-extrabold text-[#18112E] mb-8 flex items-center gap-3">
                                 Background
                             </h3>

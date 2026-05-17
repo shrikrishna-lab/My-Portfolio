@@ -42,7 +42,7 @@ export default function Skills() {
     if (skills.length === 0) return null;
 
     return (
-        <section id="skills" className="py-32 px-4 bg-white relative z-10 border-t border-neutral-100/50">
+        <section id="skills" className="lazy-section py-32 px-4 bg-white relative z-10 border-t border-neutral-100/50">
             <div className="max-w-7xl mx-auto">
                 <motion.div
                     initial={{ opacity: 0, y: 40 }}

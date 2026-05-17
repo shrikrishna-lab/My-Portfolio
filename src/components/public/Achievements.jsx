@@ -10,7 +10,7 @@ export default function Achievements() {
     if (achievements.length === 0) return null;
 
     return (
-        <section id="achievements" className="py-32 px-4 bg-[#3AA8F5] border-t-2 border-[#18112E] relative z-10 overflow-hidden">
+        <section id="achievements" className="lazy-section py-32 px-4 bg-[#3AA8F5] border-t-2 border-[#18112E] relative z-10 overflow-hidden">
             <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-white/20 blur-[120px] rounded-full -translate-y-1/2 -translate-x-1/2 pointer-events-none" />
 
             <div className="max-w-6xl mx-auto relative text-center">
@@ -41,7 +41,7 @@ export default function Achievements() {
                             whileInView={{ opacity: 1, y: 0, scale: 1 }}
                             whileHover={{ y: -5, transition: { type: "spring", stiffness: 300, damping: 25 } }}
                             viewport={{ once: true }}
-                            transition={{ delay: i * 0.1, type: "spring", stiffness: 120, damping: 20 }}
+                            transition={{ delay: i * 0.05, type: "spring", stiffness: 150, damping: 20 }}
                             className="bg-white border-4 border-[#18112E] shadow-[8px_8px_0_#18112E] rounded-[32px] p-8 hover:bg-[#FFB800] transition-all group relative overflow-hidden cursor-pointer"
                         >
                             <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 blur-[30px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-full" />

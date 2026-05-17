@@ -14,7 +14,7 @@ export default function StartupVision() {
     ];
 
     return (
-        <section id="startup" className="py-32 px-4 relative overflow-hidden bg-white border-t-2 border-[#18112E]">
+        <section id="startup" className="lazy-section py-32 px-4 relative overflow-hidden bg-white border-t-2 border-[#18112E]">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#FFB800]/10 blur-[150px] rounded-full pointer-events-none" />
 
             <div className="max-w-6xl mx-auto relative z-10">
@@ -51,7 +51,7 @@ export default function StartupVision() {
                             whileInView={{ opacity: 1, y: 0, scale: 1 }}
                             whileHover={{ y: -5, transition: { type: "spring", stiffness: 300, damping: 25 } }}
                             viewport={{ once: true }}
-                            transition={{ delay: i * 0.1, type: "spring", stiffness: 120, damping: 20 }}
+                            transition={{ delay: i * 0.05, type: "spring", stiffness: 150, damping: 20 }}
                             className="bg-[#F8F9FA] border-2 border-[#18112E] shadow-[6px_6px_0_#18112E] rounded-[32px] p-8 hover:bg-[#FFB800] transition-colors group relative overflow-hidden cursor-default"
                         >
                             <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 blur-[30px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-full" />

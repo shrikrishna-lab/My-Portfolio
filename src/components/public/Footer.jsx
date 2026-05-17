@@ -8,7 +8,7 @@ export default function Footer() {
     if (!profile) return null;
 
     return (
-        <footer className="bg-white pt-32 pb-16 px-4 relative z-10 border-t-2 border-[#18112E] overflow-hidden">
+        <footer className="lazy-section bg-white pt-32 pb-16 px-4 relative z-10 border-t-2 border-[#18112E] overflow-hidden">
             <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-[#3AA8F5]/10 blur-[120px] rounded-full pointer-events-none" />
 
             <div className="max-w-6xl mx-auto relative flex flex-col items-center gap-16">

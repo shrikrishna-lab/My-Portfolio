@@ -9,7 +9,7 @@ const cardVariants = {
         opacity: 1,
         y: 0,
         scale: 1,
-        transition: { delay: i * 0.15, type: "spring", stiffness: 120, damping: 20 },
+        transition: { delay: i * 0.06, type: "spring", stiffness: 150, damping: 20 },
     }),
 };
 
@@ -20,7 +20,7 @@ export default function Projects() {
     if (projects.length === 0) return null;
 
     return (
-        <section id="projects" className="py-32 px-4 relative z-10 bg-[#F8F9FA] border-t-2 border-[#18112E]">
+        <section id="projects" className="lazy-section py-32 px-4 relative z-10 bg-[#F8F9FA] border-t-2 border-[#18112E]">
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[#3AA8F5]/5 blur-[120px] rounded-full pointer-events-none" />
 
             <div className="max-w-7xl mx-auto relative">
