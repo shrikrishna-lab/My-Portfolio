@@ -148,16 +148,14 @@ Change it in <code>src/pages/admin/AdminPanel.jsx</code> — look for <code>ADMI
 <summary><strong>🎵 Playlist & Music Player</strong></summary>
 <br>
 
-Manage a full playlist in **Settings** tab. A floating player appears at bottom-right.
+Manage a playlist in **Settings** tab. A floating player appears at bottom-right.
 
-- **Add multiple songs** — audio URLs, YouTube, or Spotify
-- **Reorder** songs with up/down arrows
-- **Queue playback** — next/prev buttons, auto-advance to next song
-- **Auto-play** — songs start automatically when switching
-- **YouTube thumbnails** — show as spinning disc on pill button + banner in expanded player
-- **Animated progress bar** — click/drag to seek, with twinkling stars, aurora glow, and floating particles
-- **Time display** — current position and total duration on both collapsed and expanded views
-- Toggle player on/off with the floating music button
+- Add multiple songs — audio URLs, YouTube, or Spotify
+- Reorder songs with up/down arrows
+- Queue playback with next/prev, auto-advance to next song
+- YouTube thumbnails shown as spinning disc + banner
+- Animated progress bar with seek, star particles, and aurora glow
+- Toggle on/off with the floating music button
 
 </details>
 
@@ -171,7 +169,7 @@ Set a background in **Settings** tab:
 
 - **Image** — URL or upload from device
 - **Video** — URL, upload, or **YouTube link** (auto-detected!)
-- Toggle on/off with the eye button (bottom-left) — smooth crossfade transition
+- Toggle on/off with the eye button (bottom-left) — smooth crossfade
 - Falls back to animated gradient when toggled off
 
 </details>
