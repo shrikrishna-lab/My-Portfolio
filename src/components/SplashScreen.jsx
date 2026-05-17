@@ -18,7 +18,7 @@ export default function SplashScreen({ onFinish }) {
     }, []);
 
     useEffect(() => {
-        const t1 = setTimeout(() => onFinish(), 2200);
+        const t1 = setTimeout(() => onFinish(), 2800);
         return () => clearTimeout(t1);
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 

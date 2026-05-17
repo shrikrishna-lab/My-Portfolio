@@ -175,7 +175,7 @@ function CinematicText({ profile, mouseY }) {
             <motion.div
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
             >
                 <div className="inline-flex items-center gap-3 mb-6 px-4 py-2 rounded-full border border-[#d4744a]/20 bg-[#d4744a]/5 backdrop-blur-sm">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#d4744a] shadow-[0_0_8px_rgba(212,116,74,0.6)]" />
@@ -189,7 +189,7 @@ function CinematicText({ profile, mouseY }) {
                 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.92]"
                 initial={{ opacity: 0, y: 60 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}
+                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.25 }}
             >
                 <span className="text-white drop-shadow-[0_2px_20px_rgba(10,255,140,0.1)]">{profile.name}</span>
                 <br />
@@ -204,7 +204,7 @@ function CinematicText({ profile, mouseY }) {
                 className="mt-8 text-base md:text-lg text-white/40 max-w-xl leading-relaxed font-light tracking-wide"
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.6 }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.35 }}
                 style={{ y: titleY }}
             >
                 {profile.intro}
@@ -214,7 +214,7 @@ function CinematicText({ profile, mouseY }) {
                 className="flex flex-col sm:flex-row items-start gap-4 mt-10"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.8 }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.45 }}
             >
                 <motion.a
                     href="#projects"
