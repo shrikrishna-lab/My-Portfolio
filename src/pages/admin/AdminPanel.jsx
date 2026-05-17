@@ -927,7 +927,8 @@ function MusicBar() {
             if (id) { ytPlayerRef.current.loadVideoById(id); ytPlayerRef.current.playVideo(); }
         } else if (newProvider === 'audio' && audioRef.current) {
             audioRef.current.src = newSong.url;
-            audioRef.current.play().then(() => setPlaying(true)).catch(() => {});
+            audioRef.current.currentTime = 0;
+            audioRef.current.play().then(() => setPlaying(true)).catch(() => setError(true));
         }
     };
 
@@ -935,6 +936,13 @@ function MusicBar() {
     const prev = () => changeSong(index - 1);
     const nextRef = useRef(next);
     useEffect(() => { nextRef.current = next; });
+
+    // Set initial audio src (only when src is empty)
+    useEffect(() => {
+        if (provider === 'audio' && audioRef.current && !audioRef.current.src && song?.url) {
+            audioRef.current.src = song.url;
+        }
+    }, [provider, song?.url]);
 
     const seek = (clientX) => {
         if (!barRef.current || duration <= 0) return;
@@ -1037,7 +1045,7 @@ function MusicBar() {
 
     return (
         <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2">
-            {provider === 'audio' && <audio ref={audioRef} src={song.url} preload="auto" onEnded={next} />}
+            {provider === 'audio' && <audio ref={audioRef} preload="auto" onEnded={() => setTimeout(next, 500)} />}
             {provider === 'youtube' && <div id="yt-player" className="w-0 h-0 absolute opacity-0 pointer-events-none" />}
 
             {provider === 'spotify' && embedUrl && (
