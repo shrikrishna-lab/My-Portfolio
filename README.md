@@ -129,16 +129,35 @@ npm run dev
 ## ✨ Visual Effects & Animations
 
 <details open>
-<summary><strong>🌀 Background Scene</strong></summary>
+<summary><strong>🌀 Cinematic Hero (3D Portrait)</summary>
 <br>
 
-A fixed background layer with scroll-driven parallax:
+The hero section features an interactive 3D character portrait with scroll + mouse-driven parallax:
 
-- **Ambient glows** — two large blurred orbs (gold and blue) that slowly pulse and scale, positioned at opposite corners
-- **Grid pattern** — subtle dot pattern with a radial mask that fades at the edges
-- **Floating geometric shapes** — 15 circles, rounded squares, and squares with `shadow-[8px_8px_0_#18112E]` borders, each with random size, position, rotation, and duration. They float on three parallax layers (`bgY1`, `bgY2`, `bgY3`) mapped to `scrollY` via `useTransform`
+- **3D perspective** — portrait rotates on X/Y axes using combined mouse tracking and scroll position, with `transform-style: preserve-3d` and `perspective: 1200px`
+- **Scroll depth** — portrait scales 1→0.85, translates Z -80px, and tilts -12° on scroll for a card-reveal effect
+- **Mouse tracking** — cursor position drives ±6° rotation via spring physics (stiffness 150), throttled with `requestAnimationFrame`
+- **Layered effects** — rim light, floor glow, gradient overlay, and ambient glow move independently for faux-3D depth
+- **Ambient background** — dark canvas with floating gradient orbs, grain overlay, and vignette
+- **Particle field** — 20 CSS-only twinkling particles (8 on mobile) — zero JavaScript animation overhead
 
-All shape positions are pre-generated at module level so `Math.random` is never called during render (React purity).
+</details>
+
+<br>
+
+<details>
+<summary><strong>🚀 Splash Screen</summary>
+<br>
+
+A full-screen preloader that animates while the website renders behind it:
+
+- **Star field** — 250 twinkling stars with randomized sizes, pulse speeds, and delays
+- **Falling stars** — 12 diagonal shooting stars with trailing tails at staggered intervals
+- **Orbit rings** — 8 ultra-thin expanding rings with slight tilts, like solar system orbits
+- **Portfolio image** — circular profile photo with dual pulsing ring borders
+- **Custom font** — "Bagind" font self-hosted via `@font-face` for the name
+- **Loading indicator** — 3 pulsing dots at the bottom
+- **Smart timing** — splash stays minimum 2.8s; all website content renders behind it so animations are complete before reveal
 
 </details>
 
@@ -151,12 +170,13 @@ All shape positions are pre-generated at module level so `Math.random` is never 
 Every section uses `framer-motion` with `whileInView` for scroll-triggered reveals:
 
 - **Spring stiffness/damping** values tuned per element (80–300 stiffness)
-- **Stagger children** — Skills grid items fly in with `staggerChildren: 0.05`
+- **Stagger children** — Skills grid items fly in with `staggerChildren: 0.04`
 - **Hover cards** — Projects and Achievements lift on hover with spring physics
-- **Magnetic buttons** — CTA buttons scale to 1.03 on hover, 0.97 on tap
+- **Magnetic buttons** — CTA buttons scale to 1.02–1.03 on hover, 0.97–0.98 on tap
 - **Navbar** — slides down from top with spring, mobile menu animates with `AnimatePresence`
+- **Entrance speed** — all section entrance durations reduced to 0.35–0.5s for instant scroll reveal
 
-Each section uses a consistent pattern: `initial → whileInView → viewport: { once: true }` for efficient re-rendering.
+Each section uses a consistent pattern: `initial → whileInView → viewport: { once: true }` for efficient re-rendering. Below-fold sections use `content-visibility: auto` (`.lazy-section`) for instant paint on scroll.
 
 </details>
 
