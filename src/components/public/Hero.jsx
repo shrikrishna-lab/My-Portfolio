@@ -1,4 +1,4 @@
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion'; // eslint-disable-line no-unused-vars
 import { useStore } from '@/lib/store';
 import { ArrowRight, ChevronDown, Award } from 'lucide-react';
 import { useRef } from 'react';

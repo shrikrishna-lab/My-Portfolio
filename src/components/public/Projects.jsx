@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line no-unused-vars
 import { useStore } from '@/lib/store';
 import { ExternalLink, Github, ArrowUpRight, X, Code2, Eye } from 'lucide-react';
 

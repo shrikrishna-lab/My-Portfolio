@@ -1,6 +1,6 @@
 import { Github, Linkedin, Twitter, Command } from 'lucide-react';
 import { useStore } from '@/lib/store';
-import { motion } from 'framer-motion';
+import { motion } from 'framer-motion'; // eslint-disable-line no-unused-vars
 
 export default function Footer() {
     const profile = useStore((state) => state.profile);

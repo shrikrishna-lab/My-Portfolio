@@ -72,13 +72,46 @@ export default {
           "0%": { backgroundPosition: "200% center" },
           "100%": { backgroundPosition: "-200% center" },
         },
+        "equalizer": {
+          "0%, 100%": { height: "20%", opacity: "0.6" },
+          "25%": { height: "100%", opacity: "1" },
+          "50%": { height: "45%", opacity: "0.8" },
+          "75%": { height: "70%", opacity: "0.9" },
+        },
+        "disc-spin": {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
+        },
+        "pulse-glow": {
+          "0%, 100%": { boxShadow: "0 0 12px rgba(255, 184, 0, 0.15)" },
+          "50%": { boxShadow: "0 0 30px rgba(255, 184, 0, 0.4)" },
+        },
+        "twinkle": {
+          "0%, 100%": { opacity: "0.15", transform: "scale(0.8)" },
+          "50%": { opacity: "1", transform: "scale(1.2)" },
+        },
+        "float-up": {
+          "0%": { transform: "translateY(0) scale(1)", opacity: "0.8" },
+          "100%": { transform: "translateY(-40px) scale(0.3)", opacity: "0" },
+        },
+        "aurora": {
+          "0%": { transform: "translateX(-30%) skewX(-12deg)", opacity: "0.3" },
+          "50%": { transform: "translateX(30%) skewX(12deg)", opacity: "0.6" },
+          "100%": { transform: "translateX(-30%) skewX(-12deg)", opacity: "0.3" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "shine": "shine 3s linear infinite",
+        "equalizer": "equalizer 0.8s ease-in-out infinite",
+        "disc-spin": "disc-spin 4s linear infinite",
+        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
+        "twinkle": "twinkle 3s ease-in-out infinite",
+        "float-up": "float-up 2.5s ease-out infinite",
+        "aurora": "aurora 6s ease-in-out infinite",
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate")], // eslint-disable-line no-undef
 }

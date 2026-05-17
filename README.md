@@ -62,8 +62,8 @@
 | **Skills** | Add / Edit / Delete with icon & category |
 | **Projects** | Add / Edit / Delete with image upload |
 | **Achievements** | Add / Edit / Delete with date & image |
-| **Messages** | View & delete contact submissions |
-| **Settings** | Music, Background, Token, Deploy |
+| **Messages** | View & delete contact submissions, sync from GitHub |
+| **Settings** | Playlist, Background, Token, Deploy |
 
 </td>
 </tr>
@@ -145,15 +145,19 @@ Change it in <code>src/pages/admin/AdminPanel.jsx</code> — look for <code>ADMI
 <br>
 
 <details>
-<summary><strong>🎵 Music Player</strong></summary>
+<summary><strong>🎵 Playlist & Music Player</strong></summary>
 <br>
 
-Set a song in **Settings** tab. A floating player appears at bottom-right.
+Manage a full playlist in **Settings** tab. A floating player appears at bottom-right.
 
-- Paste audio URL or **upload a file** from your device
-- Supports MP3, streaming URLs, etc.
-- YouTube not supported for audio
-- Toggle on/off with the floating music button
+- **Add multiple songs** — audio URLs, YouTube, or Spotify
+- **Reorder** songs with up/down arrows
+- **Queue playback** — next/prev buttons, auto-advance to next song
+- **Auto-play** — songs start automatically when switching
+- **YouTube thumbnails** — show as spinning disc on pill button + banner in expanded player
+- **Animated progress bar** — click/drag to seek, with twinkling stars, aurora glow, and floating particles
+- **Time display** — current position and total duration on both collapsed and expanded views
+- Toggle player on/off with the floating music button
 
 </details>
 
@@ -167,7 +171,8 @@ Set a background in **Settings** tab:
 
 - **Image** — URL or upload from device
 - **Video** — URL, upload, or **YouTube link** (auto-detected!)
-- Toggle on/off with the eye button (bottom-left)
+- Toggle on/off with the eye button (bottom-left) — smooth crossfade transition
+- Falls back to animated gradient when toggled off
 
 </details>
 

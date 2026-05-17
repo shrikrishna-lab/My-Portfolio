@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'framer-motion'; // eslint-disable-line no-unused-vars
 import { useStore } from '@/lib/store';
 import { Send, Mail, MapPin } from 'lucide-react';
 

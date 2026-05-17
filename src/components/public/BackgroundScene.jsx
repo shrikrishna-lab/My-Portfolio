@@ -1,16 +1,28 @@
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion'; // eslint-disable-line no-unused-vars
+
+function generateShapes(count) {
+    return Array.from({ length: count }, () => ({
+        size: Math.random() * 80 + 40,
+        x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1920),
+        top: Math.random() * ((typeof window !== 'undefined' ? window.innerHeight : 1080) + 1000) - 200,
+        rotateInit: Math.random() * 360,
+        rotateAnim: Math.random() * 360 + 180,
+        duration: Math.random() * 15 + 10,
+        delay: Math.random() * 2,
+    }));
+}
+
+const shapes = typeof window !== 'undefined' ? generateShapes(15) : [];
 
 export default function BackgroundScene() {
     const { scrollY } = useScroll();
 
-    // Parallax layers for scroll interactions
     const bgY1 = useTransform(scrollY, [0, 5000], [0, -1000]);
     const bgY2 = useTransform(scrollY, [0, 5000], [0, -500]);
     const bgY3 = useTransform(scrollY, [0, 5000], [0, -1500]);
 
     return (
         <div className="fixed inset-0 z-0 bg-[#F2F4F7] overflow-hidden pointer-events-none">
-            {/* Bright ambient glows */}
             <motion.div
                 className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-[#FFB800]/20 blur-[150px] rounded-full mix-blend-multiply"
                 style={{ y: bgY2 }}
@@ -31,12 +43,9 @@ export default function BackgroundScene() {
                 transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 2 }}
             />
 
-            {/* Clean grid pattern */}
             <div className="absolute inset-0 bg-[#18112E]/[0.03] pattern-dots bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_0%,#000_20%,transparent_100%)] opacity-80" />
 
-            {/* Floating geometric shapes (Johnny's Dirty Soda vibe with scroll Parallax) */}
-            {typeof window !== 'undefined' && [...Array(15)].map((_, i) => {
-                const size = Math.random() * 80 + 40;
+            {shapes.map((s, i) => {
                 const parallaxLayer = i % 3 === 0 ? bgY1 : i % 3 === 1 ? bgY2 : bgY3;
 
                 return (
@@ -46,24 +55,24 @@ export default function BackgroundScene() {
                             i % 3 === 1 ? 'rounded-[20px] bg-[#3AA8F5]' :
                                 'rounded-[0px] bg-white'
                             }`}
-                        style={{ width: size, height: size, y: parallaxLayer }}
+                        style={{ width: s.size, height: s.size, y: parallaxLayer }}
                         initial={{
-                            x: Math.random() * window.innerWidth,
-                            top: Math.random() * (window.innerHeight + 1000) - 200, // random start y
-                            rotate: Math.random() * 360,
+                            x: s.x,
+                            top: s.top,
+                            rotate: s.rotateInit,
                             scale: 0
                         }}
                         animate={{
-                            rotate: [null, Math.random() * 360 + 180],
+                            rotate: [null, s.rotateAnim],
                             scale: [0, 1, 1],
                             opacity: [0, 1, 0.8]
                         }}
                         transition={{
-                            duration: Math.random() * 15 + 10,
+                            duration: s.duration,
                             repeat: Infinity,
                             repeatType: "reverse",
                             ease: "easeInOut",
-                            delay: Math.random() * 2
+                            delay: s.delay
                         }}
                     />
                 );

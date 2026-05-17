@@ -1,10 +1,10 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useStore } from '@/lib/store';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line no-unused-vars
 import {
     Shield, User, Sparkles, FolderKanban, Award, MessageSquare, Settings, RefreshCw,
     Plus, Pencil, Trash2, X, Save, Image as ImageIcon, Music, Play, Pause, Eye, EyeOff, VolumeX, AlertCircle,
-    Github, ExternalLink, UploadCloud, Check, Upload
+    Github, ExternalLink, UploadCloud, Check, Upload, ChevronDown, SkipBack, SkipForward
 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 
@@ -13,27 +13,76 @@ const FILE_PATH = 'public/data.json';
 const BRANCH = 'main';
 const TOKEN_KEY = 'github_token';
 const ADMIN_PASSWORD = 'admin123';
-const MUSIC_URL_KEY = 'music_url';
-const MUSIC_NAME_KEY = 'music_name';
 const BG_IMG_KEY = 'bg_image';
 const BG_VID_KEY = 'bg_video';
+const PLAYLIST_KEY = 'music_playlist';
+const PLAY_IDX_KEY = 'music_play_index';
 
 function getToken() { try { return localStorage.getItem(TOKEN_KEY) || ''; } catch { return ''; } }
-function getMusicUrl() { try { return localStorage.getItem(MUSIC_URL_KEY) || ''; } catch { return ''; } }
-function getMusicName() { try { return localStorage.getItem(MUSIC_NAME_KEY) || ''; } catch { return ''; } }
-function setMusicUrl(v) { try { localStorage.setItem(MUSIC_URL_KEY, v); } catch {} }
-function setMusicName(v) { try { localStorage.setItem(MUSIC_NAME_KEY, v); } catch {} }
 function getBgImg() { try { return localStorage.getItem(BG_IMG_KEY) || ''; } catch { return ''; } }
 function getBgVid() { try { return localStorage.getItem(BG_VID_KEY) || ''; } catch { return ''; } }
-function setBgImg(v) { try { localStorage.setItem(BG_IMG_KEY, v); } catch {} }
-function setBgVid(v) { try { localStorage.setItem(BG_VID_KEY, v); } catch {} }
-function isYoutubeUrl(url) { return url && (url.includes('youtube.com/watch') || url.includes('youtu.be/') || url.includes('youtube.com/embed')); }
+function getPlaylist() { try { return JSON.parse(localStorage.getItem(PLAYLIST_KEY)) || []; } catch { return []; } }
+function setPlaylist(list) { try { localStorage.setItem(PLAYLIST_KEY, JSON.stringify(list)); } catch {} }
+function getPlayIndex() { try { return parseInt(localStorage.getItem(PLAY_IDX_KEY)) || 0; } catch { return 0; } }
+function setPlayIndex(i) { try { localStorage.setItem(PLAY_IDX_KEY, String(i)); } catch {} }
+// Migrate old single-song storage to playlist
+function migratePlaylist() {
+    if (getPlaylist().length > 0) return;
+    const oldUrl = (() => { try { return localStorage.getItem('music_url') || ''; } catch { return ''; } })();
+    const oldName = (() => { try { return localStorage.getItem('music_name') || ''; } catch { return ''; } })();
+    if (oldUrl) {
+        setPlaylist([{ name: oldName || 'Music', url: oldUrl }]);
+        try { localStorage.removeItem('music_url'); localStorage.removeItem('music_name'); } catch {}
+    }
+}
+function isYoutubeUrl(url) { return !!url && /(?:youtube\.com\/(?:watch|embed|shorts)|youtu\.be\/)/i.test(url); }
+function isSpotifyUrl(url) { return !!url && /spotify\.com\/(?:track|album|playlist|episode|show)\//i.test(url); }
+function getYoutubeVideoId(url) {
+  if (!url) return '';
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname.includes('youtu.be')) return parsed.pathname.split('/').filter(Boolean)[0] || '';
+    if (parsed.searchParams.get('v')) return parsed.searchParams.get('v') || '';
+    const pathParts = parsed.pathname.split('/').filter(Boolean);
+    const shortsIndex = pathParts.indexOf('shorts');
+    if (shortsIndex >= 0) return pathParts[shortsIndex + 1] || '';
+    const embedIndex = pathParts.indexOf('embed');
+    if (embedIndex >= 0) return pathParts[embedIndex + 1] || '';
+  } catch {
+    if (url.includes('youtu.be/')) return url.split('youtu.be/')[1]?.split(/[?&#]/)[0] || '';
+  }
+  return '';
+}
 function getYoutubeEmbed(url) {
-  let id = '';
-  if (url.includes('youtu.be/')) id = url.split('youtu.be/')[1]?.split('?')[0] || '';
-  else if (url.includes('youtube.com/watch')) id = new URL(url).searchParams.get('v') || '';
-  else if (url.includes('youtube.com/embed')) return url;
-  return id ? `https://www.youtube.com/embed/${id}?autoplay=1&loop=1&mute=1&controls=0&playlist=${id}` : '';
+  const id = getYoutubeVideoId(url);
+  return id ? `https://www.youtube.com/embed/${id}?autoplay=1&playsinline=1&rel=0&modestbranding=1&controls=0&loop=1&playlist=${id}&origin=${encodeURIComponent(typeof window !== 'undefined' ? window.location.origin : 'http://localhost:5173')}` : '';
+}
+function getSpotifyEmbed(url) {
+  if (!url) return '';
+  try {
+    if (url.startsWith('spotify:')) {
+      const [, type, id] = url.split(':');
+      return type && id ? `https://open.spotify.com/embed/${type}/${id}` : '';
+    }
+    const parsed = new URL(url);
+    const match = parsed.pathname.match(/\/(track|album|playlist|episode|show)\/([A-Za-z0-9]+)/i);
+    return match ? `https://open.spotify.com/embed/${match[1].toLowerCase()}/${match[2]}?utm_source=generator` : '';
+  } catch {
+    const match = url.match(/spotify\.com\/(track|album|playlist|episode|show)\/([A-Za-z0-9]+)/i);
+    return match ? `https://open.spotify.com/embed/${match[1].toLowerCase()}/${match[2]}?utm_source=generator` : '';
+  }
+}
+function getMusicProvider(url) {
+  if (isYoutubeUrl(url)) return 'youtube';
+  if (isSpotifyUrl(url)) return 'spotify';
+  return 'audio';
+}
+function getThumbnailUrl(url) {
+  if (isYoutubeUrl(url)) {
+    const id = getYoutubeVideoId(url);
+    return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : '';
+  }
+  return '';
 }
 
 const TABS = [
@@ -60,7 +109,7 @@ function ProfileTab() {
 
     useEffect(() => {
         if (profile && !init) {
-            setForm({ ...profile });
+            setForm({ ...profile }); // eslint-disable-line react-hooks/set-state-in-effect
             setInit(true);
         }
     }, [profile, init]);
@@ -373,7 +422,7 @@ function AchievementsTab() {
     const [modal, setModal] = useState(false);
     const [editing, setEditing] = useState(null);
     const [form, setForm] = useState(emptyAchievement);
-    const [uploading, setUploading] = useState(false);
+    const [, setUploading] = useState(false);
     const fileRef = useRef(null);
 
     const openNew = () => { setEditing(null); setForm(emptyAchievement); setModal(true); };
@@ -519,9 +568,10 @@ function PasswordGate({ children }) {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4 font-sans relative overflow-hidden" style={{ background: getBgVid() || getBgImg() ? undefined : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+        <div className="min-h-screen flex items-center justify-center p-4 font-sans relative overflow-hidden">
             {getBgVid() && (isYoutubeUrl(getBgVid()) ? <iframe src={getYoutubeEmbed(getBgVid())} className="fixed inset-0 w-full h-full z-0 pointer-events-none" allow="autoplay; fullscreen" title="bg" /> : <video src={getBgVid()} autoPlay loop muted playsInline className="fixed inset-0 w-full h-full object-cover z-0" />)}
             {getBgImg() && !getBgVid() && <img src={getBgImg()} className="fixed inset-0 w-full h-full object-cover z-0" alt="" />}
+            {!getBgVid() && !getBgImg() && <div className="fixed inset-0 bg-gradient-to-br from-[#667eea] via-[#764ba2] to-[#f093fb]" />}
             {(getBgVid() || getBgImg()) && <div className="fixed inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60 z-[1]" />}
             <form onSubmit={handleSubmit} className="relative z-10 bg-white/5 backdrop-blur-sm border border-white/10 rounded-[24px] p-8 shadow-2xl shadow-black/10 w-full max-w-sm space-y-6">
                 <div className="text-center">
@@ -543,24 +593,98 @@ function PasswordGate({ children }) {
 
 function SettingsTab() {
     const [tokenInput, setTokenInput] = useState(getToken());
-
+    const [playlist, setPlaylistState] = useState(() => getPlaylist());
+    const [newName, setNewName] = useState('');
+    const [newUrl, setNewUrl] = useState('');
+    const [bgImgInput, setBgImgInput] = useState(getBgImg());
+    const [bgVidInput, setBgVidInput] = useState(getBgVid());
     const [deploying, setDeploying] = useState(false);
     const [msg, setMsg] = useState({ text: '', type: '' });
-    const store = useStore;
+
+    const showMsg = (text, type = 'success') => {
+        setMsg({ text, type });
+        window.setTimeout(() => setMsg({ text: '', type: '' }), 3000);
+    };
 
     const saveToken = () => {
-        try { localStorage.setItem(TOKEN_KEY, tokenInput); } catch {}
-        setMsg({ text: 'Token saved.', type: 'success' });
-        setTimeout(() => setMsg({ text: '', type: '' }), 3000);
+        try { localStorage.setItem(TOKEN_KEY, tokenInput.trim()); } catch {}
+        showMsg('Token saved.');
+    };
+
+    const saveAll = () => {
+        setPlaylist(getPlaylist());
+        window.location.reload();
+    };
+
+    const saveBackground = () => {
+        try {
+            localStorage.setItem(BG_IMG_KEY, bgImgInput.trim());
+            localStorage.setItem(BG_VID_KEY, bgVidInput.trim());
+        } catch {}
+        window.location.reload();
+    };
+
+    const updatePlaylist = (list) => {
+        setPlaylist(list);
+        setPlaylistState([...list]);
+    };
+
+    const addSong = () => {
+        if (!newUrl.trim()) return;
+        const list = getPlaylist();
+        list.push({ name: newName.trim() || 'Untitled', url: newUrl.trim() });
+        updatePlaylist(list);
+        setNewName('');
+        setNewUrl('');
+    };
+
+    const removeSong = (i) => {
+        const list = getPlaylist();
+        list.splice(i, 1);
+        updatePlaylist(list);
+        if (getPlayIndex() >= list.length) setPlayIndex(0);
+    };
+
+    const moveSong = (i, dir) => {
+        const to = i + dir;
+        if (to < 0 || to >= playlist.length) return;
+        const list = getPlaylist();
+        [list[i], list[to]] = [list[to], list[i]];
+        updatePlaylist(list);
+    };
+
+    const handleAudioUpload = (e) => {
+        const f = e.target.files?.[0];
+        if (!f) return;
+        const r = new FileReader();
+        r.onload = () => {
+            const list = getPlaylist();
+            list.push({ name: f.name.replace(/\.[^.]+$/, ''), url: String(r.result || '') });
+            setPlaylist(list);
+        };
+        r.readAsDataURL(f);
+    };
+
+    const handleImageUpload = (setter, storageKey) => (e) => {
+        const f = e.target.files?.[0];
+        if (!f) return;
+        const r = new FileReader();
+        r.onload = () => {
+            const value = String(r.result || '');
+            setter(value);
+            try { localStorage.setItem(storageKey, value); } catch {}
+            window.location.reload();
+        };
+        r.readAsDataURL(f);
     };
 
     const handleDeploy = async () => {
         const token = getToken();
-        if (!token) { setMsg({ text: 'Enter and save your GitHub token first.', type: 'error' }); return; }
+        if (!token) { showMsg('Enter and save your GitHub token first.', 'error'); return; }
         setDeploying(true);
         setMsg({ text: '', type: '' });
         try {
-            const state = store.getState();
+            const state = useStore.getState();
             const data = { profile: state.profile, skills: state.skills, projects: state.projects, achievements: state.achievements, messages: state.messages };
 
             const url = `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`;
@@ -571,121 +695,174 @@ function SettingsTab() {
             const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2) + '\n')));
 
             const res = await fetch(url, { method: 'PUT', headers, body: JSON.stringify({ message: 'Update portfolio data via admin panel', content, sha, branch: BRANCH }) });
-
             if (!res.ok) { const err = await res.json(); throw new Error(err.message); }
 
-            setMsg({ text: 'Deployed! Vercel will auto-redeploy in ~30s.', type: 'success' });
+            showMsg('Deployed. Vercel will pick up the GitHub commit automatically.');
         } catch (e) {
-            setMsg({ text: 'Error: ' + e.message, type: 'error' });
+            showMsg(`Error: ${e.message}`, 'error');
         }
         setDeploying(false);
     };
 
+    const curIndex = getPlayIndex();
+
     return (
         <div className="space-y-6">
-            <h2 className="text-xl font-bold text-[#18112E]">Deploy to Production</h2>
-            <p className="text-sm text-neutral-500 font-medium">Push your changes to GitHub. Vercel will auto-redeploy so all users see the updates.</p>
-
-            <div className="bg-[#F8F9FA] border border-neutral-200 rounded-[16px] p-5 space-y-4">
-                <div>
-                    <label className="text-xs font-bold text-[#18112E] block mb-1.5">GitHub Personal Access Token</label>
-                    <div className="flex gap-2">
-                        <input type="password" value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} placeholder="ghp_... or github_pat_..." className="flex-1 bg-white border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
-                        <button onClick={saveToken} className="bg-[#18112E] text-white px-5 py-3 rounded-[12px] text-sm font-bold hover:bg-[#FFB800] hover:text-[#18112E] transition-all">Save</button>
+            <div className="grid gap-4 md:grid-cols-[1.2fr_0.8fr]">
+                <div className="rounded-[24px] border border-white/10 bg-gradient-to-br from-[#18112E] via-[#24194a] to-[#3d2b76] p-6 text-white shadow-xl">
+                    <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.24em] text-white/80">
+                        <Shield className="h-3.5 w-3.5 text-[#FFB800]" /> Admin console
                     </div>
-                    <a href="https://github.com/settings/tokens" target="_blank" rel="noreferrer" className="text-[11px] text-blue-600 underline mt-1.5 inline-block">Generate a classic token with repo scope</a>
+                    <h2 className="mt-4 text-2xl md:text-3xl font-black tracking-tight">Control panel</h2>
+                    <p className="mt-2 max-w-2xl text-sm md:text-base text-white/70">
+                        Manage the portfolio, media, and deployment settings from one place.
+                    </p>
                 </div>
-
-                <div className="pt-2 border-t border-neutral-200">
-                    <button onClick={handleDeploy} disabled={deploying || !getToken()} className="flex items-center gap-2 bg-[#FFB800] text-[#18112E] px-6 py-3 rounded-[12px] font-bold hover:bg-[#ffcc33] transition-all disabled:opacity-50 shadow-md">
-                        <Upload className="w-5 h-5" /> {deploying ? 'Deploying to GitHub...' : 'Deploy to Production'}
-                    </button>
-                    <p className="text-[11px] text-neutral-400 mt-2">Commits to <span className="font-mono">{REPO}/{FILE_PATH}</span> on <span className="font-mono">{BRANCH}</span>. Vercel redeploys automatically.</p>
+                <div className="grid grid-cols-2 gap-3">
+                    <div className="rounded-[20px] border border-neutral-200 bg-white p-4 shadow-sm">
+                        <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-neutral-400">Deploy</div>
+                        <div className="mt-2 text-lg font-black text-[#18112E]">GitHub</div>
+                        <div className="text-xs text-neutral-500">Push updates to main</div>
+                    </div>
+                    <div className="rounded-[20px] border border-neutral-200 bg-white p-4 shadow-sm">
+                        <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-neutral-400">Playlist</div>
+                        <div className="mt-2 text-lg font-black text-[#18112E]">{playlist.length} songs</div>
+                        <div className="text-xs text-neutral-500">Queue playback</div>
+                    </div>
+                    <div className="rounded-[20px] border border-neutral-200 bg-white p-4 shadow-sm">
+                        <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-neutral-400">Content</div>
+                        <div className="mt-2 text-lg font-black text-[#18112E]">{useStore.getState().projects.length + useStore.getState().skills.length}</div>
+                        <div className="text-xs text-neutral-500">Projects + skills</div>
+                    </div>
+                    <div className="rounded-[20px] border border-neutral-200 bg-white p-4 shadow-sm">
+                        <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-neutral-400">Inbox</div>
+                        <div className="mt-2 text-lg font-black text-[#18112E]">{useStore.getState().messages.length}</div>
+                        <div className="text-xs text-neutral-500">New messages</div>
+                    </div>
                 </div>
             </div>
 
-            <hr className="border-neutral-200" />
-
-            <h2 className="text-xl font-bold text-[#18112E]">Music Player</h2>
-            <p className="text-sm text-neutral-500 font-medium">Set a song for the admin panel — paste a URL or upload a file.</p>
-
-            <div className="bg-[#F8F9FA] border border-neutral-200 rounded-[16px] p-5 space-y-4">
+            <div className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-[24px] p-5 space-y-4 shadow-2xl shadow-black/10">
                 <div>
-                    <label className="text-xs font-bold text-[#18112E] block mb-1.5">Song Name</label>
-                    <input type="text" defaultValue={getMusicName()} onChange={(e) => { setMusicName(e.target.value); window.location.reload(); }} placeholder="My Song" className="w-full bg-white border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
+                    <h2 className="text-xl font-bold text-white">Deploy to Production</h2>
+                    <p className="text-sm text-white/70 font-medium">Push your changes to GitHub. Vercel redeploys automatically after the commit lands.</p>
                 </div>
-                <div>
-                    <label className="text-xs font-bold text-[#18112E] block mb-1.5">Audio URL or Upload (YouTube not supported for audio)</label>
-                    <div className="flex gap-2">
-                        <input type="text" defaultValue={getMusicUrl()} onChange={(e) => { setMusicUrl(e.target.value); window.location.reload(); }} placeholder="https://example.com/song.mp3" className="flex-1 bg-white border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
-                        <label className="flex items-center gap-1.5 px-4 bg-[#18112E] text-white rounded-[12px] text-xs font-bold cursor-pointer hover:bg-[#FFB800] hover:text-[#18112E] transition-all whitespace-nowrap">
-                            <UploadCloud className="w-4 h-4" /> Upload
-                            <input type="file" accept="audio/*" className="hidden" onChange={(e) => {
-                                const f = e.target.files?.[0];
-                                if (!f) return;
-                                const r = new FileReader();
-                                r.onload = () => { setMusicUrl(r.result); window.location.reload(); };
-                                r.readAsDataURL(f);
-                            }} />
-                        </label>
+                <div className="bg-white rounded-[18px] p-5 space-y-4">
+                    <div>
+                        <label className="text-xs font-bold text-[#18112E] block mb-1.5">GitHub Personal Access Token</label>
+                        <div className="flex gap-2">
+                            <input type="password" value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} placeholder="ghp_... or github_pat_..." className="flex-1 bg-[#F8F9FA] border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
+                            <button onClick={saveToken} className="bg-[#18112E] text-white px-5 py-3 rounded-[12px] text-sm font-bold hover:bg-[#FFB800] hover:text-[#18112E] transition-all">Save</button>
+                        </div>
+                        <a href="https://github.com/settings/tokens" target="_blank" rel="noreferrer" className="text-[11px] text-blue-600 underline mt-1.5 inline-block">Generate a classic token with repo scope</a>
+                    </div>
+                    <div className="pt-2 border-t border-neutral-200">
+                        <button onClick={handleDeploy} disabled={deploying || !getToken()} className="flex items-center gap-2 bg-[#FFB800] text-[#18112E] px-6 py-3 rounded-[12px] font-bold hover:bg-[#ffcc33] transition-all disabled:opacity-50 shadow-md">
+                            <Upload className="w-5 h-5" /> {deploying ? 'Deploying to GitHub...' : 'Deploy to Production'}
+                        </button>
+                        <p className="text-[11px] text-neutral-400 mt-2">Commits to <span className="font-mono">{REPO}/{FILE_PATH}</span> on <span className="font-mono">{BRANCH}</span>.</p>
                     </div>
                 </div>
-                {getMusicUrl() && (
-                    <div className="flex items-center gap-3 text-sm text-green-600 font-medium">
-                        <Music className="w-4 h-4" /> Song set — player appears bottom-right.
-                    </div>
-                )}
             </div>
 
-            <hr className="border-neutral-200" />
-
-            <h2 className="text-xl font-bold text-[#18112E]">Background</h2>
-            <p className="text-sm text-neutral-500 font-medium">Set a background image or video — paste a URL or upload a file.</p>
-
-            <div className="bg-[#F8F9FA] border border-neutral-200 rounded-[16px] p-5 space-y-4">
-                <div>
-                    <label className="text-xs font-bold text-[#18112E] block mb-1.5">Background Image — URL or Upload</label>
-                    <div className="flex gap-2">
-                        <input type="text" defaultValue={getBgImg()} onChange={(e) => { setBgImg(e.target.value); window.location.reload(); }} placeholder="https://example.com/bg.jpg" className="flex-1 bg-white border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
-                        <label className="flex items-center gap-1.5 px-4 bg-[#18112E] text-white rounded-[12px] text-xs font-bold cursor-pointer hover:bg-[#FFB800] hover:text-[#18112E] transition-all whitespace-nowrap">
-                            <UploadCloud className="w-4 h-4" /> Upload
-                            <input type="file" accept="image/*" className="hidden" onChange={(e) => {
-                                const f = e.target.files?.[0];
-                                if (!f) return;
-                                const r = new FileReader();
-                                r.onload = () => { setBgImg(r.result); window.location.reload(); };
-                                r.readAsDataURL(f);
-                            }} />
-                        </label>
+            <div className="grid gap-6 lg:grid-cols-2">
+                <div className="rounded-[24px] border border-neutral-200 bg-white p-5 shadow-sm">
+                    <div className="flex items-start justify-between gap-4">
+                        <div>
+                            <h2 className="text-xl font-bold text-[#18112E]">Playlist ({playlist.length})</h2>
+                            <p className="text-sm text-neutral-500 font-medium">Songs play in queue order. Add audio, YouTube, or Spotify URLs.</p>
+                        </div>
+                        <button onClick={saveAll} className="bg-[#FFB800] text-[#18112E] px-4 py-2.5 rounded-[12px] text-sm font-bold hover:bg-[#ffcc33] transition-all shadow-sm">
+                            Save & reload
+                        </button>
+                    </div>
+                    <div className="mt-5 space-y-3 max-h-[280px] overflow-y-auto">
+                        {playlist.length === 0 && (
+                            <div className="text-center py-8 text-neutral-400 text-sm font-bold">No songs yet. Add one below.</div>
+                        )}
+                        {playlist.map((s, i) => {
+                            const prov = getMusicProvider(s.url);
+                            const isCurrent = i === curIndex;
+                            return (
+                                <div key={i} className={`flex items-center gap-3 p-3 rounded-[14px] border transition-all ${isCurrent ? 'bg-[#FFB800]/10 border-[#FFB800]/40' : 'bg-[#F8F9FA] border-neutral-100'}`}>
+                                    <div className="flex flex-col gap-0.5">
+                                        <button onClick={() => moveSong(i, -1)} disabled={i === 0} className="text-neutral-400 hover:text-[#18112E] disabled:opacity-20 disabled:cursor-not-allowed"><ChevronDown className="w-3 h-3 -rotate-90" /></button>
+                                        <button onClick={() => moveSong(i, 1)} disabled={i === playlist.length - 1} className="text-neutral-400 hover:text-[#18112E] disabled:opacity-20 disabled:cursor-not-allowed"><ChevronDown className="w-3 h-3 rotate-90" /></button>
+                                    </div>
+                                    <div className={`w-8 h-8 rounded-[10px] flex items-center justify-center text-xs font-black ${isCurrent ? 'bg-[#FFB800] text-[#18112E]' : 'bg-white border border-neutral-100 text-neutral-400'}`}>
+                                        {prov === 'youtube' ? 'YT' : prov === 'spotify' ? 'SP' : '♪'}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className={`text-sm font-bold truncate ${isCurrent ? 'text-[#18112E]' : 'text-neutral-600'}`}>{s.name}</p>
+                                        <p className="text-[10px] text-neutral-400 font-medium truncate">{s.url}</p>
+                                    </div>
+                                    <button onClick={() => removeSong(i)} className="p-1.5 rounded-[8px] text-neutral-400 hover:text-red-500 hover:bg-red-50 transition-colors">
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                </div>
+                            );
+                        })}
+                    </div>
+                    <div className="mt-4 pt-4 border-t border-neutral-100 space-y-3">
+                        <div className="flex gap-2">
+                            <input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Song name" className="flex-1 bg-[#F8F9FA] border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
+                        </div>
+                        <div className="flex gap-2">
+                            <input type="text" value={newUrl} onChange={(e) => setNewUrl(e.target.value)} placeholder="Audio, YouTube or Spotify URL" className="flex-1 bg-[#F8F9FA] border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
+                            <label className="flex items-center gap-1.5 px-4 bg-[#18112E] text-white rounded-[12px] text-xs font-bold cursor-pointer hover:bg-[#FFB800] hover:text-[#18112E] transition-all whitespace-nowrap">
+                                <UploadCloud className="w-4 h-4" /> Upload
+                                <input type="file" accept="audio/*" className="hidden" onChange={handleAudioUpload} />
+                            </label>
+                        </div>
+                        <button onClick={addSong} className="w-full bg-[#FFB800] text-[#18112E] py-3 rounded-[12px] text-sm font-bold hover:bg-[#ffcc33] transition-all shadow-sm">
+                            <Plus className="w-4 h-4 inline mr-1.5" />Add to playlist
+                        </button>
                     </div>
                 </div>
-                <div>
-                    <label className="text-xs font-bold text-[#18112E] block mb-1.5">Background Video — URL or Upload (YouTube supported!)</label>
-                    <div className="flex gap-2">
-                        <input type="text" defaultValue={getBgVid()} onChange={(e) => { setBgVid(e.target.value); window.location.reload(); }} placeholder="https://youtube.com/watch?v=... or https://example.com/bg.mp4" className="flex-1 bg-white border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
-                        <label className="flex items-center gap-1.5 px-4 bg-[#18112E] text-white rounded-[12px] text-xs font-bold cursor-pointer hover:bg-[#FFB800] hover:text-[#18112E] transition-all whitespace-nowrap">
-                            <UploadCloud className="w-4 h-4" /> Upload
-                            <input type="file" accept="video/*" className="hidden" onChange={(e) => {
-                                const f = e.target.files?.[0];
-                                if (!f) return;
-                                const r = new FileReader();
-                                r.onload = () => { setBgVid(r.result); window.location.reload(); };
-                                r.readAsDataURL(f);
-                            }} />
-                        </label>
+
+                <div className="rounded-[24px] border border-neutral-200 bg-white p-5 shadow-sm">
+                    <div>
+                        <h2 className="text-xl font-bold text-[#18112E]">Background</h2>
+                        <p className="text-sm text-neutral-500 font-medium">Set a background image or video — YouTube videos also render inline.</p>
+                    </div>
+                    <div className="mt-5 space-y-4">
+                        <div>
+                            <label className="text-xs font-bold text-[#18112E] block mb-1.5">Background Image URL</label>
+                            <div className="flex gap-2">
+                                <input type="text" value={bgImgInput} onChange={(e) => setBgImgInput(e.target.value)} placeholder="https://example.com/bg.jpg" className="flex-1 bg-[#F8F9FA] border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
+                                <label className="flex items-center gap-1.5 px-4 bg-[#18112E] text-white rounded-[12px] text-xs font-bold cursor-pointer hover:bg-[#FFB800] hover:text-[#18112E] transition-all whitespace-nowrap">
+                                    <UploadCloud className="w-4 h-4" /> Upload
+                                    <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload(setBgImgInput, BG_IMG_KEY)} />
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label className="text-xs font-bold text-[#18112E] block mb-1.5">Background Video URL</label>
+                            <div className="flex gap-2">
+                                <input type="text" value={bgVidInput} onChange={(e) => setBgVidInput(e.target.value)} placeholder="https://youtube.com/watch?v=... or https://example.com/bg.mp4" className="flex-1 bg-[#F8F9FA] border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" />
+                                <label className="flex items-center gap-1.5 px-4 bg-[#18112E] text-white rounded-[12px] text-xs font-bold cursor-pointer hover:bg-[#FFB800] hover:text-[#18112E] transition-all whitespace-nowrap">
+                                    <UploadCloud className="w-4 h-4" /> Upload
+                                    <input type="file" accept="video/*" className="hidden" onChange={handleImageUpload(setBgVidInput, BG_VID_KEY)} />
+                                </label>
+                            </div>
+                        </div>
+                        <div className="flex items-center justify-between gap-3 rounded-[16px] border border-dashed border-neutral-200 bg-neutral-50 px-4 py-3">
+                            <div className="flex items-center gap-2 text-sm font-medium text-neutral-600">
+                                <ImageIcon className="w-4 h-4 text-[#FFB800]" />
+                                Backgrounds update after save.
+                            </div>
+                            <button onClick={saveBackground} className="bg-[#FFB800] text-[#18112E] px-4 py-2.5 rounded-[12px] text-sm font-bold hover:bg-[#ffcc33] transition-all shadow-sm">
+                                Save background
+                            </button>
+                        </div>
                     </div>
                 </div>
-                {(getBgImg() || getBgVid()) && (
-                    <div className="flex items-center gap-3 text-sm text-green-600 font-medium">
-                        <ImageIcon className="w-4 h-4" /> Background set — toggle it from the floating buttons (bottom-left).
-                    </div>
-                )}
             </div>
 
-            <hr className="border-neutral-200" />
-
-            <h2 className="text-xl font-bold text-[#18112E]">Admin Password</h2>
-            <p className="text-sm text-neutral-500 font-medium">The password is hardcoded — change it in <code className="bg-neutral-200 px-1.5 py-0.5 rounded text-xs">AdminPanel.jsx</code> (look for <code className="bg-neutral-200 px-1.5 py-0.5 rounded text-xs">ADMIN_PASSWORD</code>) and redeploy. Current password works on all devices.</p>
+            <div className="rounded-[20px] border border-neutral-200 bg-white p-4 shadow-sm">
+                <h2 className="text-xl font-bold text-[#18112E]">Admin Password</h2>
+                <p className="text-sm text-neutral-500 font-medium">The password is hardcoded in <code className="bg-neutral-100 px-1.5 py-0.5 rounded text-xs">AdminPanel.jsx</code> via <code className="bg-neutral-100 px-1.5 py-0.5 rounded text-xs">ADMIN_PASSWORD</code>.</p>
+            </div>
 
             {msg.text && (
                 <div className={`rounded-[12px] p-4 text-sm font-bold ${msg.type === 'error' ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-700'}`}>
@@ -696,55 +873,334 @@ function SettingsTab() {
     );
 }
 
+function fmt(t) {
+    if (!t || !isFinite(t)) return '0:00';
+    const m = Math.floor(t / 60);
+    const s = Math.floor(t % 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
 function MusicBar() {
-    const url = getMusicUrl();
-    const name = getMusicName() || 'Music';
+    const [playlist] = useState(() => getPlaylist());
+    const [index, setIndexState] = useState(() => getPlayIndex());
     const [playing, setPlaying] = useState(false);
     const [error, setError] = useState(false);
+    const [expanded, setExpanded] = useState(false);
+    const [currentTime, setCurrentTime] = useState(0);
+    const [duration, setDuration] = useState(0);
+    const [seeking, setSeeking] = useState(false);
     const audioRef = useRef(null);
-    const isYt = isYoutubeUrl(url);
+    const ytPlayerRef = useRef(null);
+    const ytTimer = useRef(null);
+    const barRef = useRef(null);
+
+    migratePlaylist();
+
+    const song = playlist[index] || null;
+    const provider = song ? getMusicProvider(song.url) : null;
+    const embedUrl = provider === 'spotify' ? getSpotifyEmbed(song?.url) : '';
+    const thumb = provider === 'youtube' ? getThumbnailUrl(song?.url) : '';
+    const stars = useMemo(() => Array.from({ length: 28 }, (_, i) => ({
+        left: `${(i * 3.7 + 1.2) % 100}%`,
+        top: `${(i * 7.1 + 2.3) % 80 + 10}%`,
+        delay: `${(i * 0.43) % 4}s`,
+        size: `${(i % 3 + 1) * 1.5}px`,
+        duration: `${2 + (i % 5) * 0.8}s`,
+    })), []);
+    const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+
+    const changeSong = (newIndex) => {
+        if (playlist.length === 0) return;
+        if (newIndex < 0) newIndex = playlist.length - 1;
+        if (newIndex >= playlist.length) newIndex = 0;
+        const newSong = playlist[newIndex];
+        if (!newSong) return;
+        setIndexState(newIndex);
+        setPlayIndex(newIndex);
+        setError(false);
+        setCurrentTime(0);
+        setDuration(0);
+        setPlaying(false);
+        const newProvider = getMusicProvider(newSong.url);
+        if (newProvider === 'youtube' && ytPlayerRef.current) {
+            const id = getYoutubeVideoId(newSong.url);
+            if (id) { ytPlayerRef.current.loadVideoById(id); ytPlayerRef.current.playVideo(); }
+        } else if (newProvider === 'audio' && audioRef.current) {
+            audioRef.current.src = newSong.url;
+            audioRef.current.play().then(() => setPlaying(true)).catch(() => {});
+        }
+    };
+
+    const next = () => changeSong(index + 1);
+    const prev = () => changeSong(index - 1);
+    const nextRef = useRef(next);
+    useEffect(() => { nextRef.current = next; });
+
+    const seek = (clientX) => {
+        if (!barRef.current || duration <= 0) return;
+        const rect = barRef.current.getBoundingClientRect();
+        const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+        const seekTime = pct * duration;
+        setCurrentTime(seekTime);
+        if (provider === 'youtube' && ytPlayerRef.current) ytPlayerRef.current.seekTo(seekTime, true);
+        if (provider === 'audio' && audioRef.current) audioRef.current.currentTime = seekTime;
+    };
+
+    const handleBarDown = (e) => { setSeeking(true); seek(e.clientX || e.touches?.[0]?.clientX); };
+    const handleBarMove = (e) => { if (seeking) seek(e.clientX || e.touches?.[0]?.clientX); };
+
+    useEffect(() => {
+        if (!seeking) return;
+        const up = () => setSeeking(false);
+        window.addEventListener('mouseup', up);
+        window.addEventListener('touchend', up);
+        return () => { window.removeEventListener('mouseup', up); window.removeEventListener('touchend', up); };
+    }, [seeking]);
+
+    useEffect(() => {
+        if (provider !== 'audio' || !audioRef.current) return;
+        const el = audioRef.current;
+        const update = () => { if (!seeking) { setCurrentTime(el.currentTime); setDuration(el.duration || 0); } };
+        el.addEventListener('timeupdate', update);
+        el.addEventListener('loadedmetadata', () => setDuration(el.duration || 0));
+        return () => el.removeEventListener('timeupdate', update);
+    }, [provider, song?.url, seeking]);
+
+    useEffect(() => {
+        if (provider !== 'youtube' || !ytPlayerRef.current) return;
+        if (playing && !seeking) {
+            ytTimer.current = setInterval(() => {
+                const p = ytPlayerRef.current;
+                if (p && p.getCurrentTime) { setCurrentTime(p.getCurrentTime()); setDuration(p.getDuration() || 0); }
+            }, 250);
+        }
+        return () => { if (ytTimer.current) { clearInterval(ytTimer.current); ytTimer.current = null; } };
+    }, [provider, playing, seeking]);
+
+    useEffect(() => {
+        if (!song || provider !== 'youtube' || ytPlayerRef.current) return;
+        const id = getYoutubeVideoId(song.url);
+        if (!id) return;
+        const initPlayer = () => {
+            if (ytPlayerRef.current) return;
+            ytPlayerRef.current = new YT.Player('yt-player', {
+                height: 0, width: 0,
+                videoId: id,
+                playerVars: { autoplay: 0, controls: 0, rel: 0, modestbranding: 1, playsinline: 1, loop: 0 },
+                events: {
+                    onReady: () => { ytPlayerRef.current?.setVolume(100); },
+                    onStateChange: (e) => {
+                        if (e.data === YT.PlayerState.PLAYING) setPlaying(true);
+                        else if (e.data === YT.PlayerState.PAUSED) setPlaying(false);
+                        else if (e.data === YT.PlayerState.ENDED) { setPlaying(false); setCurrentTime(0); nextRef.current(); }
+                    },
+                    onError: () => setError(true),
+                },
+            });
+        };
+        if (window.YT?.Player) initPlayer();
+        else {
+            window.onYouTubeIframeAPIReady = initPlayer;
+            if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
+                const tag = document.createElement('script');
+                tag.src = 'https://www.youtube.com/iframe_api';
+                document.head.appendChild(tag);
+            }
+        }
+        return () => {
+            if (ytTimer.current) { clearInterval(ytTimer.current); ytTimer.current = null; }
+            if (ytPlayerRef.current) { try { ytPlayerRef.current.destroy(); } catch {} ytPlayerRef.current = null; }
+        };
+    }, [provider, song?.url]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const toggle = () => {
         if (error) setError(false);
-        if (isYt) {
-            window.open(url, '_blank');
+        if (provider === 'youtube' && ytPlayerRef.current) {
+            const p = ytPlayerRef.current;
+            if (p.getPlayerState?.() === YT.PlayerState.PLAYING) p.pauseVideo();
+            else p.playVideo();
             return;
         }
+        if (provider === 'spotify') { setPlaying((v) => !v); return; }
         const el = audioRef.current;
         if (!el) return;
         if (playing) { el.pause(); setPlaying(false); }
         else { el.play().then(() => setPlaying(true)).catch(() => { setError(true); setPlaying(false); }); }
     };
 
-    if (!url) return null;
+    if (!song) return null;
+
+    const bars = [
+        { h: 65, d: '0s' }, { h: 100, d: '0.12s' }, { h: 40, d: '0.24s' },
+        { h: 85, d: '0.06s' }, { h: 55, d: '0.18s' }, { h: 90, d: '0.3s' },
+    ];
 
     return (
-        <>
-            {!isYt && <audio ref={audioRef} src={url} loop preload="auto" />}
-            <div className={`fixed bottom-4 right-4 z-50 flex items-center gap-3 bg-white/10 backdrop-blur-sm border border-white/10 rounded-[16px] px-4 py-3 shadow-2xl shadow-black/10 transition-all duration-300 hover:-translate-y-1 ${playing ? 'bg-[#FFB800]/20 border-[#FFB800]/30' : ''}`}>
-                <div className="relative">
-                    {playing && !error && (
-                        <span className="absolute inset-0 rounded-[10px] bg-[#FFB800] animate-ping opacity-30" />
-                    )}
-                    <button onClick={toggle} className="relative w-9 h-9 rounded-[10px] flex items-center justify-center transition-all active:scale-90 bg-[#18112E] text-white hover:bg-[#FFB800] hover:text-[#18112E]">
-                        {error ? <AlertCircle className="w-4 h-4" /> : playing ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                    </button>
+        <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2">
+            {provider === 'audio' && <audio ref={audioRef} src={song.url} preload="auto" onEnded={next} />}
+            {provider === 'youtube' && <div id="yt-player" className="w-0 h-0 absolute opacity-0 pointer-events-none" />}
+
+            {provider === 'spotify' && embedUrl && (
+                <div className={playing && !error ? '' : 'hidden'}>
+                    <iframe src={embedUrl} title="Spotify player" className="h-[152px] w-[320px] rounded-[16px]" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" />
                 </div>
-                <div className="flex items-center gap-2">
-                    {playing && !error && !isYt && (
-                        <span className="flex items-end gap-[2px] h-4">
-                            <span className="w-[3px] bg-[#18112E] rounded-full animate-bounce" style={{ animationDelay: '0ms', height: '60%' }} />
-                            <span className="w-[3px] bg-[#18112E] rounded-full animate-bounce" style={{ animationDelay: '150ms', height: '100%' }} />
-                            <span className="w-[3px] bg-[#18112E] rounded-full animate-bounce" style={{ animationDelay: '300ms', height: '40%' }} />
-                            <span className="w-[3px] bg-[#18112E] rounded-full animate-bounce" style={{ animationDelay: '75ms', height: '80%' }} />
-                        </span>
+            )}
+
+            <div className={`w-[320px] rounded-[20px] shadow-2xl shadow-black/20 overflow-hidden transition-all duration-300 ${expanded ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none absolute'} ${playing ? 'animate-pulse-glow border border-[#FFB800]/20' : 'bg-white/10 backdrop-blur-xl border border-white/20'}`}>
+                {thumb && (
+                    <div className="relative h-36 -mx-5 -mt-5 mb-4 overflow-hidden">
+                        <img src={thumb} alt="" className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#18112E]/90 via-[#18112E]/30 to-transparent" />
+                        <div className="absolute top-3 right-3 px-2 py-0.5 bg-black/40 backdrop-blur rounded text-[10px] font-bold text-white/80 uppercase tracking-wider">
+                            YouTube
+                        </div>
+                    </div>
+                )}
+                <div className={`p-5 pb-4 ${thumb ? 'pt-0' : ''} ${playing ? 'bg-gradient-to-br from-[#FFB800]/10 via-[#18112E]/60 to-[#18112E]/80 backdrop-blur-xl' : ''}`}>
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="relative">
+                            {thumb ? (
+                                <div className={`w-10 h-10 rounded-full overflow-hidden ring-2 ${playing ? 'ring-[#FFB800]' : 'ring-white/20'}`}>
+                                    <img src={thumb} alt="" className={`w-full h-full object-cover ${playing ? 'animate-disc-spin' : ''}`} />
+                                </div>
+                            ) : (
+                                <div className={`w-10 h-10 rounded-[12px] flex items-center justify-center text-sm font-black transition-all duration-700 ${playing ? 'bg-[#FFB800] text-[#18112E] shadow-lg shadow-[#FFB800]/50 animate-pulse-glow' : 'bg-white/10 text-white/80'}`}>
+                                    {provider === 'spotify' ? <Music className="w-5 h-5" /> : <Music className="w-5 h-5" />}
+                                </div>
+                            )}
+                            {playing && !thumb && (
+                                <span className="absolute -inset-1 rounded-[14px] border-2 border-transparent bg-gradient-to-r from-[#FFB800] via-[#ff8c00] to-[#FFB800] bg-[length:200%_100%] animate-shine -z-10 opacity-40" />
+                            )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <p className="text-sm font-bold text-white truncate drop-shadow-sm">{song.name}</p>
+                            <p className="text-[10px] text-white/50 font-medium flex items-center gap-1.5">
+                                <span>{provider === 'youtube' ? 'YouTube' : provider === 'spotify' ? 'Spotify' : 'Audio'}</span>
+                                <span className="w-1 h-1 rounded-full bg-white/30" />
+                                <span>{index + 1}/{playlist.length}</span>
+                            </p>
+                        </div>
+                        {playing && provider === 'audio' && (
+                            <div className="flex items-end gap-[2px] h-6">
+                                {bars.map((b, i) => (
+                                    <span key={i} className="w-[3px] bg-[#FFB800] rounded-full animate-equalizer" style={{ height: `${b.h}%`, animationDelay: b.d }} />
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {provider !== 'spotify' && (
+                        <div className="mb-3">
+                            <div ref={barRef} className="relative h-4 group cursor-pointer py-1" onMouseDown={handleBarDown} onMouseMove={handleBarMove} onTouchStart={handleBarDown} onTouchMove={handleBarMove}>
+                                {/* Track outer glow */}
+                                <div className="absolute inset-y-0 left-0 right-0 rounded-full bg-gradient-to-r from-[#FFB800]/10 via-[#ff8c00]/5 to-transparent blur-xl opacity-50" style={{ width: `${Math.max(progress, 5)}%` }} />
+
+                                {/* Track background - layered glass */}
+                                <div className="absolute inset-y-0 left-0 right-0 rounded-full overflow-hidden">
+                                    <div className="absolute inset-0 bg-white/[0.04] rounded-full" />
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.02] to-transparent" />
+                                </div>
+
+                                {/* Tick marks */}
+                                {[0, 1, 2, 3].map((t) => (
+                                    <div key={t} className="absolute top-1/2 -translate-y-1/2 w-px h-1.5 bg-white/10 rounded-full" style={{ left: `${t * 33.33}%` }} />
+                                ))}
+
+                                {/* Filled progress with layered depth */}
+                                <div className="absolute inset-y-0 left-0 rounded-full transition-[width] duration-100 ease-linear overflow-visible" style={{ width: `${progress}%` }}>
+                                    {/* Base glow layer */}
+                                    <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#FFB800] via-[#ff8c00] to-[#FFB800] shadow-[0_0_20px_rgba(255,184,0,0.4)]" />
+                                    {/* Inner highlight */}
+                                    <div className="absolute inset-[2px] rounded-full bg-gradient-to-r from-white/30 via-white/10 to-transparent" />
+                                    {/* Energy pulse */}
+                                    <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shine" style={{ backgroundSize: '200% 100%' }} />
+
+                                    {/* Thumb sphere */}
+                                    <div className="absolute right-0 top-1/2 -translate-y-1/2">
+                                        <div className="w-4 h-4 rounded-full bg-white shadow-[0_0_20px_rgba(255,184,0,0.8)] scale-0 group-hover:scale-100 transition-all duration-300">
+                                            <div className="absolute inset-[2px] rounded-full bg-gradient-to-br from-[#FFB800] to-[#ff8c00]" />
+                                            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shine" style={{ backgroundSize: '200% 100%' }} />
+                                        </div>
+                                        {/* Ring ripple */}
+                                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full border border-[#FFB800]/30 scale-0 group-hover:scale-150 transition-all duration-500 animate-ping" />
+                                    </div>
+                                </div>
+
+                                {/* Stars scattered along the bar */}
+                                {stars.slice(0, 15).map((s, i) => (
+                                    <div key={i} className="absolute rounded-full pointer-events-none" style={{
+                                        left: s.left, top: `-${(i % 3 + 1) * 8}px`,
+                                        width: s.size, height: s.size,
+                                        background: i % 2 === 0 ? '#FFB800' : 'rgba(255,255,255,0.6)',
+                                        animation: `twinkle ${s.duration} ease-in-out ${s.delay} infinite`,
+                                        filter: 'blur(0.5px)',
+                                    }} />
+                                ))}
+                            </div>
+
+                            <div className="flex items-center justify-between mt-1.5 px-0.5">
+                                <div className="flex items-center gap-1.5">
+                                    <span className="text-[11px] font-bold text-white/60 tabular-nums tracking-wide drop-shadow-[0_0_6px_rgba(255,184,0,0.1)]">{fmt(currentTime)}</span>
+                                    <span className="text-white/10 text-[8px] font-medium">/</span>
+                                    <span className="text-[9px] font-medium text-white/30 tabular-nums">{fmt(duration)}</span>
+                                </div>
+                                {playing && (
+                                    <div className="flex items-center gap-1">
+                                        <span className="w-1 h-1 rounded-full bg-[#FFB800]/60 animate-pulse" />
+                                        <span className="text-[8px] font-semibold text-white/30 uppercase tracking-[0.15em]">playing</span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     )}
-                    <span className={`text-sm font-bold max-w-[120px] truncate ${error ? 'text-red-500' : 'text-[#18112E]'}`}>
-                        {error ? 'Failed to play' : isYt ? 'Open in YouTube' : name}
-                    </span>
+
+                    <div className="flex items-center gap-1.5">
+                        <button onClick={prev} disabled={playlist.length <= 1} className="w-9 h-9 rounded-[10px] bg-white/10 text-white/60 hover:text-white hover:bg-white/20 transition-all disabled:opacity-30 flex items-center justify-center active:scale-90" title="Previous">
+                            <SkipBack className="w-4 h-4" />
+                        </button>
+                        <button onClick={toggle} className={`w-11 h-11 rounded-[14px] flex items-center justify-center transition-all active:scale-90 shadow-lg ${playing ? 'bg-[#FFB800] text-[#18112E] shadow-[#FFB800]/40 hover:bg-[#ffcc33] animate-pulse-glow' : 'bg-[#FFB800] text-[#18112E] hover:bg-[#ffcc33] shadow-black/20'}`}>
+                            {error ? <AlertCircle className="w-5 h-5" /> : playing ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+                        </button>
+                        <button onClick={next} disabled={playlist.length <= 1} className="w-9 h-9 rounded-[10px] bg-white/10 text-white/60 hover:text-white hover:bg-white/20 transition-all disabled:opacity-30 flex items-center justify-center active:scale-90" title="Next">
+                            <SkipForward className="w-4 h-4" />
+                        </button>
+
+                        <div className="flex items-center gap-1 h-8 ml-2 flex-1 justify-end">
+                            {playing && !error && provider === 'audio' ? (
+                                <span className="text-[10px] text-[#FFB800] font-semibold animate-pulse">LIVE</span>
+                            ) : provider === 'audio' && !playing ? (
+                                <span className="text-[10px] text-white/40 font-medium">Click to play</span>
+                            ) : provider !== 'audio' ? (
+                                <span className={`text-[10px] font-medium transition-colors ${playing ? 'text-[#FFB800]' : 'text-white/40'}`}>{playing ? 'Playing' : 'Paused'}</span>
+                            ) : null}
+                            {error && <span className="text-[10px] text-red-400 font-medium">Failed</span>}
+                        </div>
+                    </div>
                 </div>
             </div>
-        </>
+
+            <button onClick={() => setExpanded((v) => !v)} className={`flex items-center gap-3 rounded-full px-5 py-3 shadow-2xl shadow-black/10 transition-all duration-500 hover:-translate-y-1 ${playing ? 'bg-[#FFB800]/15 border border-[#FFB800]/30 backdrop-blur-xl animate-pulse-glow' : 'bg-white/10 backdrop-blur-xl border border-white/20 hover:bg-white/20'}`}>
+                <div className="relative">
+                    {playing && !error && <span className="absolute inset-0 rounded-full bg-[#FFB800] animate-ping opacity-40" />}
+                    {thumb ? (
+                        <div className="relative w-9 h-9 rounded-full overflow-hidden ring-2 ring-white/20">
+                            <img src={thumb} alt="" className={`w-full h-full object-cover ${playing ? 'animate-disc-spin' : ''}`} />
+                        </div>
+                    ) : (
+                        <div className={`relative w-8 h-8 rounded-[10px] flex items-center justify-center text-xs font-black transition-all duration-700 ${playing ? 'bg-[#18112E] text-[#FFB800] animate-disc-spin' : 'bg-[#18112E] text-white'}`}>
+                            {provider === 'spotify' ? 'SP' : '♪'}
+                        </div>
+                    )}
+                </div>
+                <div className="flex flex-col items-start min-w-0">
+                    <span className="text-sm font-bold truncate leading-tight transition-colors duration-500" style={{ color: playing ? '#FFB800' : 'white' }}>{error ? 'Error' : song.name}</span>
+                    {playing && provider !== 'spotify' && (
+                        <span className="text-[9px] text-white/40 font-medium tabular-nums">{fmt(currentTime)} / {fmt(duration)}</span>
+                    )}
+                </div>
+                <ChevronDown className={`w-4 h-4 transition-all duration-300 ${expanded ? 'rotate-180' : ''}`} style={{ color: playing ? '#FFB800' : 'rgba(255,255,255,0.6)' }} />
+            </button>
+        </div>
     );
 }
 
@@ -752,67 +1208,91 @@ export default function AdminPanel() {
     const [activeTab, setActiveTab] = useState('profile');
     const [showBg, setShowBg] = useState(true);
     const [showMusic, setShowMusic] = useState(true);
+    const profile = useStore((s) => s.profile);
+    const skillCount = useStore((s) => s.skills.length);
+    const projectCount = useStore((s) => s.projects.length);
+    const achievementCount = useStore((s) => s.achievements.length);
+    const messageCount = useStore((s) => s.messages.length);
+
+    const overviewCards = [
+        { label: 'Profile', value: profile?.name || 'Ready', hint: profile?.title || 'Edit your intro' },
+        { label: 'Content', value: String(projectCount + skillCount), hint: 'Projects + skills' },
+        { label: 'Messages', value: String(messageCount), hint: 'Inbox activity' },
+        { label: 'Awards', value: String(achievementCount), hint: 'Highlights' },
+    ];
 
     return (
         <PasswordGate>
-        <div className="min-h-screen font-sans relative" style={{ background: getBgVid() || getBgImg() ? undefined : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-            {showBg && getBgVid() && (isYoutubeUrl(getBgVid()) ? (
-                <iframe src={getYoutubeEmbed(getBgVid())} className="fixed inset-0 w-full h-full z-0 pointer-events-none" allow="autoplay; fullscreen" title="bg" />
+        <div className="min-h-screen font-sans relative">
+            {getBgVid() && (isYoutubeUrl(getBgVid()) ? (
+                <iframe src={getYoutubeEmbed(getBgVid())} className={`fixed inset-0 w-full h-full z-0 pointer-events-none transition-opacity duration-700 ${showBg ? 'opacity-100' : 'opacity-0'}`} allow="autoplay; fullscreen" title="bg" />
             ) : (
-                <video src={getBgVid()} autoPlay loop muted playsInline className="fixed inset-0 w-full h-full object-cover z-0" onError={(e) => { e.target.style.display = 'none'; }} />
+                <video src={getBgVid()} autoPlay loop muted playsInline className={`fixed inset-0 w-full h-full object-cover z-0 transition-opacity duration-700 ${showBg ? 'opacity-100' : 'opacity-0'}`} onError={(e) => { e.target.style.display = 'none'; }} />
             ))}
-            {showBg && getBgImg() && !getBgVid() && (
-                <img src={getBgImg()} className="fixed inset-0 w-full h-full object-cover z-0" alt="" onError={(e) => { e.target.style.display = 'none'; }} />
+            {getBgImg() && !getBgVid() && (
+                <img src={getBgImg()} className={`fixed inset-0 w-full h-full object-cover z-0 transition-opacity duration-700 ${showBg ? 'opacity-100' : 'opacity-0'}`} alt="" onError={(e) => { e.target.style.display = 'none'; }} />
             )}
-            {!getBgVid() && !getBgImg() && (
-                <div className="fixed inset-0 z-0 bg-gradient-to-br from-[#667eea] via-[#764ba2] to-[#f093fb] animate-pulse" style={{ animationDuration: '8s' }} />
-            )}
-            {showBg && (getBgVid() || getBgImg()) && <div className="fixed inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60 z-[1]" />}
+            <div className={`fixed inset-0 z-0 bg-gradient-to-br from-[#667eea] via-[#764ba2] to-[#f093fb] transition-opacity duration-700 ${(!showBg || (!getBgVid() && !getBgImg())) ? 'opacity-100' : 'opacity-0'}`} />
+            {(getBgVid() || getBgImg()) && <div className={`fixed inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60 z-[1] transition-opacity duration-700 ${showBg ? 'opacity-100' : 'opacity-0'}`} />}
             <div className="relative z-10 min-h-screen">
-            <header className="h-[60px] bg-white/10 backdrop-blur-sm border-b border-white/10 px-4 md:px-6 flex items-center justify-between sticky top-0 z-50 shadow-lg shadow-black/5">
-                <span className="text-lg font-extrabold tracking-tight text-[#18112E] drop-shadow-sm">Admin<span className="text-[#FFB800]">.</span></span>
-                <a href="/" className="text-xs font-bold text-[#18112E]/60 hover:text-[#18112E] transition-colors">View Site</a>
-            </header>
-
-            <div className="max-w-[1200px] mx-auto p-4 md:p-8">
-                <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-6">
-                    <div>
-                        <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)] tracking-tight">Control Panel</h1>
-                        <p className="text-white/70 mt-1 font-medium text-sm drop-shadow-sm">Manage your portfolio — no database needed.</p>
+                <header className="sticky top-0 z-50 border-b border-white/10 bg-white/10 backdrop-blur-sm shadow-lg shadow-black/5">
+                    <div className="mx-auto flex h-[68px] max-w-[1200px] items-center justify-between px-4 md:px-8">
+                        <span className="text-lg font-extrabold tracking-tight text-[#18112E] drop-shadow-sm">Admin<span className="text-[#FFB800]">.</span></span>
+                        <a href="/" className="text-xs font-bold text-[#18112E]/60 hover:text-[#18112E] transition-colors">View Site</a>
                     </div>
-                </div>
+                </header>
 
-                <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1 mb-6">
-                    {TABS.map((tab) => {
-                        const isActive = activeTab === tab.id;
-                        return (
-                            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-[12px] text-sm font-bold transition-all whitespace-nowrap shrink-0 backdrop-blur-sm ${isActive ? 'bg-[#FFB800]/70 text-[#18112E] shadow-lg shadow-black/10' : 'bg-white/10 text-white/70 border border-white/10 hover:bg-white/20 hover:border-[#FFB800]/50 hover:text-white'}`}>
-                                <tab.icon className="w-4 h-4" /> {tab.label}
-                            </button>
-                        );
-                    })}
-                </div>
-
-                <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
-                    <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-[24px] p-6 shadow-2xl shadow-black/10">
-                        {activeTab === 'profile' && <ProfileTab />}
-                        {activeTab === 'skills' && <SkillsTab />}
-                        {activeTab === 'projects' && <ProjectsTab />}
-                        {activeTab === 'achievements' && <AchievementsTab />}
-                        {activeTab === 'messages' && <MessagesTab />}
-                        {activeTab === 'settings' && <SettingsTab />}
+                <div className="mx-auto max-w-[1200px] space-y-6 p-4 md:p-8">
+                    <div className="grid gap-4 lg:grid-cols-[1.35fr_0.65fr]">
+                        <div className="rounded-[28px] border border-white/10 bg-white/10 p-6 shadow-2xl shadow-black/10 backdrop-blur-sm">
+                            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.24em] text-white/80">
+                                <Shield className="h-3.5 w-3.5 text-[#FFB800]" /> Admin dashboard
+                            </div>
+                            <h1 className="mt-4 text-3xl font-black tracking-tight text-white md:text-4xl">Manage content, media, and deployment.</h1>
+                            <p className="mt-3 max-w-2xl text-sm md:text-base font-medium text-white/75">A cleaner workspace for editing profile data, media links, and site settings without leaving the panel.</p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                            {overviewCards.map((card) => (
+                                <div key={card.label} className="rounded-[20px] border border-white/10 bg-white/90 p-4 shadow-sm backdrop-blur-sm">
+                                    <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-neutral-400">{card.label}</div>
+                                    <div className="mt-2 text-lg font-black text-[#18112E]">{card.value}</div>
+                                    <div className="text-xs text-neutral-500">{card.hint}</div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                </motion.div>
-            </div>
-            {showMusic && <MusicBar />}
-            <div className="fixed bottom-4 left-4 z-50 flex gap-2">
-                <button onClick={() => setShowBg(!showBg)} className="w-10 h-10 rounded-[12px] bg-white/10 backdrop-blur-sm border border-white/10 shadow-lg shadow-black/10 flex items-center justify-center hover:bg-white/25 transition-all text-white/70 hover:text-white" title="Toggle Background">
-                    {showBg ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                </button>
-                <button onClick={() => setShowMusic(!showMusic)} className="w-10 h-10 rounded-[12px] bg-white/10 backdrop-blur-sm border border-white/10 shadow-lg shadow-black/10 flex items-center justify-center hover:bg-white/25 transition-all text-white/70 hover:text-white" title="Toggle Music">
-                    {showMusic ? <Music className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-                </button>
-            </div>
+
+                    <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
+                        {TABS.map((tab) => {
+                            const isActive = activeTab === tab.id;
+                            return (
+                                <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-[12px] text-sm font-bold transition-all whitespace-nowrap shrink-0 backdrop-blur-sm ${isActive ? 'bg-[#FFB800]/80 text-[#18112E] shadow-lg shadow-black/10' : 'bg-white/10 text-white/70 border border-white/10 hover:bg-white/20 hover:border-[#FFB800]/50 hover:text-white'}`}>
+                                    <tab.icon className="w-4 h-4" /> {tab.label}
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+                        <div className="rounded-[28px] border border-white/10 bg-white/10 p-5 shadow-2xl shadow-black/10 backdrop-blur-sm md:p-6">
+                            {activeTab === 'profile' && <ProfileTab />}
+                            {activeTab === 'skills' && <SkillsTab />}
+                            {activeTab === 'projects' && <ProjectsTab />}
+                            {activeTab === 'achievements' && <AchievementsTab />}
+                            {activeTab === 'messages' && <MessagesTab />}
+                            {activeTab === 'settings' && <SettingsTab />}
+                        </div>
+                    </motion.div>
+                </div>
+                {showMusic && <MusicBar />}
+                <div className="fixed bottom-4 left-4 z-50 flex gap-2">
+                    <button onClick={() => setShowBg(!showBg)} className="w-10 h-10 rounded-[12px] bg-white/10 backdrop-blur-sm border border-white/10 shadow-lg shadow-black/10 flex items-center justify-center hover:bg-white/25 transition-all text-white/70 hover:text-white" title="Toggle Background">
+                        {showBg ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                    </button>
+                    <button onClick={() => setShowMusic(!showMusic)} className="w-10 h-10 rounded-[12px] bg-white/10 backdrop-blur-sm border border-white/10 shadow-lg shadow-black/10 flex items-center justify-center hover:bg-white/25 transition-all text-white/70 hover:text-white" title="Toggle Music">
+                        {showMusic ? <Music className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+                    </button>
+                </div>
             </div>
         </div>
         </PasswordGate>
