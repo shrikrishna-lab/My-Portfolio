@@ -45,13 +45,14 @@
 
 | Section | What it shows |
 |---------|--------------|
-| **Hero** | Animated intro + parallax background |
-| **Skills** | Categorized grid with icon picker |
-| **Projects** | Cards with image, tech stack, links |
-| **Achievements** | Interactive milestone cards |
-| **Startup Vision** | Mission & vision statement |
-| **Contact** | Form with email & social links |
-| **Footer** | Social links & copyright |
+| **Hero** | Animated intro with scroll parallax, spring animations, gradient text |
+| **About** | Background story with timeline, glass cards |
+| **Skills** | Categorized grid with Lucide icons, stagger animations |
+| **Projects** | Cards with image, tech stack pills, detail modal |
+| **Achievements** | Interactive milestone cards with expandable modal |
+| **Startup Vision** | Mission statement with icon pillars |
+| **Contact** | Form with validation, animated send button |
+| **Footer** | Social links with hover animations |
 
 </td>
 <td>
@@ -122,6 +123,97 @@ npm run dev
 <em>No backend server. Everything runs in the browser.</em>
 
 </div>
+
+---
+
+## ✨ Visual Effects & Animations
+
+<details open>
+<summary><strong>🌀 Background Scene</strong></summary>
+<br>
+
+A fixed background layer with scroll-driven parallax:
+
+- **Ambient glows** — two large blurred orbs (gold and blue) that slowly pulse and scale, positioned at opposite corners
+- **Grid pattern** — subtle dot pattern with a radial mask that fades at the edges
+- **Floating geometric shapes** — 15 circles, rounded squares, and squares with `shadow-[8px_8px_0_#18112E]` borders, each with random size, position, rotation, and duration. They float on three parallax layers (`bgY1`, `bgY2`, `bgY3`) mapped to `scrollY` via `useTransform`
+
+All shape positions are pre-generated at module level so `Math.random` is never called during render (React purity).
+
+</details>
+
+<br>
+
+<details>
+<summary><strong>🎬 Section Animations</strong></summary>
+<br>
+
+Every section uses `framer-motion` with `whileInView` for scroll-triggered reveals:
+
+- **Spring stiffness/damping** values tuned per element (80–300 stiffness)
+- **Stagger children** — Skills grid items fly in with `staggerChildren: 0.05`
+- **Hover cards** — Projects and Achievements lift on hover with spring physics
+- **Magnetic buttons** — CTA buttons scale to 1.03 on hover, 0.97 on tap
+- **Navbar** — slides down from top with spring, mobile menu animates with `AnimatePresence`
+
+Each section uses a consistent pattern: `initial → whileInView → viewport: { once: true }` for efficient re-rendering.
+
+</details>
+
+<br>
+
+<details>
+<summary><strong>🎵 Music Player Animations</strong></summary>
+<br>
+
+Custom Tailwind keyframes defined in `tailwind.config.js`:
+
+| Animation | Duration | Effect |
+|-----------|----------|--------|
+| `equalizer` | 0.8s | 6 bars bounce at staggered heights (20%–100%) with opacity fade |
+| `disc-spin` | 4s | Smooth 360° rotation on YouTube thumbnail discs |
+| `pulse-glow` | 2s | Pulsing box-shadow from 12px to 30px gold blur |
+| `shine` | 3s | Gradient sweep across progress bar and card borders |
+| `aurora` | 6s | Slow horizontal sway with skew for the wave beneath the progress bar |
+| `twinkle` | 3s | Star particles fade and scale between 0.8 and 1.2 |
+
+The collapsed pill button shows a spinning disc (YouTube thumbnail or styled icon), an animated equalizer for audio, and pulsing glow rings when active.
+
+</details>
+
+<br>
+
+<details>
+<summary><strong>🪟 Glass-morphism UI</strong></summary>
+<br>
+
+The admin panel uses a consistent glass aesthetic:
+
+- `backdrop-blur-xl` on all panels and buttons
+- `border border-white/10` with `bg-white/10` backgrounds
+- Dark gradient fallback `from-[#667eea] via-[#764ba2] to-[#f093fb]`
+- Overlay gradient `from-black/40 via-transparent to-black/60` over media backgrounds
+- All interactive elements have `.active:scale-90` for tactile feedback
+
+</details>
+
+<br>
+
+<details>
+<summary><strong>🤖 YouTube IFrame API</strong></summary>
+<br>
+
+YouTube music plays entirely in the background — no visible video:
+
+- Player element is `w-0 h-0 opacity-0 pointer-events-none absolute`
+- API script injected on first YouTube song, reused for subsequent tracks
+- `loadVideoById()` + `playVideo()` for seamless song switching
+- `seekTo()` for progress bar seeking
+- `onStateChange` tracks PLAYING/PAUSED/ENDED states
+- Auto-resets volume to 100% on player ready
+- Player destroyed on cleanup to prevent memory leaks
+
+</details>
 
 ---
 
@@ -214,19 +306,37 @@ No external storage service needed.
 
 ```
 📦 Portfolio CMS
-├── 📂 public/          → 📄 data.json (edit & deploy)
+├── 📂 public/
+│   └── 📄 data.json            → deployed content (GitHub commit)
 ├── 📂 src/
-│   ├── 📄 App.jsx      → Routes (/ + /admin)
-│   ├── 📄 main.jsx     → Entry point
+│   ├── 📄 App.jsx              → Routes (/ + /admin)
+│   ├── 📄 main.jsx             → React entry point
+│   ├── 📄 index.css            → Tailwind directives + custom scrollbar
 │   ├── 📂 lib/
-│   │   └── 📄 store.js → Zustand (all CRUD)
-│   ├── 📂 components/  → Hero, Skills, Projects, etc.
+│   │   └── 📄 store.js         → Zustand store (profile, skills, projects, achievements, messages, CRUD + GitHub sync)
+│   ├── 📂 components/public/
+│   │   ├── 📄 BackgroundScene.jsx → parallax orbs, grid, floating shapes
+│   │   ├── 📄 Navbar.jsx          → sticky glass nav + mobile drawer
+│   │   ├── 📄 Hero.jsx            → scroll parallax, spring text, CTAs
+│   │   ├── 📄 About.jsx           → story section with timeline
+│   │   ├── 📄 Skills.jsx          → categorized skill pills with stagger
+│   │   ├── 📄 Projects.jsx        → project cards + detail modal
+│   │   ├── 📄 Achievements.jsx    → milestone cards + expandable modal
+│   │   ├── 📄 StartupVision.jsx   → mission pillars with hover lift
+│   │   ├── 📄 Contact.jsx         → form with validation + social info
+│   │   └── 📄 Footer.jsx          → social links + copyright
 │   └── 📂 pages/
-│       ├── 📂 public/  → Home, Layout
+│       ├── 📂 public/
+│       │   ├── 📄 Home.jsx        → composes all public sections
+│       │   └── 📄 PublicLayout.jsx → layout with BackgroundScene
 │       └── 📂 admin/
-│           └── 📄 AdminPanel.jsx
-├── 📄 panel.mjs        → CLI tool (optional)
-└── 📄 vercel.json      → SPA routing
+│           └── 📄 AdminPanel.jsx  → full admin (Profile, Skills, Projects, Achievements, Messages, Settings tabs)
+├── 📄 panel.mjs              → CLI tool for terminal editing
+├── 📄 eslint.config.js       → flat config with react-hooks + react-refresh
+├── 📄 jsconfig.json          → path alias @/ → ./src/
+├── 📄 tailwind.config.js     → custom colors, fonts, keyframes (shine, equalizer, aurora, twinkle, disc-spin, pulse-glow)
+├── 📄 vite.config.js         → React plugin + @/ alias
+└── 📄 vercel.json            → SPA rewrites for client-side routing
 ```
 
 ---
@@ -254,6 +364,35 @@ node panel.mjs
 └─────────────────────────────────────────┘
 </pre>
 </div>
+
+---
+
+## 🗃️ State Management (Zustand)
+
+All portfolio data lives in a single Zustand store (`src/lib/store.js`):
+
+```
+Store shape:
+  profile       → { name, title, intro, aboutStory, startupVision, characterImage, email, github, linkedin, twitter }
+  skills[]      → { id, name, icon, category }
+  projects[]    → { id, title, description, techStack, imageUrl, githubUrl, liveUrl }
+  achievements[]→ { id, title, date, description, imageUrl }
+  messages[]    → { id, name, email, message, createdAt }
+  loading       → bool
+  getGithubToken→ fn() (from localStorage)
+
+Key actions:
+  fetchAll()            → GET /data.json → fallback to localStorage
+  addSkill / updateSkill / deleteSkill
+  addProject / updateProject / deleteProject
+  addAchievement / updateAchievement / deleteAchievement
+  addMessage            → saves locally + pushes to GitHub if token set
+  deleteMessage         → removes locally + syncs to GitHub
+  fetchMessagesFromGitHub → merges remote messages with local
+  uploadImage           → FileReader → base64 data URL
+```
+
+Data persists to `localStorage` under key `portfolio_data` on every mutation.
 
 ---
 
