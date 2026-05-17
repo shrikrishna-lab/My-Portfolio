@@ -928,7 +928,11 @@ function MusicBar() {
         } else if (newProvider === 'audio' && audioRef.current) {
             audioRef.current.src = newSong.url;
             audioRef.current.currentTime = 0;
-            audioRef.current.play().then(() => setPlaying(true)).catch(() => setError(true));
+            audioRef.current.muted = true;
+            audioRef.current.play().then(() => {
+                audioRef.current.muted = false;
+                setPlaying(true);
+            }).catch(() => { audioRef.current.muted = false; setError(true); });
         }
     };
 
