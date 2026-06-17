@@ -941,7 +941,7 @@ export default function Sandbox() {
                                                                 <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider">{exp.duration}</span>
                                                             </div>
                                                             <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider">📍 {exp.location}</p>
-                                                            <p className="text-xs text-neutral-600 font-medium leading-relaxed">{exp.description}</p>
+                                                            <p className="text-xs text-neutral-600 font-medium leading-relaxed whitespace-pre-wrap">{exp.description}</p>
                                                             {exp.skills && exp.skills.length > 0 && (
                                                                 <div className="flex flex-wrap gap-1 pt-1.5">
                                                                     {exp.skills.map((s, i) => (
@@ -1559,7 +1559,7 @@ export default function Sandbox() {
                                     <h3 className="text-2xl sm:text-3xl font-black text-[#18112E] tracking-tight">{selectedProject.title}</h3>
                                     <StatusBadge status={selectedProject.status} />
                                 </div>
-                                <p className="text-neutral-500 font-bold text-sm sm:text-base leading-relaxed">{selectedProject.description}</p>
+                                <p className="text-neutral-500 font-bold text-sm sm:text-base leading-relaxed whitespace-pre-wrap">{selectedProject.description}</p>
                             </div>
 
                             {/* Tech Stack */}
@@ -1642,7 +1642,7 @@ export default function Sandbox() {
                                     {selectedActivity.location && <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4" />{selectedActivity.location}</span>}
                                     <span className="flex items-center gap-1.5"><Tag className="w-4 h-4" />{selectedActivity.type}</span>
                                 </div>
-                                <p className="text-neutral-500 font-bold text-sm sm:text-base leading-relaxed pt-2">{selectedActivity.description}</p>
+                                <p className="text-neutral-500 font-bold text-sm sm:text-base leading-relaxed pt-2 whitespace-pre-wrap">{selectedActivity.description}</p>
                             </div>
 
                             {/* Photos Carousel */}
