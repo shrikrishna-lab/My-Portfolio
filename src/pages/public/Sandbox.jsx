@@ -775,6 +775,7 @@ export default function Sandbox() {
                                                 src={profile.characterImage || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"} 
                                                 alt="" 
                                                 className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-2 border-white" 
+                                                referrerPolicy="no-referrer"
                                                 onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"; }}
                                             />
                                         </div>
@@ -854,7 +855,7 @@ export default function Sandbox() {
                                         {/* Cover Banner */}
                                         <div className="h-32 sm:h-40 bg-gradient-to-r from-[#0A66C2]/85 to-[#004182] relative overflow-hidden">
                                             {profile.bannerImage ? (
-                                                <img src={profile.bannerImage} className="w-full h-full object-cover" alt="" onError={(e) => { e.target.style.display = 'none'; }} />
+                                                <img src={profile.bannerImage} className="w-full h-full object-cover" alt="" referrerPolicy="no-referrer" onError={(e) => { e.target.style.display = 'none'; }} />
                                             ) : null}
                                             <div className="absolute inset-0 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px] opacity-15" />
                                             <div className="absolute top-0 right-0 bg-[#0A66C2] text-white text-[9px] font-black uppercase tracking-widest px-4 py-1 rounded-bl-xl border-l border-b border-[#18112E] z-10">
@@ -870,6 +871,7 @@ export default function Sandbox() {
                                                     src={profile.characterImage || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"} 
                                                     alt={profile.name} 
                                                     className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-white shadow-md bg-white" 
+                                                    referrerPolicy="no-referrer"
                                                     onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"; }}
                                                 />
                                                 <span className="absolute bottom-1 right-1 bg-emerald-500 text-white rounded-full p-1 border-2 border-white shadow-sm flex items-center justify-center" title="Verified Profile">
@@ -1039,6 +1041,7 @@ export default function Sandbox() {
                                                                 src={profile.characterImage || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"} 
                                                                 alt="" 
                                                                 className="w-10 h-10 rounded-full object-cover border border-[#18112E] shrink-0" 
+                                                                referrerPolicy="no-referrer"
                                                                 onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"; }}
                                                             />
                                                             <div className="min-w-0 flex-1">
@@ -1072,6 +1075,7 @@ export default function Sandbox() {
                                                                 src={act.photos[0]} 
                                                                 alt="" 
                                                                 className="w-full h-full object-cover" 
+                                                                referrerPolicy="no-referrer"
                                                                 onError={(e) => {
                                                                     const parent = e.target.closest('.rounded-xl');
                                                                     if (parent) parent.style.display = 'none';
