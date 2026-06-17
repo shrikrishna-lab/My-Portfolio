@@ -241,31 +241,86 @@ YouTube music plays entirely in the background — no visible video:
 
 ## 🏖️ Sandbox Page
 
-The public **Sandbox** page (`/sandbox`) is a playground that showcases your activities, ongoing learning, startup ideas, and social integrations. It is fully responsive, interactive, and acts as a dynamic resume.
+The public **Sandbox** page (`/sandbox`) is an interactive playground that showcases developer activities, ongoing learning tracker, startup idea incubator, and mock social integrations.
 
-### 1. Interactive Activities Feed
-The activities feed allows visitors to toggle between different integrations dynamically using a tab switcher:
-- **Snap Dude**: An Instagram-like visual social timeline for developer updates.
-- **LinkedIn Profile View**: A high-fidelity, pixel-perfect mock LinkedIn profile page. Displays:
-  - Cover banner and verified profile badge.
-  - **About** summary story.
-  - **Experience** timeline displaying roles, dates, company details, descriptions, and tag pills.
-  - **Education** history with school, degree, dates, and achievements.
-  - **Certifications** badge list dynamically populated from your achievements.
-  - **Activity Posts** showing portfolio updates published to LinkedIn with interactive likes.
-- **GitHub View**: Summarizes your open-source projects, contributions, and repositories.
-- **YouTube View**: Integrates video logs or demo highlights.
-- **Feed (Carousel)**: A card-based carousel for quick horizontal scrolling through all adventures.
+| Feature Area | Key Capability | Interactive Elements |
+|--------------|----------------|----------------------|
+| **1. Social Feed Switcher** | Toggles mock feeds for LinkedIn, Snap Dude, GitHub, and YouTube | Likes, comments, slide-through post carousels |
+| **2. Learning Tracker** | Tracks active upskilling curves, completed topics, and notes | Status badges, progress rings, study link tabs |
+| **3. Project Change-logs** | Active project checklist lists, pending tasks, and date logs | Checklist completion states, toggleable logs |
+| **4. Startup Idea Repository** | Incubator for brainstorming app concepts, pitches, and tech stacks | Conceptual descriptions and constraint logs |
+| **5. Activity Log (Devlog)** | Chronological timeline of technical progress, features, and updates | Expandable documentation cards, screens |
 
-### 2. Learning Tracker
-A visual upskilling tracker that keeps tabs on your active learning curves. It displays the emoji icon, status pill (In Progress, Completed, etc.), progress percentage bar, completed/pending topics, study resources, and general notes.
+---
 
-### 3. Current Projects & Idea Sandbox
-- **Current Projects**: Shows active project cards with dynamic checklist items, pending tasks, status badges, and project-specific changelogs.
-- **Idea Repository**: A repository of startup pitches, app concepts, and brainstorm notes.
+### 📱 Social Feed Integrations
 
-### 4. Activity Log (Devlog)
-A chronological week-by-week timeline detailing your updates, complete with type badges (Update, Feature, Learning) and expandability for technical details and screenshots.
+<details open>
+<summary><strong>💼 High-Fidelity LinkedIn Mock Profile</strong></summary>
+<br>
+
+A pixel-perfect replica of a LinkedIn profile page rendered directly in your portfolio. This allows you to showcase a professional narrative without directing users off-site.
+
+- **Profile Header Card**: Standard LinkedIn cover banner overlayed with avatar image, name, headline, geographic location, and a mock **Connect** button.
+- **Dynamic Experience Timeline**: Automatically displays your professional career history (roles, companies, duration, and custom tag pills) synced directly from your database.
+- **Academic Education History**: Lists school name, degree, dates, grade metrics, and academic activities.
+- **Credentials & Licenses**: Dynamic Trophy-badged credentials populated directly from your achievements.
+- **Interactive Post Feed**: Displays updates tagged for LinkedIn. Supports liking posts and viewing comments.
+
+</details>
+
+<br>
+
+<details>
+<summary><strong>📸 Snap Dude Feed</strong></summary>
+<br>
+
+An Instagram/Snapchat-style visual gallery feed for quick media updates.
+- Double-tap posts to **Like** with spring-animated heart icons.
+- Add comments directly under visual mock posts.
+- Supports image slides, tag lists, and timestamps.
+
+</details>
+
+<br>
+
+<details>
+<summary><strong>🐙 GitHub & 🎥 YouTube Views</strong></summary>
+<br>
+
+- **GitHub Integration**: Renders your open-source projects, contribution stats, and direct links to active repositories.
+- **YouTube Embeds**: Streams video logs, project demonstrations, and tutorials using a custom video player overlay.
+
+</details>
+
+---
+
+### 📚 Learning & Progress Tracking
+
+<details>
+<summary><strong>⚡ Learning Tracker</strong></summary>
+<br>
+
+Tracks exactly what you are learning with high-fidelity visualization:
+- **Progress Rings**: Smooth SVG circular rings displaying active progress percentage.
+- **Topic Checklists**: Clear lists dividing *completed* topics (strikethrough) and *pending* topics.
+- **Resource Hub**: Fast-access link pills linking directly to official documentation, tutorials, or guides.
+- **Field Notes**: Custom insights, tips, and thoughts for each learning path.
+
+</details>
+
+<br>
+
+<details>
+<summary><strong>🪵 Chronological Activity Log (Devlog)</strong></summary>
+<br>
+
+A week-by-week technical journal representing your progress.
+- **Update Types**: Highlights categories with custom emoji badges — `⚙️ Update`, `✨ Feature`, `📚 Learning`.
+- **Details Cards**: Expandable panels that reveal deep-dive technical documentation, checklists of changes made, and links to git commits.
+- **Embedded Screenshots**: Image slides displaying proof-of-work layouts and screenshots directly inside the timeline.
+
+</details>
 
 ---
 
