@@ -1,4 +1,4 @@
-﻿import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useStore } from '@/lib/store';
 import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line no-unused-vars
 import {
@@ -627,6 +627,7 @@ function MessagesTab() {
 }
 
 function PasswordGate({ children }) {
+    const profile = useStore((s) => s.profile);
     const [input, setInput] = useState('');
     const [error, setError] = useState('');
     const [authed, setAuthed] = useState(() => {
@@ -637,7 +638,8 @@ function PasswordGate({ children }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (input === ADMIN_PASSWORD) {
+        const correctPassword = profile?.adminPassword || ADMIN_PASSWORD;
+        if (input === correctPassword) {
             try { sessionStorage.setItem('admin_auth', 'true'); } catch {}
             setAuthed(true);
             setError('');
@@ -672,14 +674,23 @@ function PasswordGate({ children }) {
 }
 
 function SettingsTab() {
+    const profile = useStore((s) => s.profile);
+    const updateProfile = useStore((s) => s.updateProfile);
     const [tokenInput, setTokenInput] = useState(getToken());
     const [playlist, setPlaylistState] = useState(() => getPlaylist());
     const [newName, setNewName] = useState('');
     const [newUrl, setNewUrl] = useState('');
     const [bgImgInput, setBgImgInput] = useState(getBgImg());
     const [bgVidInput, setBgVidInput] = useState(getBgVid());
+    const [passInput, setPassInput] = useState(profile?.adminPassword || 'admin123');
     const [deploying, setDeploying] = useState(false);
     const [msg, setMsg] = useState({ text: '', type: '' });
+
+    useEffect(() => {
+        if (profile?.adminPassword) {
+            setPassInput(profile.adminPassword);
+        }
+    }, [profile]);
 
     const showMsg = (text, type = 'success') => {
         setMsg({ text, type });
@@ -702,6 +713,15 @@ function SettingsTab() {
             localStorage.setItem(BG_VID_KEY, bgVidInput.trim());
         } catch {}
         window.location.reload();
+    };
+
+    const savePassword = () => {
+        if (!passInput.trim()) {
+            showMsg('Password cannot be empty.', 'error');
+            return;
+        }
+        updateProfile({ adminPassword: passInput.trim() });
+        showMsg('Password saved locally. Deploy to make it permanent.');
     };
 
     const updatePlaylist = (list) => {
@@ -776,6 +796,8 @@ function SettingsTab() {
                 currentProjects: state.currentProjects,
                 learningPaths: state.learningPaths,
                 activities: state.activities,
+                experience: state.experience || [],
+                education: state.education || [],
             };
 
             const url = `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`;
@@ -950,9 +972,26 @@ function SettingsTab() {
                 </div>
             </div>
 
-            <div className="rounded-[20px] border border-neutral-200 bg-white p-4 shadow-sm">
-                <h2 className="text-xl font-bold text-[#18112E]">Admin Password</h2>
-                <p className="text-sm text-neutral-500 font-medium">The password is hardcoded in <code className="bg-neutral-100 px-1.5 py-0.5 rounded text-xs">AdminPanel.jsx</code> via <code className="bg-neutral-100 px-1.5 py-0.5 rounded text-xs">ADMIN_PASSWORD</code>.</p>
+            <div className="rounded-[24px] border border-neutral-200 bg-white p-5 shadow-sm space-y-4">
+                <div>
+                    <h2 className="text-xl font-bold text-[#18112E]">Admin Password</h2>
+                    <p className="text-sm text-neutral-500 font-medium">Update the admin password. Deploy to production to apply it permanently.</p>
+                </div>
+                <div className="flex gap-2">
+                    <input 
+                        type="password" 
+                        value={passInput} 
+                        onChange={(e) => setPassInput(e.target.value)} 
+                        placeholder="New admin password" 
+                        className="flex-1 bg-[#F8F9FA] border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" 
+                    />
+                    <button 
+                        onClick={savePassword} 
+                        className="bg-[#18112E] text-white px-5 py-3 rounded-[12px] text-sm font-bold hover:bg-[#FFB800] hover:text-[#18112E] transition-all"
+                    >
+                        Save Password
+                    </button>
+                </div>
             </div>
 
             {msg.text && (

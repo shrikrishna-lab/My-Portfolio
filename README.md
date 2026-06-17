@@ -331,7 +331,7 @@ A week-by-week technical journal representing your progress.
 <br>
 
 Default password: <code>admin123</code>  
-Change it in <code>src/pages/admin/AdminPanel.jsx</code> — look for <code>ADMIN_PASSWORD</code>.
+Change it directly in the **Settings** tab of the Admin Panel, then click **Deploy to Production** to apply it permanently (stored in `data.json` under `profile.adminPassword`).
 
 | Device | Behavior |
 |--------|----------|
@@ -548,7 +548,7 @@ Data persists to `localStorage` under key `portfolio_data` on every mutation.
 
 | Item | Storage |
 |------|---------|
-| **Admin password** | Hardcoded in `AdminPanel.jsx` (change before deploy) |
+| **Admin password** | Stored in `public/data.json` under `profile.adminPassword` (changeable via Settings UI) |
 | **GitHub token** | Your browser's `localStorage` only |
 | **Portfolio content** | `public/data.json` + `localStorage` |
 | **Contact messages** | `localStorage` (per-browser) |
