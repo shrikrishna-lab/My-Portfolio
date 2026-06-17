@@ -42,7 +42,7 @@ export default function About() {
                                  Background
                              </h3>
                              <div className="space-y-6 text-neutral-600 text-lg sm:text-xl leading-relaxed font-medium bg-[#F8F9FA] p-6 sm:p-8 rounded-[32px] border border-neutral-100 shadow-sm">
-                                 <p>{profile.aboutStory}</p>
+                                 <p className="whitespace-pre-wrap">{profile.aboutStory}</p>
                              </div>
                          </div>
 

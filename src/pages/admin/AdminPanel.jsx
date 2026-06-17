@@ -108,9 +108,11 @@ const popularIcons = ['Code', 'Server', 'Database', 'Brush', 'Terminal', 'Globe'
 function ProfileTab() {
     const profile = useStore((s) => s.profile);
     const updateProfile = useStore((s) => s.updateProfile);
+    const uploadImage = useStore((s) => s.uploadImage);
     const [form, setForm] = useState({});
     const [saved, setSaved] = useState(false);
     const [init, setInit] = useState(false);
+    const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
         if (profile && !init) {
@@ -159,7 +161,40 @@ function ProfileTab() {
                 {Field({ label: 'Full Name', field: 'name' })}
                 {Field({ label: 'Headline Title', field: 'title' })}
                 <div className="md:col-span-2">{Field({ label: 'Brief Introduction', field: 'intro', multiline: true })}</div>
-                <div className="md:col-span-2">{Field({ label: 'Hero Image URL', field: 'characterImage' })}</div>
+                <div className="md:col-span-2">
+                    <label className="text-xs font-bold text-[#18112E] mb-1.5 block">Profile Picture (Hero Image)</label>
+                    <div className="flex gap-2">
+                        <input type="text" placeholder="Image URL" value={form.characterImage || ''} onChange={(e) => set('characterImage', e.target.value)} className={cls} />
+                        <label className="flex items-center justify-center px-4 bg-[#18112E] text-white hover:bg-[#FFB800] hover:text-[#18112E] rounded-[12px] font-bold text-xs cursor-pointer transition-colors shrink-0">
+                            {uploading ? '...' : 'Upload'}
+                            <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                setUploading(true);
+                                const { url } = await uploadImage(file);
+                                setUploading(false);
+                                if (url) set('characterImage', url);
+                            }} />
+                        </label>
+                    </div>
+                </div>
+                <div className="md:col-span-2">
+                    <label className="text-xs font-bold text-[#18112E] mb-1.5 block">LinkedIn Card Banner Image</label>
+                    <div className="flex gap-2">
+                        <input type="text" placeholder="Banner Image URL" value={form.bannerImage || ''} onChange={(e) => set('bannerImage', e.target.value)} className={cls} />
+                        <label className="flex items-center justify-center px-4 bg-[#18112E] text-white hover:bg-[#FFB800] hover:text-[#18112E] rounded-[12px] font-bold text-xs cursor-pointer transition-colors shrink-0">
+                            {uploading ? '...' : 'Upload'}
+                            <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                setUploading(true);
+                                const { url } = await uploadImage(file);
+                                setUploading(false);
+                                if (url) set('bannerImage', url);
+                            }} />
+                        </label>
+                    </div>
+                </div>
             </div>
             <hr className="border-neutral-100" />
             <h2 className="text-xl font-bold text-[#18112E]">About</h2>

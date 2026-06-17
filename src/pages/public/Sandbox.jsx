@@ -771,7 +771,12 @@ export default function Sandbox() {
                                     <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-10 pb-6 border-b border-neutral-100">
                                         <div className="relative shrink-0">
                                             <div className="absolute inset-0 -m-1 rounded-full bg-[#FFFC00] border-2 border-[#18112E]" />
-                                            <img src={profile.characterImage} alt="" className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-2 border-white" />
+                                            <img 
+                                                src={profile.characterImage || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"} 
+                                                alt="" 
+                                                className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-2 border-white" 
+                                                onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"; }}
+                                            />
                                         </div>
                                         <div className="space-y-3 text-center sm:text-left flex-1 min-w-0">
                                             <div className="flex flex-col sm:flex-row sm:items-center gap-3">
@@ -847,9 +852,12 @@ export default function Sandbox() {
                                     {/* Real LinkedIn Profile Header Card */}
                                     <div className="bg-white border-2 border-[#18112E] rounded-[24px] shadow-[6px_6px_0_#18112E] overflow-hidden relative">
                                         {/* Cover Banner */}
-                                        <div className="h-32 sm:h-40 bg-gradient-to-r from-[#0A66C2]/85 to-[#004182] relative">
+                                        <div className="h-32 sm:h-40 bg-gradient-to-r from-[#0A66C2]/85 to-[#004182] relative overflow-hidden">
+                                            {profile.bannerImage ? (
+                                                <img src={profile.bannerImage} className="w-full h-full object-cover" alt="" onError={(e) => { e.target.style.display = 'none'; }} />
+                                            ) : null}
                                             <div className="absolute inset-0 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px] opacity-15" />
-                                            <div className="absolute top-0 right-0 bg-[#0A66C2] text-white text-[9px] font-black uppercase tracking-widest px-4 py-1 rounded-bl-xl border-l border-b border-[#18112E]">
+                                            <div className="absolute top-0 right-0 bg-[#0A66C2] text-white text-[9px] font-black uppercase tracking-widest px-4 py-1 rounded-bl-xl border-l border-b border-[#18112E] z-10">
                                                 Official Profile
                                             </div>
                                         </div>
@@ -858,7 +866,12 @@ export default function Sandbox() {
                                         <div className="px-5 sm:px-8 pb-6 relative">
                                             {/* Overlapping Avatar */}
                                             <div className="relative -mt-16 sm:-mt-20 mb-4 inline-block">
-                                                <img src={profile.characterImage} alt={profile.name} className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-white shadow-md bg-white" />
+                                                <img 
+                                                    src={profile.characterImage || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"} 
+                                                    alt={profile.name} 
+                                                    className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-white shadow-md bg-white" 
+                                                    onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"; }}
+                                                />
                                                 <span className="absolute bottom-1 right-1 bg-emerald-500 text-white rounded-full p-1 border-2 border-white shadow-sm flex items-center justify-center" title="Verified Profile">
                                                     <CheckCircle2 className="w-4 h-4 fill-current text-white" />
                                                 </span>
@@ -897,7 +910,7 @@ export default function Sandbox() {
                                     {/* LinkedIn About Card */}
                                     <div className="bg-white border-2 border-[#18112E] rounded-[24px] p-5 sm:p-6 shadow-[6px_6px_0_#18112E] space-y-3">
                                         <h4 className="text-sm font-black text-[#18112E] uppercase tracking-wider">About</h4>
-                                        <p className="text-xs sm:text-sm text-neutral-600 font-medium leading-relaxed">{profile.aboutStory}</p>
+                                        <p className="text-xs sm:text-sm text-neutral-600 font-medium leading-relaxed whitespace-pre-wrap">{profile.aboutStory}</p>
                                     </div>
 
                                     {/* LinkedIn Experience Card */}
@@ -1020,21 +1033,28 @@ export default function Sandbox() {
                                             return (
                                                 <div key={act.id} className="bg-white border-2 border-[#18112E] rounded-[24px] p-5 sm:p-6 shadow-[6px_6px_0_#18112E] space-y-4 text-left">
                                                     {/* Post Header */}
-                                                    <div className="flex items-start justify-between gap-2">
-                                                        <div className="flex items-center gap-3">
-                                                            <img src={profile.characterImage} alt="" className="w-10 h-10 rounded-full object-cover border border-[#18112E]" />
-                                                            <div>
-                                                                <h4 className="text-xs sm:text-sm font-black text-[#18112E] tracking-tight">{profile.name}</h4>
-                                                                <p className="text-[10px] text-neutral-400 font-bold truncate max-w-[200px] sm:max-w-none">{profile.title}</p>
-                                                                <p className="text-[9px] text-neutral-400 font-medium">{act.date} • {act.location || 'Online'} • 🌐</p>
+                                                    <div className="flex items-start justify-between gap-2 min-w-0">
+                                                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                                                            <img 
+                                                                src={profile.characterImage || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"} 
+                                                                alt="" 
+                                                                className="w-10 h-10 rounded-full object-cover border border-[#18112E] shrink-0" 
+                                                                onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"; }}
+                                                            />
+                                                            <div className="min-w-0 flex-1">
+                                                                <h4 className="text-xs sm:text-sm font-black text-[#18112E] tracking-tight truncate">{profile.name}</h4>
+                                                                <p className="text-[10px] text-neutral-400 font-bold truncate">{profile.title}</p>
+                                                                <p className="text-[9px] text-neutral-400 font-medium truncate">{act.date} • {act.location || 'Online'} • 🌐</p>
                                                             </div>
                                                         </div>
-                                                        <StatusBadge status={act.status} />
+                                                        <div className="shrink-0">
+                                                            <StatusBadge status={act.status} />
+                                                        </div>
                                                     </div>
 
                                                     {/* Text description */}
                                                     <div className="space-y-2">
-                                                        <p className="text-xs sm:text-sm text-neutral-600 font-medium leading-relaxed">{act.description}</p>
+                                                        <p className="text-xs sm:text-sm text-neutral-600 font-medium leading-relaxed whitespace-pre-wrap">{act.description}</p>
                                                         {act.tags && (
                                                             <div className="flex flex-wrap gap-1.5 text-[10px] sm:text-xs font-black text-[#0A66C2]">
                                                                 {act.tags.map((tag, i) => (
@@ -1048,7 +1068,15 @@ export default function Sandbox() {
                                                     {act.photos && act.photos.length > 0 && (
                                                         <div onClick={() => setSelectedActivity(act)}
                                                             className="rounded-xl overflow-hidden border border-neutral-100 bg-neutral-50 max-h-80 cursor-pointer">
-                                                            <img src={act.photos[0]} alt="" className="w-full h-full object-cover" />
+                                                            <img 
+                                                                src={act.photos[0]} 
+                                                                alt="" 
+                                                                className="w-full h-full object-cover" 
+                                                                onError={(e) => {
+                                                                    const parent = e.target.closest('.rounded-xl');
+                                                                    if (parent) parent.style.display = 'none';
+                                                                }}
+                                                            />
                                                         </div>
                                                     )}
 
