@@ -1,4 +1,4 @@
-import { Github, Linkedin, Twitter, Command } from 'lucide-react';
+import { Github, Linkedin, Camera, Command } from 'lucide-react';
 import { useStore } from '@/lib/store';
 import { motion } from 'framer-motion'; // eslint-disable-line no-unused-vars
 
@@ -34,9 +34,9 @@ export default function Footer() {
                             <Linkedin className="w-6 h-6 text-[#18112E] group-hover:text-white transition-colors" />
                         </motion.a>
                     )}
-                    {profile.twitter && (
-                        <motion.a whileHover={{ scale: 1.05, y: -3 }} whileTap={{ scale: 0.95 }} href={profile.twitter} target="_blank" rel="noreferrer" className="w-14 h-14 rounded-[16px] bg-[#F8F9FA] border-2 border-[#18112E] shadow-[4px_4px_0_#18112E] flex items-center justify-center hover:bg-[#1DA1F2] hover:shadow-[6px_6px_0_#18112E] transition-colors group">
-                            <Twitter className="w-6 h-6 text-[#18112E] group-hover:text-white transition-colors" />
+                    {profile.snapdude && (
+                        <motion.a whileHover={{ scale: 1.05, y: -3 }} whileTap={{ scale: 0.95 }} href={profile.snapdude} target="_blank" rel="noreferrer" className="w-14 h-14 rounded-[16px] bg-[#F8F9FA] border-2 border-[#18112E] shadow-[4px_4px_0_#18112E] flex items-center justify-center hover:bg-[#FFFC00] hover:shadow-[6px_6px_0_#18112E] transition-colors group">
+                            <Camera className="w-6 h-6 text-[#18112E] group-hover:text-[#18112E] transition-colors" />
                         </motion.a>
                     )}
                 </div>

@@ -35,7 +35,7 @@ export default function Projects() {
                         <span className="w-10 h-1 bg-[#3AA8F5] rounded-full" />
                         <span className="text-[#3AA8F5] font-extrabold tracking-widest text-sm uppercase">Selected Works</span>
                     </div>
-                    <h2 className="text-5xl md:text-8xl lg:text-[7rem] font-black text-[#18112E] tracking-tighter uppercase leading-[0.9]">
+                    <h2 className="text-4xl sm:text-5xl md:text-8xl lg:text-[7rem] font-black text-[#18112E] tracking-tighter uppercase leading-[0.9]">
                         Featured<br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FFB800] to-[#ffcc33]">Projects.</span>
                     </h2>
@@ -82,7 +82,7 @@ export default function Projects() {
                             </div>
 
                             {/* Content */}
-                            <div className="flex-1 flex flex-col p-7">
+                            <div className="flex-1 flex flex-col p-5 sm:p-7">
                                 <div className="flex items-start justify-between gap-4 mb-3">
                                     <h3 className="text-2xl font-black text-[#18112E] tracking-tight leading-tight">{project.title}</h3>
                                     {project.githubUrl && (

@@ -56,12 +56,12 @@ export default function Skills() {
                         <span className="w-10 h-1 bg-[#18112E] rounded-full" />
                     </div>
 
-                    <h2 className="text-5xl md:text-8xl lg:text-[7rem] font-black text-[#18112E] tracking-tighter text-center mb-24 uppercase leading-[0.9]">
+                    <h2 className="text-4xl sm:text-5xl md:text-8xl lg:text-[7rem] font-black text-[#18112E] tracking-tighter text-center mb-24 uppercase leading-[0.9]">
                         Tech <br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-neutral-400 to-neutral-300">Arsenal.</span>
                     </h2>
 
-                    <div className="space-y-16 max-w-5xl mx-auto bg-white p-12 rounded-[40px] border border-neutral-100 shadow-[0_10px_40px_rgba(0,0,0,0.02)]">
+                    <div className="space-y-16 max-w-5xl mx-auto bg-white p-6 sm:p-12 rounded-[40px] border border-neutral-100 shadow-[0_10px_40px_rgba(0,0,0,0.02)]">
                         {frontendSkills.length > 0 && (
                             <div className="flex flex-col md:flex-row gap-8 md:items-start">
                                 <h3 className="w-48 text-2xl font-black text-[#18112E] uppercase tracking-tight pt-3 border-t-2 border-neutral-100 md:border-none md:pt-0">

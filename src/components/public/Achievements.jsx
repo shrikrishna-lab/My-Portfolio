@@ -26,7 +26,7 @@ export default function Achievements() {
                         <span className="w-10 h-1 bg-[#18112E]" />
                     </div>
 
-                    <h2 className="text-5xl md:text-8xl font-black text-[#18112E] tracking-tighter uppercase leading-[0.9] mb-24">
+                    <h2 className="text-4xl sm:text-5xl md:text-8xl font-black text-[#18112E] tracking-tighter uppercase leading-[0.9] mb-24">
                         Trophies & <br />
                         <span className="text-white drop-shadow-[4px_4px_0_rgba(24,17,46,1)]">Milestones.</span>
                     </h2>
@@ -42,7 +42,7 @@ export default function Achievements() {
                             whileHover={{ y: -5, transition: { type: "spring", stiffness: 300, damping: 25 } }}
                             viewport={{ once: true }}
                             transition={{ delay: i * 0.05, type: "spring", stiffness: 150, damping: 20 }}
-                            className="bg-white border-4 border-[#18112E] shadow-[8px_8px_0_#18112E] rounded-[32px] p-8 hover:bg-[#FFB800] transition-all group relative overflow-hidden cursor-pointer"
+                            className="bg-white border-4 border-[#18112E] shadow-[8px_8px_0_#18112E] rounded-[32px] p-6 sm:p-8 hover:bg-[#FFB800] transition-all group relative overflow-hidden cursor-pointer"
                         >
                             <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 blur-[30px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-full" />
 

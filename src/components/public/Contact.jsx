@@ -41,7 +41,7 @@ export default function Contact() {
                         <span className="w-10 h-1 bg-[#18112E]" />
                     </div>
 
-                    <h2 className="text-5xl md:text-8xl font-black text-[#18112E] tracking-tighter uppercase leading-[0.9]">
+                    <h2 className="text-4xl sm:text-5xl md:text-8xl font-black text-[#18112E] tracking-tighter uppercase leading-[0.9]">
                         Start a <br />
                         <span className="text-white drop-shadow-[4px_4px_0_rgba(24,17,46,1)]">Conversation.</span>
                     </h2>
@@ -53,31 +53,31 @@ export default function Contact() {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                         transition={{ type: "spring", stiffness: 100, damping: 20 }}
-                        className="space-y-12 bg-white rounded-[32px] p-10 border-2 border-[#18112E] shadow-[8px_8px_0_#18112E]"
+                        className="space-y-12 bg-white rounded-[32px] p-6 sm:p-10 border-2 border-[#18112E] shadow-[8px_8px_0_#18112E]"
                     >
-                        <p className="text-neutral-600 text-xl leading-relaxed font-bold">
+                        <p className="text-neutral-600 text-lg sm:text-xl leading-relaxed font-bold">
                             Whether you have a question, a project idea, or just want to say hi, my inbox is always open.
-                            <span className="block text-[#18112E] mt-4 font-black text-2xl">Let's build something exceptional together.</span>
+                            <span className="block text-[#18112E] mt-4 font-black text-xl sm:text-2xl">Let's build something exceptional together.</span>
                         </p>
 
                         <div className="space-y-8">
-                            <div className="flex items-start gap-6 group cursor-default">
-                                <div className="w-14 h-14 rounded-2xl bg-[#F8F9FA] border-2 border-[#18112E] flex items-center justify-center shadow-[4px_4px_0_#18112E] group-hover:bg-[#FFB800] transition-colors group-hover:-translate-y-1">
+                            <div className="flex items-start gap-4 sm:gap-6 group cursor-default min-w-0">
+                                <div className="shrink-0 w-14 h-14 rounded-2xl bg-[#F8F9FA] border-2 border-[#18112E] flex items-center justify-center shadow-[4px_4px_0_#18112E] group-hover:bg-[#FFB800] transition-colors group-hover:-translate-y-1">
                                     <Mail className="w-6 h-6 text-[#18112E]" />
                                 </div>
-                                <div>
+                                <div className="min-w-0 flex-1">
                                     <div className="text-sm text-neutral-500 font-bold mb-1 uppercase tracking-wider">Email</div>
-                                    <div className="text-xl font-black text-[#18112E] tracking-tight">{profile.email}</div>
+                                    <div className="text-lg sm:text-xl font-black text-[#18112E] tracking-tight break-all">{profile.email}</div>
                                 </div>
                             </div>
 
-                            <div className="flex items-start gap-6 group cursor-default">
-                                <div className="w-14 h-14 rounded-2xl bg-[#F8F9FA] border-2 border-[#18112E] flex items-center justify-center shadow-[4px_4px_0_#18112E] group-hover:bg-[#FFB800] transition-colors group-hover:-translate-y-1">
+                            <div className="flex items-start gap-4 sm:gap-6 group cursor-default min-w-0">
+                                <div className="shrink-0 w-14 h-14 rounded-2xl bg-[#F8F9FA] border-2 border-[#18112E] flex items-center justify-center shadow-[4px_4px_0_#18112E] group-hover:bg-[#FFB800] transition-colors group-hover:-translate-y-1">
                                     <MapPin className="w-6 h-6 text-[#18112E]" />
                                 </div>
-                                <div>
+                                <div className="min-w-0 flex-1">
                                     <div className="text-sm text-neutral-500 font-bold mb-1 uppercase tracking-wider">Location</div>
-                                    <div className="text-xl font-black text-[#18112E] tracking-tight">Based in India, working globally</div>
+                                    <div className="text-lg sm:text-xl font-black text-[#18112E] tracking-tight break-words">Based in India, working globally</div>
                                 </div>
                             </div>
                         </div>
@@ -89,7 +89,7 @@ export default function Contact() {
                         viewport={{ once: true }}
                         transition={{ type: "spring", stiffness: 100, damping: 20, delay: 0.15 }}
                         onSubmit={handleSubmit}
-                        className="flex flex-col gap-6 bg-white rounded-[32px] p-10 border-2 border-[#18112E] shadow-[8px_8px_0_#18112E]"
+                        className="flex flex-col gap-6 bg-white rounded-[32px] p-6 sm:p-10 border-2 border-[#18112E] shadow-[8px_8px_0_#18112E]"
                     >
                         <div className="flex flex-col md:flex-row gap-6">
                             <div className="flex-1 space-y-2">

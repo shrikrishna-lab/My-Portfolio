@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import PublicLayout from './pages/public/PublicLayout';
 import Home from './pages/public/Home';
+import Sandbox from './pages/public/Sandbox';
 import AdminPanel from './pages/admin/AdminPanel';
 import SplashScreen from './components/SplashScreen';
 import { useStore } from './lib/store';
@@ -24,6 +25,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<PublicLayout />}>
             <Route index element={<Home />} />
+            <Route path="sandbox" element={<Sandbox />} />
           </Route>
           <Route path="/admin" element={<AdminPanel />} />
         </Routes>

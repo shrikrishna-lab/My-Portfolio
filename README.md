@@ -51,6 +51,7 @@
 | **Projects** | Cards with image, tech stack pills, detail modal |
 | **Achievements** | Interactive milestone cards with expandable modal |
 | **Startup Vision** | Mission statement with icon pillars |
+| **Sandbox (LinkedIn)** | High-fidelity mock LinkedIn profile rendering cover, about story, experience timeline, education history, certificates, and interactive posts feed |
 | **Contact** | Form with validation, animated send button |
 | **Footer** | Social links with hover animations |
 
@@ -63,6 +64,7 @@
 | **Skills** | Add / Edit / Delete with icon & category |
 | **Projects** | Add / Edit / Delete with image upload |
 | **Achievements** | Add / Edit / Delete with date & image |
+| **Life Dashboard** | Manage projects, learning paths, activities, ideas, devlogs, **experiences**, and **education**. Supports browser bookmarklet sync. |
 | **Messages** | View & delete contact submissions, sync from GitHub |
 | **Settings** | Playlist, Background, Token, Deploy |
 
@@ -283,6 +285,23 @@ Set a background in **Settings** tab:
 - **Video** — URL, upload, or **YouTube link** (auto-detected!)
 - Toggle on/off with the eye button (bottom-left) — smooth crossfade
 - Falls back to animated gradient when toggled off
+
+</details>
+
+<br>
+
+<details>
+<summary><strong>🔗 LinkedIn Sync Scraper (Method 3)</strong></summary>
+<br>
+
+Syncing data from LinkedIn is notoriously difficult due to CORS, authwalls, and bot blocks. This project uses a **Browser Bookmarklet Scraper** to sync your profile, experiences, and education in real-time under your own logged-in browser session.
+
+#### How it works:
+1. **Copy the Bookmarklet**: Inside the Admin Panel (Life Dashboard → Import LinkedIn JSON), copy the bookmarklet code.
+2. **Create a Bookmark**: Create a new bookmark in your browser bookmarks bar, name it (e.g., *Sync Portfolio*), and paste the copied javascript code as the URL.
+3. **Visit LinkedIn**: Navigate to your own public LinkedIn profile page (e.g., `linkedin.com/in/your-name`).
+4. **Click & Sync**: Click the bookmarklet. The script scrapes your profile details, experiences, and education, and immediately POSTs it to the dev server's endpoint (`http://localhost:5173/api/sync`) which automatically writes to `public/data.json` on disk.
+5. **Production Fallback**: If the local endpoint is unreachable (e.g., when visiting your live production site), the bookmarklet automatically copies the JSON data to your clipboard so you can paste it manually into the import modal text box.
 
 </details>
 

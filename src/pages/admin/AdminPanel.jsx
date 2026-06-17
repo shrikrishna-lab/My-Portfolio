@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
+﻿import { useState, useRef, useEffect, useMemo } from 'react';
 import { useStore } from '@/lib/store';
 import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line no-unused-vars
 import {
@@ -90,6 +90,7 @@ const TABS = [
     { id: 'skills', label: 'Skills', icon: Sparkles },
     { id: 'projects', label: 'Projects', icon: FolderKanban },
     { id: 'achievements', label: 'Achievements', icon: Award },
+    { id: 'dashboard', label: 'Life Dashboard', icon: Sparkles },
     { id: 'messages', label: 'Messages', icon: MessageSquare },
     { id: 'settings', label: 'Settings', icon: Settings },
 ];
@@ -168,7 +169,33 @@ function ProfileTab() {
                 {Field({ label: 'Email', field: 'email' })}
                 {Field({ label: 'GitHub', field: 'github' })}
                 {Field({ label: 'LinkedIn', field: 'linkedin' })}
-                {Field({ label: 'Twitter / X', field: 'twitter' })}
+                {Field({ label: 'Snap Dude URL', field: 'snapdude' })}
+                {Field({ label: 'YouTube', field: 'youtube' })}
+            </div>
+            <hr className="border-neutral-100" />
+            <h2 className="text-xl font-bold text-[#18112E]">Social Dashboard Tabs</h2>
+            <p className="text-xs text-neutral-400 font-medium -mt-2">Enable or disable tabs in the Activities & Journeys feed on the public Sandbox page.</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                {['snapdude', 'linkedin', 'youtube', 'github', 'carousel'].map((tab) => {
+                    const socialTabs = form.socialTabs || { snapdude: true, linkedin: true, youtube: false, github: true, carousel: true };
+                    const enabled = socialTabs[tab] !== false; // default to true if undefined
+                    return (
+                        <label key={tab} className="flex items-center gap-3 bg-[#F8F9FA] border-2 border-[#18112E]/10 rounded-xl p-3 cursor-pointer hover:border-[#FFB800] transition-colors select-none">
+                            <input 
+                                type="checkbox" 
+                                checked={enabled} 
+                                onChange={(e) => {
+                                    const nextTabs = { ...socialTabs, [tab]: e.target.checked };
+                                    setForm(prev => ({ ...prev, socialTabs: nextTabs }));
+                                }} 
+                                className="w-4 h-4 rounded text-[#FFB800] focus:ring-[#FFB800] border-neutral-300" 
+                            />
+                            <span className="text-xs font-black uppercase tracking-wider text-[#18112E]">
+                                {tab === 'carousel' ? 'Feed (Original)' : tab === 'snapdude' ? 'Snap Dude' : tab}
+                            </span>
+                        </label>
+                    );
+                })}
             </div>
             <div className="flex justify-end pt-2">
                 <button onClick={handleSave} className="flex items-center gap-2 bg-[#FFB800] text-[#18112E] px-6 py-3 rounded-[12px] font-bold hover:bg-[#ffcc33] transition-all shadow-md text-sm">
@@ -180,7 +207,7 @@ function ProfileTab() {
 }
 
 function SkillsTab() {
-    const skills = useStore((s) => s.skills);
+    const skills = useStore((s) => s.skills) || [];
     const addSkill = useStore((s) => s.addSkill);
     const updateSkill = useStore((s) => s.updateSkill);
     const deleteSkill = useStore((s) => s.deleteSkill);
@@ -301,7 +328,7 @@ function SkillModal({ modal, setModal, editing, form, setForm, saving, handleSav
 }
 
 function ProjectsTab() {
-    const projects = useStore((s) => s.projects);
+    const projects = useStore((s) => s.projects) || [];
     const addProject = useStore((s) => s.addProject);
     const updateProject = useStore((s) => s.updateProject);
     const deleteProject = useStore((s) => s.deleteProject);
@@ -414,7 +441,7 @@ function ProjectModal({ modal, setModal, editing, form, setForm, saving, handleS
 }
 
 function AchievementsTab() {
-    const achievements = useStore((s) => s.achievements);
+    const achievements = useStore((s) => s.achievements) || [];
     const addAchievement = useStore((s) => s.addAchievement);
     const updateAchievement = useStore((s) => s.updateAchievement);
     const deleteAchievement = useStore((s) => s.deleteAchievement);
@@ -498,12 +525,65 @@ function AchievementsTab() {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {/* Import LinkedIn JSON Modal */}
+            <AnimatePresence>
+                {importModal && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center bg-[#18112E]/40 backdrop-blur-sm p-4" onClick={() => setImportModal(false)}>
+                        <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }} className="bg-white rounded-[24px] w-full max-w-xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+                            <div className="flex items-center justify-between p-6 border-b border-neutral-100 bg-[#F8F9FA]">
+                                <h2 className="text-lg font-bold text-[#18112E] flex items-center gap-2">
+                                    <Upload className="w-5 h-5 text-[#0A66C2]" /> Import LinkedIn JSON
+                                </h2>
+                                <button onClick={() => setImportModal(false)} className="text-neutral-400 hover:text-[#18112E] bg-white p-1.5 rounded-full border border-neutral-100 shadow-sm"><X className="w-4 h-4" /></button>
+                            </div>
+                            <div className="p-6 space-y-4 overflow-y-auto flex-1 text-left">
+                                <div className="p-4 bg-blue-50/50 border border-blue-100 rounded-xl space-y-2 text-xs text-neutral-600 leading-normal">
+                                    <p className="font-bold text-[#0A66C2]">How to use the Bookmarklet sync:</p>
+                                    <ol className="list-decimal pl-4 space-y-1">
+                                        <li>Copy the Bookmarklet code below.</li>
+                                        <li>Create a browser bookmark with any name (e.g. <em>Sync LinkedIn</em>) and paste this code as the URL.</li>
+                                        <li>Visit your public LinkedIn profile (e.g. <code>linkedin.com/in/your-name</code>).</li>
+                                        <li>Click the bookmark. It will scrape your page and copy the JSON payload to your clipboard automatically.</li>
+                                        <li>Come back here, paste the copied text into the box below, and click <strong>"Process & Import"</strong>.</li>
+                                    </ol>
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-bold text-[#18112E] block uppercase tracking-wider font-black">Bookmarklet Code</label>
+                                    <div className="flex gap-2">
+                                        <input readOnly value="javascript:(function(){try{const nameEl=document.querySelector('.text-heading-xlarge')||document.querySelector('h1');const name=nameEl?nameEl.innerText.trim():'';const headlineEl=document.querySelector('.text-body-medium')||document.querySelector('.pv-text-details__left-panel div');const headline=headlineEl?headlineEl.innerText.trim():'';const aboutHeader=document.getElementById('about');let about='';if(aboutHeader){const container=aboutHeader.closest('section');if(container){const textEl=container.querySelector('.inline-show-more-text');about=textEl?textEl.innerText.trim():'';}}const expHeader=document.getElementById('experience');const experiences=[];if(expHeader){const section=expHeader.closest('section');if(section){const items=section.querySelectorAll('.pvs-entity, .experience-item, .pvs-list__outer-container > ul > li');items.forEach((item,index)=>{try{const roleEl=item.querySelector('.t-bold span')||item.querySelector('.mr1.t-bold span');const role=roleEl?roleEl.innerText.trim():'';const companyEl=item.querySelector('.t-normal span')||item.querySelector('.t-14.t-normal span');const company=companyEl?companyEl.innerText.trim().split('Â·')[0].trim():'';const durationEl=item.querySelector('.t-14.t-normal.t-black--light span')||item.querySelector('.pvs-entity__caption-wrapper');const duration=durationEl?durationEl.innerText.trim().split('Â·')[0].trim():'';const descEl=item.querySelector('.inline-show-more-text span');const description=descEl?descEl.innerText.trim():'';if(role&&company){experiences.push({role,company,duration,location:'Remote',description,skills:[]});}}catch(e){}});}}const eduHeader=document.getElementById('education');const educations=[];if(eduHeader){const section=eduHeader.closest('section');if(section){const items=section.querySelectorAll('.pvs-entity, .pvs-list__outer-container > ul > li');items.forEach((item,index)=>{try{const schoolEl=item.querySelector('.t-bold span');const school=schoolEl?schoolEl.innerText.trim():'';const degreeEl=item.querySelector('.t-normal span');const degree=degreeEl?degreeEl.innerText.trim():'';const durationEl=item.querySelector('.t-14.t-normal.t-black--light span');const duration=durationEl?durationEl.innerText.trim():'';if(school){educations.push({school,degree,duration,grade:'',activities:''});}}catch(e){}});}}const payload={profile:{name,title:headline,aboutStory:about},experience:experiences,education:educations};const json=JSON.stringify(payload,null,2);fetch('http://localhost:5173/api/sync',{method:'POST',headers:{'Content-Type':'application/json'},body:json}).then(r=>r.json()).then(d=>{if(d.success){alert('LinkedIn profile synced directly to local portfolio!');}else{throw new Error(d.error||'Failed');}}).catch(err=>{const textarea=document.createElement('textarea');textarea.value=json;document.body.appendChild(textarea);textarea.select();document.execCommand('copy');document.body.removeChild(textarea);alert('Local sync failed (or on production). JSON has been copied to clipboard instead. Paste it manually in the admin panel.');});}catch(err){alert('Scraper Error: '+err.message);}})();" className="flex-1 font-mono text-[10px] bg-[#F8F9FA] border-2 border-transparent focus:border-[#FFB800] focus:bg-white rounded-[12px] px-3 py-2 text-[#18112E] outline-none" />
+                                        <button onClick={() => {
+                                            const code = `javascript:(function(){try{const nameEl=document.querySelector('.text-heading-xlarge')||document.querySelector('h1');const name=nameEl?nameEl.innerText.trim():'';const headlineEl=document.querySelector('.text-body-medium')||document.querySelector('.pv-text-details__left-panel div');const headline=headlineEl?headlineEl.innerText.trim():'';const aboutHeader=document.getElementById('about');let about='';if(aboutHeader){const container=aboutHeader.closest('section');if(container){const textEl=container.querySelector('.inline-show-more-text');about=textEl?textEl.innerText.trim():'';}}const expHeader=document.getElementById('experience');const experiences=[];if(expHeader){const section=expHeader.closest('section');if(section){const items=section.querySelectorAll('.pvs-entity, .experience-item, .pvs-list__outer-container > ul > li');items.forEach((item,index)=>{try{const roleEl=item.querySelector('.t-bold span')||item.querySelector('.mr1.t-bold span');const role=roleEl?roleEl.innerText.trim():'';const companyEl=item.querySelector('.t-normal span')||item.querySelector('.t-14.t-normal span');const company=companyEl?companyEl.innerText.trim().split('·')[0].trim():'';const durationEl=item.querySelector('.t-14.t-normal.t-black--light span')||item.querySelector('.pvs-entity__caption-wrapper');const duration=durationEl?durationEl.innerText.trim().split('·')[0].trim():'';const descEl=item.querySelector('.inline-show-more-text span');const description=descEl?descEl.innerText.trim():'';if(role&&company){experiences.push({role,company,duration,location:'Remote',description,skills:[]});}}catch(e){}});}}const eduHeader=document.getElementById('education');const educations=[];if(eduHeader){const section=eduHeader.closest('section');if(section){const items=section.querySelectorAll('.pvs-entity, .pvs-list__outer-container > ul > li');items.forEach((item,index)=>{try{const schoolEl=item.querySelector('.t-bold span');const school=schoolEl?schoolEl.innerText.trim():'';const degreeEl=item.querySelector('.t-normal span');const degree=degreeEl?degreeEl.innerText.trim():'';const durationEl=item.querySelector('.t-14.t-normal.t-black--light span');const duration=durationEl?durationEl.innerText.trim():'';if(school){educations.push({school,degree,duration,grade:'',activities:''});}}catch(e){}});}}const payload={profile:{name,title:headline,aboutStory:about},experience:experiences,education:educations};const json=JSON.stringify(payload,null,2);const textarea=document.createElement('textarea');textarea.value=json;document.body.appendChild(textarea);textarea.select();document.execCommand('copy');document.body.removeChild(textarea);alert('LinkedIn Scraped Successfully!\n\nJSON data has been copied to your clipboard.\nGo to your Portfolio Admin Panel, open "Import LinkedIn JSON" and paste (Ctrl+V) the data.');}catch(err){alert('Sync Error: '+err.message);}})();`;
+                                            navigator.clipboard.writeText(code);
+                                            alert('Bookmarklet code copied to clipboard!');
+                                        }} className="px-4 py-2 bg-[#18112E] text-white font-bold text-xs uppercase tracking-wider rounded-[12px] hover:bg-neutral-800 transition-colors shrink-0">Copy</button>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold text-[#18112E] block uppercase tracking-wider font-black">Paste JSON Data</label>
+                                    <textarea rows={6} placeholder="Paste copied JSON here..." value={importText} onChange={(e) => setImportText(e.target.value)} className={`${cls} resize-y min-h-[140px]`} />
+                                </div>
+
+                                {importError && (
+                                    <div className="p-3 bg-red-50 border border-red-100 rounded-xl text-xs font-bold text-red-500">{importError}</div>
+                                )}
+                            </div>
+                            <div className="p-6 border-t border-neutral-100 bg-white flex gap-3">
+                                <button onClick={() => setImportModal(false)} className="flex-1 bg-[#F8F9FA] text-[#18112E] font-bold py-3 rounded-[12px] hover:bg-neutral-200 transition-colors text-sm">Cancel</button>
+                                <button onClick={handleImport} className="flex-1 bg-[#FFB800] text-[#18112E] font-bold py-3 rounded-[12px] hover:bg-[#ffcc33] transition-colors shadow-md text-sm">Process & Import</button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
 
 function MessagesTab() {
-    const messages = useStore((s) => s.messages);
+    const messages = useStore((s) => s.messages) || [];
     const deleteMessage = useStore((s) => s.deleteMessage);
     const fetchMessagesFromGitHub = useStore((s) => s.fetchMessagesFromGitHub);
     const [syncing, setSyncing] = useState(false);
@@ -685,7 +765,18 @@ function SettingsTab() {
         setMsg({ text: '', type: '' });
         try {
             const state = useStore.getState();
-            const data = { profile: state.profile, skills: state.skills, projects: state.projects, achievements: state.achievements, messages: state.messages };
+            const data = {
+                profile: state.profile,
+                skills: state.skills,
+                projects: state.projects,
+                achievements: state.achievements,
+                messages: state.messages,
+                nowLogs: state.nowLogs,
+                sandboxIdeas: state.sandboxIdeas,
+                currentProjects: state.currentProjects,
+                learningPaths: state.learningPaths,
+                activities: state.activities,
+            };
 
             const url = `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`;
             const headers = { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' };
@@ -731,12 +822,12 @@ function SettingsTab() {
                     </div>
                     <div className="rounded-[20px] border border-neutral-200 bg-white p-4 shadow-sm">
                         <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-neutral-400">Content</div>
-                        <div className="mt-2 text-lg font-black text-[#18112E]">{useStore.getState().projects.length + useStore.getState().skills.length}</div>
+                        <div className="mt-2 text-lg font-black text-[#18112E]">{(useStore.getState().projects?.length || 0) + (useStore.getState().skills?.length || 0)}</div>
                         <div className="text-xs text-neutral-500">Projects + skills</div>
                     </div>
                     <div className="rounded-[20px] border border-neutral-200 bg-white p-4 shadow-sm">
                         <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-neutral-400">Inbox</div>
-                        <div className="mt-2 text-lg font-black text-[#18112E]">{useStore.getState().messages.length}</div>
+                        <div className="mt-2 text-lg font-black text-[#18112E]">{useStore.getState().messages?.length || 0}</div>
                         <div className="text-xs text-neutral-500">New messages</div>
                     </div>
                 </div>
@@ -869,6 +960,749 @@ function SettingsTab() {
                     {msg.text}
                 </div>
             )}
+        </div>
+    );
+}
+
+function DashboardTab() {
+    const [subTab, setSubTab] = useState('projects');
+
+    const nowLogs = useStore((s) => s.nowLogs) || [];
+    const sandboxIdeas = useStore((s) => s.sandboxIdeas) || [];
+    const currentProjects = useStore((s) => s.currentProjects) || [];
+    const learningPaths = useStore((s) => s.learningPaths) || [];
+    const activities = useStore((s) => s.activities) || [];
+    const experience = useStore((s) => s.experience) || [];
+    const education = useStore((s) => s.education) || [];
+
+    const addNowLog = useStore((s) => s.addNowLog);
+    const updateNowLog = useStore((s) => s.updateNowLog);
+    const deleteNowLog = useStore((s) => s.deleteNowLog);
+
+    const addSandboxIdea = useStore((s) => s.addSandboxIdea);
+    const updateSandboxIdea = useStore((s) => s.updateSandboxIdea);
+    const deleteSandboxIdea = useStore((s) => s.deleteSandboxIdea);
+
+    const addCurrentProject = useStore((s) => s.addCurrentProject);
+    const updateCurrentProject = useStore((s) => s.updateCurrentProject);
+    const deleteCurrentProject = useStore((s) => s.deleteCurrentProject);
+
+    const addLearningPath = useStore((s) => s.addLearningPath);
+    const updateLearningPath = useStore((s) => s.updateLearningPath);
+    const deleteLearningPath = useStore((s) => s.deleteLearningPath);
+
+    const addActivity = useStore((s) => s.addActivity);
+    const updateActivity = useStore((s) => s.updateActivity);
+    const deleteActivity = useStore((s) => s.deleteActivity);
+
+    const addExperience = useStore((s) => s.addExperience);
+    const updateExperience = useStore((s) => s.updateExperience);
+    const deleteExperience = useStore((s) => s.deleteExperience);
+    const setExperience = useStore((s) => s.setExperience);
+
+    const addEducation = useStore((s) => s.addEducation);
+    const updateEducation = useStore((s) => s.updateEducation);
+    const deleteEducation = useStore((s) => s.deleteEducation);
+    const setEducation = useStore((s) => s.setEducation);
+    
+    const updateProfile = useStore((s) => s.updateProfile);
+    const uploadImage = useStore((s) => s.uploadImage);
+
+    const [importModal, setImportModal] = useState(false);
+    const [importText, setImportText] = useState('');
+    const [importError, setImportError] = useState('');
+
+    const handleImport = () => {
+        try {
+            const parsed = JSON.parse(importText);
+            if (!parsed) throw new Error("Invalid JSON structure");
+
+            // 1. Update Profile
+            if (parsed.profile) {
+                const profileUpdates = {};
+                if (parsed.profile.name) profileUpdates.name = parsed.profile.name;
+                if (parsed.profile.title) profileUpdates.title = parsed.profile.title;
+                if (parsed.profile.aboutStory) profileUpdates.aboutStory = parsed.profile.aboutStory;
+                if (Object.keys(profileUpdates).length > 0) {
+                    updateProfile(profileUpdates);
+                }
+            }
+
+            // 2. Update Experience
+            if (Array.isArray(parsed.experience)) {
+                const experiencesWithIds = parsed.experience.map((exp, idx) => ({
+                    ...exp,
+                    id: exp.id || `exp_${Date.now()}_${idx}`,
+                    skills: Array.isArray(exp.skills) ? exp.skills : (exp.skills ? String(exp.skills).split(',').map(s => s.trim()).filter(Boolean) : [])
+                }));
+                setExperience(experiencesWithIds);
+            }
+
+            // 3. Update Education
+            if (Array.isArray(parsed.education)) {
+                const educationsWithIds = parsed.education.map((edu, idx) => ({
+                    ...edu,
+                    id: edu.id || `edu_${Date.now()}_${idx}`
+                }));
+                setEducation(educationsWithIds);
+            }
+
+            setImportText('');
+            setImportError('');
+            setImportModal(false);
+            alert('LinkedIn JSON data successfully imported! Check the Experience and Education lists. Remember to click "Deploy to Production" to push changes.');
+        } catch (err) {
+            setImportError('Failed to parse JSON: ' + err.message);
+        }
+    };
+
+    const [modal, setModal] = useState(false);
+    const [editingId, setEditingId] = useState(null);
+    
+    const [projectForm, setProjectForm] = useState({
+        title: '', status: 'Active', description: '', techStack: '', progress: 0, previewImage: '', githubUrl: '', liveUrl: '',
+        tasksDone: '', tasksPending: '', changelog: ''
+    });
+    const [learningForm, setLearningForm] = useState({
+        title: '', status: 'In Progress', icon: '☕', progress: 0, startDate: '', topicsCompleted: '', topicsPending: '', resources: '', notes: ''
+    });
+    const [activityForm, setActivityForm] = useState({
+        title: '', type: 'Hackathon', status: 'Registered', date: '', location: '', description: '', photos: '', tags: '', notes: '',
+        platforms: { snapdude: true, linkedin: true, youtube: false, carousel: true }
+    });
+    const [ideaForm, setIdeaForm] = useState({
+        title: '', status: 'Active', description: '', notes: ''
+    });
+    const [logForm, setLogForm] = useState({
+        date: '', type: 'Update', content: '', documentation: '', photos: '', links: '', changes: ''
+    });
+    const [experienceForm, setExperienceForm] = useState({
+        role: '', company: '', duration: '', location: '', description: '', skills: ''
+    });
+    const [educationForm, setEducationForm] = useState({
+        school: '', degree: '', duration: '', grade: '', activities: ''
+    });
+
+    const [uploading, setUploading] = useState(false);
+
+    const openNew = () => {
+        setEditingId(null);
+        if (subTab === 'projects') setProjectForm({ title: '', status: 'Active', description: '', techStack: '', progress: 0, previewImage: '', githubUrl: '', liveUrl: '', tasksDone: '', tasksPending: '', changelog: '' });
+        if (subTab === 'learning') setLearningForm({ title: '', status: 'In Progress', icon: '☕', progress: 0, startDate: '', topicsCompleted: '', topicsPending: '', resources: '', notes: '' });
+        if (subTab === 'activities') setActivityForm({ title: '', type: 'Hackathon', status: 'Registered', date: '', location: '', description: '', photos: '', tags: '', notes: '', platforms: { snapdude: true, linkedin: true, youtube: false, carousel: true } });
+        if (subTab === 'ideas') setIdeaForm({ title: '', status: 'Active', description: '', notes: '' });
+        if (subTab === 'devlog') setLogForm({ date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }), type: 'Update', content: '', documentation: '', photos: '', links: '', changes: '' });
+        if (subTab === 'experience') setExperienceForm({ role: '', company: '', duration: '', location: '', description: '', skills: '' });
+        if (subTab === 'education') setEducationForm({ school: '', degree: '', duration: '', grade: '', activities: '' });
+        setModal(true);
+    };
+
+    const openEdit = (item) => {
+        setEditingId(item.id);
+        if (subTab === 'projects') {
+            setProjectForm({
+                title: item.title || '',
+                status: item.status || 'Active',
+                description: item.description || '',
+                techStack: item.techStack || '',
+                progress: item.progress || 0,
+                previewImage: item.previewImage || '',
+                githubUrl: item.githubUrl || '',
+                liveUrl: item.liveUrl || '',
+                tasksDone: (item.tasksDone || []).join('\n'),
+                tasksPending: (item.tasksPending || []).join('\n'),
+                changelog: (item.changelog || []).map(c => `${c.date}: ${c.text}`).join('\n')
+            });
+        }
+        if (subTab === 'learning') {
+            setLearningForm({
+                title: item.title || '',
+                status: item.status || 'In Progress',
+                icon: item.icon || '☕',
+                progress: item.progress || 0,
+                startDate: item.startDate || '',
+                topicsCompleted: (item.topicsCompleted || []).join('\n'),
+                topicsPending: (item.topicsPending || []).join('\n'),
+                resources: (item.resources || []).map(r => `${r.name}|${r.url}`).join('\n'),
+                notes: item.notes || ''
+            });
+        }
+        if (subTab === 'activities') {
+            setActivityForm({
+                title: item.title || '',
+                type: item.type || 'Hackathon',
+                status: item.status || 'Registered',
+                date: item.date || '',
+                location: item.location || '',
+                description: item.description || '',
+                photos: (item.photos || []).join(','),
+                tags: (item.tags || []).join(','),
+                notes: item.notes || '',
+                platforms: item.platforms || { snapdude: true, linkedin: true, youtube: false, carousel: true }
+            });
+        }
+        if (subTab === 'ideas') {
+            setIdeaForm({
+                title: item.title || '',
+                status: item.status || 'Active',
+                description: item.description || '',
+                notes: item.notes || ''
+            });
+        }
+        if (subTab === 'devlog') {
+            setLogForm({
+                date: item.date || '',
+                type: item.type || 'Update',
+                content: item.content || '',
+                documentation: item.documentation || '',
+                photos: (item.photos || []).join(','),
+                links: (item.links || []).map(lnk => `${lnk.label}|${lnk.url}`).join('\n'),
+                changes: (item.changes || []).join('\n')
+            });
+        }
+        if (subTab === 'experience') {
+            setExperienceForm({
+                role: item.role || '',
+                company: item.company || '',
+                duration: item.duration || '',
+                location: item.location || '',
+                description: item.description || '',
+                skills: (item.skills || []).join(', ')
+            });
+        }
+        if (subTab === 'education') {
+            setEducationForm({
+                school: item.school || '',
+                degree: item.degree || '',
+                duration: item.duration || '',
+                grade: item.grade || '',
+                activities: item.activities || ''
+            });
+        }
+        setModal(true);
+    };
+
+    const handleSave = () => {
+        if (subTab === 'projects') {
+            if (!projectForm.title.trim()) return;
+            const parsed = {
+                ...projectForm,
+                progress: parseInt(projectForm.progress) || 0,
+                tasksDone: projectForm.tasksDone.split('\n').map(t => t.trim()).filter(Boolean),
+                tasksPending: projectForm.tasksPending.split('\n').map(t => t.trim()).filter(Boolean),
+                changelog: projectForm.changelog.split('\n').map(line => {
+                    const idx = line.indexOf(':');
+                    if (idx === -1) return { date: 'Log', text: line.trim() };
+                    return { date: line.substring(0, idx).trim(), text: line.substring(idx + 1).trim() };
+                }).filter(c => c.text)
+            };
+            if (editingId) updateCurrentProject(editingId, parsed);
+            else addCurrentProject(parsed);
+        }
+        if (subTab === 'learning') {
+            if (!learningForm.title.trim()) return;
+            const parsed = {
+                ...learningForm,
+                progress: parseInt(learningForm.progress) || 0,
+                topicsCompleted: learningForm.topicsCompleted.split('\n').map(t => t.trim()).filter(Boolean),
+                topicsPending: learningForm.topicsPending.split('\n').map(t => t.trim()).filter(Boolean),
+                resources: learningForm.resources.split('\n').map(line => {
+                    const parts = line.split('|');
+                    return { name: parts[0]?.trim() || 'Resource', url: parts[1]?.trim() || '#' };
+                }).filter(r => r.name)
+            };
+            if (editingId) updateLearningPath(editingId, parsed);
+            else addLearningPath(parsed);
+        }
+        if (subTab === 'activities') {
+            if (!activityForm.title.trim()) return;
+            const parsed = {
+                ...activityForm,
+                photos: activityForm.photos.split(',').map(p => p.trim()).filter(Boolean),
+                tags: activityForm.tags.split(',').map(t => t.trim()).filter(Boolean),
+                platforms: activityForm.platforms || { snapdude: true, linkedin: true, youtube: false, carousel: true }
+            };
+            if (editingId) updateActivity(editingId, parsed);
+            else addActivity(parsed);
+        }
+        if (subTab === 'ideas') {
+            if (!ideaForm.title.trim()) return;
+            if (editingId) updateSandboxIdea(editingId, ideaForm);
+            else addSandboxIdea(ideaForm);
+        }
+        if (subTab === 'devlog') {
+            if (!logForm.content.trim()) return;
+            const parsed = {
+                ...logForm,
+                photos: logForm.photos.split(',').map(p => p.trim()).filter(Boolean),
+                changes: logForm.changes.split('\n').map(c => c.trim()).filter(Boolean),
+                links: logForm.links.split('\n').map(line => {
+                    const parts = line.split('|');
+                    return { label: parts[0]?.trim() || 'Link', url: parts[1]?.trim() || '#' };
+                }).filter(l => l.label)
+            };
+            if (editingId) updateNowLog(editingId, parsed);
+            else addNowLog(parsed);
+        }
+        if (subTab === 'experience') {
+            if (!experienceForm.role.trim() || !experienceForm.company.trim()) return;
+            const parsed = {
+                ...experienceForm,
+                skills: experienceForm.skills.split(',').map(s => s.trim()).filter(Boolean)
+            };
+            if (editingId) updateExperience(editingId, parsed);
+            else addExperience(parsed);
+        }
+        if (subTab === 'education') {
+            if (!educationForm.school.trim() || !educationForm.degree.trim()) return;
+            if (editingId) updateEducation(editingId, educationForm);
+            else addEducation(educationForm);
+        }
+        setModal(false);
+    };
+
+    const handleUpload = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setUploading(true);
+        const { url } = await uploadImage(file);
+        setUploading(false);
+        if (url) {
+            if (subTab === 'projects') setProjectForm(prev => ({ ...prev, previewImage: url }));
+            if (subTab === 'activities') setActivityForm(prev => ({ ...prev, photos: prev.photos ? `${prev.photos},${url}` : url }));
+        }
+    };
+
+    const subTabs = [
+        { id: 'projects', label: 'Projects', count: currentProjects.length },
+        { id: 'learning', label: 'Learning Paths', count: learningPaths.length },
+        { id: 'activities', label: 'Activities', count: activities.length },
+        { id: 'ideas', label: 'Idea Sandbox', count: sandboxIdeas.length },
+        { id: 'devlog', label: 'Now Devlog', count: nowLogs.length },
+        { id: 'experience', label: 'Experience', count: experience.length },
+        { id: 'education', label: 'Education', count: education.length }
+    ];
+
+    const cls = "w-full bg-[#F8F9FA] border-2 border-transparent focus:border-[#FFB800] focus:bg-white rounded-[12px] px-4 py-2.5 text-[#18112E] font-medium transition-all focus:outline-none placeholder-neutral-400 text-sm";
+
+    return (
+        <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex gap-1.5 overflow-x-auto pb-1 max-w-full">
+                    {subTabs.map(t => (
+                        <button key={t.id} onClick={() => { setSubTab(t.id); }}
+                             className={`px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap ${subTab === t.id ? 'bg-[#FFB800] text-[#18112E] shadow-sm' : 'bg-[#F8F9FA] text-neutral-400 hover:text-[#18112E]'}`}>
+                            {t.label} ({t.count})
+                        </button>
+                    ))}
+                </div>
+                <div className="flex gap-2 self-start sm:self-auto shrink-0">
+                    <button onClick={() => setImportModal(true)} className="flex items-center gap-1.5 bg-neutral-100 text-[#18112E] px-4 py-2 rounded-[10px] font-bold hover:bg-neutral-200 border border-neutral-200 transition-all text-xs">
+                        <Upload className="w-4 h-4 text-[#0A66C2]" /> Import LinkedIn JSON
+                    </button>
+                    <button onClick={openNew} className="flex items-center gap-1.5 bg-[#FFB800] text-[#18112E] px-4 py-2 rounded-[10px] font-bold hover:bg-[#ffcc33] transition-all text-xs shadow-sm">
+                        <Plus className="w-4 h-4" /> Add Item
+                    </button>
+                </div>
+            </div>
+
+            {/* List View */}
+            <div className="bg-white border border-neutral-100 rounded-[16px] overflow-hidden shadow-sm">
+                <table className="w-full text-sm border-collapse">
+                    <thead>
+                        <tr className="border-b border-neutral-100 bg-[#F8F9FA] text-left text-xs font-extrabold text-[#18112E] uppercase tracking-widest">
+                            <th className="px-5 py-3">Title / Info</th>
+                            <th className="px-5 py-3">Status</th>
+                            <th className="px-5 py-3 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {subTab === 'projects' && currentProjects.map(p => (
+                            <tr key={p.id} className="border-b border-neutral-50 hover:bg-neutral-50/50 transition-colors group">
+                                <td className="px-5 py-3">
+                                    <div className="font-bold text-[#18112E]">{p.title}</div>
+                                    <div className="text-xs text-neutral-400 font-medium line-clamp-1">{p.description}</div>
+                                </td>
+                                <td className="px-5 py-3"><span className="text-[10px] font-black px-2 py-0.5 rounded border border-neutral-200 uppercase">{p.status}</span></td>
+                                <td className="px-5 py-3 text-right">
+                                    <div className="flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button onClick={() => openEdit(p)} className="p-2 bg-white shadow-sm border border-neutral-100 rounded-[8px] text-[#18112E] hover:bg-[#FFB800] transition-colors"><Pencil className="w-3.5 h-3.5" /></button>
+                                        <button onClick={() => { if (window.confirm('Delete?')) deleteCurrentProject(p.id); }} className="p-2 bg-white shadow-sm border border-neutral-100 rounded-[8px] text-red-500 hover:bg-red-50 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                        {subTab === 'learning' && learningPaths.map(lp => (
+                            <tr key={lp.id} className="border-b border-neutral-50 hover:bg-neutral-50/50 transition-colors group">
+                                <td className="px-5 py-3">
+                                    <div className="font-bold text-[#18112E] flex items-center gap-1.5"><span>{lp.icon}</span> <span>{lp.title}</span></div>
+                                    <div className="text-xs text-neutral-400 font-medium">{lp.progress}% done • {lp.startDate}</div>
+                                </td>
+                                <td className="px-5 py-3"><span className="text-[10px] font-black px-2 py-0.5 rounded border border-neutral-200 uppercase">{lp.status}</span></td>
+                                <td className="px-5 py-3 text-right">
+                                    <div className="flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button onClick={() => openEdit(lp)} className="p-2 bg-white shadow-sm border border-neutral-100 rounded-[8px] text-[#18112E] hover:bg-[#FFB800] transition-colors"><Pencil className="w-3.5 h-3.5" /></button>
+                                        <button onClick={() => { if (window.confirm('Delete?')) deleteLearningPath(lp.id); }} className="p-2 bg-white shadow-sm border border-neutral-100 rounded-[8px] text-red-500 hover:bg-red-50 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                        {subTab === 'activities' && activities.map(act => (
+                            <tr key={act.id} className="border-b border-neutral-50 hover:bg-neutral-50/50 transition-colors group">
+                                <td className="px-5 py-3">
+                                    <div className="font-bold text-[#18112E]">{act.title}</div>
+                                    <div className="text-xs text-neutral-400 font-medium">{act.date} • {act.type}</div>
+                                </td>
+                                <td className="px-5 py-3"><span className="text-[10px] font-black px-2 py-0.5 rounded border border-neutral-200 uppercase">{act.status}</span></td>
+                                <td className="px-5 py-3 text-right">
+                                    <div className="flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button onClick={() => openEdit(act)} className="p-2 bg-white shadow-sm border border-neutral-100 rounded-[8px] text-[#18112E] hover:bg-[#FFB800] transition-colors"><Pencil className="w-3.5 h-3.5" /></button>
+                                        <button onClick={() => { if (window.confirm('Delete?')) deleteActivity(act.id); }} className="p-2 bg-white shadow-sm border border-neutral-100 rounded-[8px] text-red-500 hover:bg-red-50 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                        {subTab === 'ideas' && sandboxIdeas.map(idea => (
+                            <tr key={idea.id} className="border-b border-neutral-50 hover:bg-neutral-50/50 transition-colors group">
+                                <td className="px-5 py-3">
+                                    <div className="font-bold text-[#18112E]">{idea.title}</div>
+                                    <div className="text-xs text-neutral-400 font-medium line-clamp-1">{idea.description}</div>
+                                </td>
+                                <td className="px-5 py-3"><span className="text-[10px] font-black px-2 py-0.5 rounded border border-neutral-200 uppercase">{idea.status}</span></td>
+                                <td className="px-5 py-3 text-right">
+                                    <div className="flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button onClick={() => openEdit(idea)} className="p-2 bg-white shadow-sm border border-neutral-100 rounded-[8px] text-[#18112E] hover:bg-[#FFB800] transition-colors"><Pencil className="w-3.5 h-3.5" /></button>
+                                        <button onClick={() => { if (window.confirm('Delete?')) deleteSandboxIdea(idea.id); }} className="p-2 bg-white shadow-sm border border-neutral-100 rounded-[8px] text-red-500 hover:bg-red-50 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                        {subTab === 'devlog' && nowLogs.map(log => (
+                            <tr key={log.id} className="border-b border-neutral-50 hover:bg-neutral-50/50 transition-colors group">
+                                <td className="px-5 py-3">
+                                    <div className="font-bold text-[#18112E] line-clamp-1">{log.content}</div>
+                                    <div className="text-xs text-neutral-400 font-medium">{log.date}</div>
+                                </td>
+                                <td className="px-5 py-3"><span className="text-[10px] font-black px-2 py-0.5 rounded border border-neutral-200 uppercase">{log.type}</span></td>
+                                <td className="px-5 py-3 text-right">
+                                    <div className="flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button onClick={() => openEdit(log)} className="p-2 bg-white shadow-sm border border-neutral-100 rounded-[8px] text-[#18112E] hover:bg-[#FFB800] transition-colors"><Pencil className="w-3.5 h-3.5" /></button>
+                                        <button onClick={() => { if (window.confirm('Delete?')) deleteNowLog(log.id); }} className="p-2 bg-white shadow-sm border border-neutral-100 rounded-[8px] text-red-500 hover:bg-red-50 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                        {subTab === 'experience' && experience.map(exp => (
+                            <tr key={exp.id} className="border-b border-neutral-50 hover:bg-neutral-50/50 transition-colors group">
+                                <td className="px-5 py-3">
+                                    <div className="font-bold text-[#18112E]">{exp.role}</div>
+                                    <div className="text-xs text-neutral-400 font-medium">{exp.company} • {exp.duration}</div>
+                                </td>
+                                <td className="px-5 py-3"><span className="text-[10px] font-black px-2 py-0.5 rounded border border-neutral-200 uppercase">{exp.location}</span></td>
+                                <td className="px-5 py-3 text-right">
+                                    <div className="flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button onClick={() => openEdit(exp)} className="p-2 bg-white shadow-sm border border-neutral-100 rounded-[8px] text-[#18112E] hover:bg-[#FFB800] transition-colors"><Pencil className="w-3.5 h-3.5" /></button>
+                                        <button onClick={() => { if (window.confirm('Delete?')) deleteExperience(exp.id); }} className="p-2 bg-white shadow-sm border border-neutral-100 rounded-[8px] text-red-500 hover:bg-red-50 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                        {subTab === 'education' && education.map(edu => (
+                            <tr key={edu.id} className="border-b border-neutral-50 hover:bg-neutral-50/50 transition-colors group">
+                                <td className="px-5 py-3">
+                                    <div className="font-bold text-[#18112E]">{edu.school}</div>
+                                    <div className="text-xs text-neutral-400 font-medium">{edu.degree} • {edu.duration}</div>
+                                </td>
+                                <td className="px-5 py-3"><span className="text-[10px] font-black px-2 py-0.5 rounded border border-neutral-200 uppercase">{edu.grade}</span></td>
+                                <td className="px-5 py-3 text-right">
+                                    <div className="flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button onClick={() => openEdit(edu)} className="p-2 bg-white shadow-sm border border-neutral-100 rounded-[8px] text-[#18112E] hover:bg-[#FFB800] transition-colors"><Pencil className="w-3.5 h-3.5" /></button>
+                                        <button onClick={() => { if (window.confirm('Delete?')) deleteEducation(edu.id); }} className="p-2 bg-white shadow-sm border border-neutral-100 rounded-[8px] text-red-500 hover:bg-red-50 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+                {((subTab === 'projects' && currentProjects.length === 0) ||
+                  (subTab === 'learning' && learningPaths.length === 0) ||
+                  (subTab === 'activities' && activities.length === 0) ||
+                  (subTab === 'ideas' && sandboxIdeas.length === 0) ||
+                  (subTab === 'devlog' && nowLogs.length === 0) ||
+                  (subTab === 'experience' && experience.length === 0) ||
+                  (subTab === 'education' && education.length === 0)) && (
+                    <div className="text-center py-12 text-neutral-400 font-bold">No items found in this section.</div>
+                )}
+            </div>
+
+            {/* Edit / Add Modal */}
+            <AnimatePresence>
+                {modal && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center bg-[#18112E]/40 backdrop-blur-sm p-4" onClick={() => setModal(false)}>
+                        <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }} className="bg-white rounded-[24px] w-full max-w-lg shadow-2xl overflow-hidden max-h-[90vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+                            <div className="flex items-center justify-between p-6 border-b border-neutral-100 bg-[#F8F9FA]">
+                                <h2 className="text-lg font-bold text-[#18112E]">{editingId ? 'Edit Item' : 'New Item'}</h2>
+                                <button onClick={() => setModal(false)} className="text-neutral-400 hover:text-[#18112E] bg-white p-1.5 rounded-full border border-neutral-100 shadow-sm"><X className="w-4 h-4" /></button>
+                            </div>
+                            <div className="p-6 space-y-4 overflow-y-auto flex-1 text-left">
+                                {/* EXPERIENCE FORM */}
+                                {subTab === 'experience' && (
+                                    <>
+                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5 font-black uppercase tracking-wider">Role / Job Title</label><input placeholder="e.g. Full-Stack Developer" value={experienceForm.role} onChange={(e) => setExperienceForm({ ...experienceForm, role: e.target.value })} className={cls} /></div>
+                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5 font-black uppercase tracking-wider">Company / Initiative</label><input placeholder="e.g. DevConnect Startup" value={experienceForm.company} onChange={(e) => setExperienceForm({ ...experienceForm, company: e.target.value })} className={cls} /></div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div><label className="text-xs font-bold text-[#18112E] block mb-1.5 font-black uppercase tracking-wider">Duration</label><input placeholder="e.g. 2025 - Present" value={experienceForm.duration} onChange={(e) => setExperienceForm({ ...experienceForm, duration: e.target.value })} className={cls} /></div>
+                                            <div><label className="text-xs font-bold text-[#18112E] block mb-1.5 font-black uppercase tracking-wider">Location</label><input placeholder="e.g. Pune, India" value={experienceForm.location} onChange={(e) => setExperienceForm({ ...experienceForm, location: e.target.value })} className={cls} /></div>
+                                        </div>
+                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5 font-black uppercase tracking-wider">Description</label><textarea rows={3} placeholder="Describe responsibilities and impact..." value={experienceForm.description} onChange={(e) => setExperienceForm({ ...experienceForm, description: e.target.value })} className={`${cls} resize-none`} /></div>
+                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5 font-black uppercase tracking-wider">Skills Utilized (comma separated)</label><input placeholder="React, Supabase, Node.js" value={experienceForm.skills} onChange={(e) => setExperienceForm({ ...experienceForm, skills: e.target.value })} className={cls} /></div>
+                                    </>
+                                )}
+
+                                {/* EDUCATION FORM */}
+                                {subTab === 'education' && (
+                                    <>
+                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5 font-black uppercase tracking-wider">School / University</label><input placeholder="e.g. Savitribai Phule Pune University" value={educationForm.school} onChange={(e) => setEducationForm({ ...educationForm, school: e.target.value })} className={cls} /></div>
+                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5 font-black uppercase tracking-wider">Degree / Course</label><input placeholder="e.g. B.Sc. in Information Technology" value={educationForm.degree} onChange={(e) => setEducationForm({ ...educationForm, degree: e.target.value })} className={cls} /></div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div><label className="text-xs font-bold text-[#18112E] block mb-1.5 font-black uppercase tracking-wider">Duration</label><input placeholder="e.g. 2023 - 2026" value={educationForm.duration} onChange={(e) => setEducationForm({ ...educationForm, duration: e.target.value })} className={cls} /></div>
+                                            <div><label className="text-xs font-bold text-[#18112E] block mb-1.5 font-black uppercase tracking-wider">Grade / CGPA</label><input placeholder="e.g. CGPA: 8.9" value={educationForm.grade} onChange={(e) => setEducationForm({ ...educationForm, grade: e.target.value })} className={cls} /></div>
+                                        </div>
+                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5 font-black uppercase tracking-wider">Activities & Societies</label><textarea rows={2} placeholder="e.g. Organized coding events" value={educationForm.activities} onChange={(e) => setEducationForm({ ...educationForm, activities: e.target.value })} className={`${cls} resize-none`} /></div>
+                                    </>
+                                )}
+
+                                {/* CURRENT PROJECTS FORM */}
+                                {subTab === 'projects' && (
+                                    <>
+                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Project Title</label><input placeholder="Title" value={projectForm.title} onChange={(e) => setProjectForm({ ...projectForm, title: e.target.value })} className={cls} /></div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="text-xs font-bold text-[#18112E] block mb-1.5">Status</label>
+                                                <select value={projectForm.status} onChange={(e) => setProjectForm({ ...projectForm, status: e.target.value })} className={cls}>
+                                                    <option value="Active">Active</option>
+                                                    <option value="Paused">Paused</option>
+                                                    <option value="Completed">Completed</option>
+                                                </select>
+                                            </div>
+                                            <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Progress % (0-100)</label><input type="number" value={projectForm.progress} onChange={(e) => setProjectForm({ ...projectForm, progress: e.target.value })} className={cls} /></div>
+                                        </div>
+                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Description</label><textarea rows={2} placeholder="Description..." value={projectForm.description} onChange={(e) => setProjectForm({ ...projectForm, description: e.target.value })} className={`${cls} resize-none`} /></div>
+                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Tech Stack (CSV)</label><input placeholder="React, Node.js" value={projectForm.techStack} onChange={(e) => setProjectForm({ ...projectForm, techStack: e.target.value })} className={cls} /></div>
+                                        <div>
+                                            <label className="text-xs font-bold text-[#18112E] block mb-1.5">Preview Image</label>
+                                            <div className="flex gap-2">
+                                                <input placeholder="Image URL" value={projectForm.previewImage} onChange={(e) => setProjectForm({ ...projectForm, previewImage: e.target.value })} className="flex-1 bg-[#F8F9FA] border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-2.5 text-[#18112E] font-medium outline-none text-sm" />
+                                                <label className="flex items-center justify-center px-4 bg-[#18112E] text-white hover:bg-[#FFB800] hover:text-[#18112E] rounded-[12px] font-bold text-xs cursor-pointer transition-colors">{uploading ? '...' : 'Upload'}<input type="file" accept="image/*" className="hidden" onChange={handleUpload} /></label>
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">GitHub URL</label><input placeholder="Link" value={projectForm.githubUrl} onChange={(e) => setProjectForm({ ...projectForm, githubUrl: e.target.value })} className={cls} /></div>
+                                            <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Live URL</label><input placeholder="Link" value={projectForm.liveUrl} onChange={(e) => setProjectForm({ ...projectForm, liveUrl: e.target.value })} className={cls} /></div>
+                                        </div>
+                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Tasks Done (one per line)</label><textarea rows={3} placeholder="Setup project..." value={projectForm.tasksDone} onChange={(e) => setProjectForm({ ...projectForm, tasksDone: e.target.value })} className={`${cls} resize-y min-h-[70px]`} /></div>
+                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Tasks Pending (one per line)</label><textarea rows={3} placeholder="Realtime messaging..." value={projectForm.tasksPending} onChange={(e) => setProjectForm({ ...projectForm, tasksPending: e.target.value })} className={`${cls} resize-y min-h-[70px]`} /></div>
+                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Changelog (Format: "Date: Change text", one per line)</label><textarea rows={3} placeholder="June 17: Added dashboard features" value={projectForm.changelog} onChange={(e) => setProjectForm({ ...projectForm, changelog: e.target.value })} className={`${cls} resize-y min-h-[70px]`} /></div>
+                                    </>
+                                )}
+
+                                {/* LEARNING PATHS FORM */}
+                                {subTab === 'learning' && (
+                                    <>
+                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Learning Subject Title</label><input placeholder="Java (Core), n8n..." value={learningForm.title} onChange={(e) => setLearningForm({ ...learningForm, title: e.target.value })} className={cls} /></div>
+                                        <div className="grid grid-cols-3 gap-3">
+                                            <div>
+                                                <label className="text-xs font-bold text-[#18112E] block mb-1.5">Icon Emoji</label>
+                                                <input placeholder="☕, 🐳, ⚡" value={learningForm.icon} onChange={(e) => setLearningForm({ ...learningForm, icon: e.target.value })} className={cls} />
+                                            </div>
+                                            <div>
+                                                <label className="text-xs font-bold text-[#18112E] block mb-1.5">Status</label>
+                                                <select value={learningForm.status} onChange={(e) => setLearningForm({ ...learningForm, status: e.target.value })} className={cls}>
+                                                    <option value="In Progress">In Progress</option>
+                                                    <option value="Completed">Completed</option>
+                                                    <option value="Paused">Paused</option>
+                                                </select>
+                                            </div>
+                                            <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Progress %</label><input type="number" value={learningForm.progress} onChange={(e) => setLearningForm({ ...learningForm, progress: e.target.value })} className={cls} /></div>
+                                        </div>
+                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Start Date</label><input placeholder="May 2026" value={learningForm.startDate} onChange={(e) => setLearningForm({ ...learningForm, startDate: e.target.value })} className={cls} /></div>
+                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Topics Completed (one per line)</label><textarea rows={3} placeholder="Variables" value={learningForm.topicsCompleted} onChange={(e) => setLearningForm({ ...learningForm, topicsCompleted: e.target.value })} className={`${cls} resize-y min-h-[70px]`} /></div>
+                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Topics Pending (one per line)</label><textarea rows={3} placeholder="Exception handling" value={learningForm.topicsPending} onChange={(e) => setLearningForm({ ...learningForm, topicsPending: e.target.value })} className={`${cls} resize-y min-h-[70px]`} /></div>
+                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Resources (Format: "Name|URL", one per line)</label><textarea rows={2} placeholder="n8n Docs|https://docs.n8n.io" value={learningForm.resources} onChange={(e) => setLearningForm({ ...learningForm, resources: e.target.value })} className={`${cls} resize-y min-h-[60px]`} /></div>
+                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Notes / General thoughts</label><input placeholder="Focusing on fundamentals..." value={learningForm.notes} onChange={(e) => setLearningForm({ ...learningForm, notes: e.target.value })} className={cls} /></div>
+                                    </>
+                                )}
+
+                                {/* ACTIVITIES & JOURNEYS FORM */}
+                                {subTab === 'activities' && (
+                                    <>
+                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Activity/Journey Title</label><input placeholder="Goa Tech Meetup, SIH 2026..." value={activityForm.title} onChange={(e) => setActivityForm({ ...activityForm, title: e.target.value })} className={cls} /></div>
+                                        <div className="grid grid-cols-3 gap-3">
+                                            <div>
+                                                <label className="text-xs font-bold text-[#18112E] block mb-1.5">Type</label>
+                                                <select value={activityForm.type} onChange={(e) => setActivityForm({ ...activityForm, type: e.target.value })} className={cls}>
+                                                    <option value="Hackathon">Hackathon</option>
+                                                    <option value="Journey">Journey</option>
+                                                    <option value="Certification">Certification</option>
+                                                    <option value="Event">Event</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label className="text-xs font-bold text-[#18112E] block mb-1.5">Status</label>
+                                                <select value={activityForm.status} onChange={(e) => setActivityForm({ ...activityForm, status: e.target.value })} className={cls}>
+                                                    <option value="Registered">Registered</option>
+                                                    <option value="Attended">Attended</option>
+                                                    <option value="Finished">Finished</option>
+                                                    <option value="Pending">Pending</option>
+                                                    <option value="Not Completed">Not Completed</option>
+                                                    <option value="Buried">Buried</option>
+                                                    <option value="Failure">Failure</option>
+                                                    <option value="Success">Success</option>
+                                                </select>
+                                            </div>
+                                            <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Date</label><input placeholder="June 2026" value={activityForm.date} onChange={(e) => setActivityForm({ ...activityForm, date: e.target.value })} className={cls} /></div>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Location</label><input placeholder="Bangalore, Goa, Online..." value={activityForm.location} onChange={(e) => setActivityForm({ ...activityForm, location: e.target.value })} className={cls} /></div>
+                                            <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Tags (comma-separated)</label><input placeholder="AI, Winner, Travel" value={activityForm.tags} onChange={(e) => setActivityForm({ ...activityForm, tags: e.target.value })} className={cls} /></div>
+                                        </div>
+                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Description</label><textarea rows={2} placeholder="Explain the journey..." value={activityForm.description} onChange={(e) => setActivityForm({ ...activityForm, description: e.target.value })} className={`${cls} resize-none`} /></div>
+                                        <div>
+                                            <label className="text-xs font-bold text-[#18112E] block mb-1.5">Photo URLs (comma-separated)</label>
+                                            <div className="flex gap-2">
+                                                <input placeholder="Image URLs" value={activityForm.photos} onChange={(e) => setActivityForm({ ...activityForm, photos: e.target.value })} className="flex-1 bg-[#F8F9FA] border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-2.5 text-[#18112E] font-medium outline-none text-sm" />
+                                                <label className="flex items-center justify-center px-4 bg-[#18112E] text-white hover:bg-[#FFB800] hover:text-[#18112E] rounded-[12px] font-bold text-xs cursor-pointer transition-colors">{uploading ? '...' : 'Upload'}<input type="file" accept="image/*" className="hidden" onChange={handleUpload} /></label>
+                                            </div>
+                                        </div>
+                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Notes / Key learnings</label><input placeholder="Learned solidarity smart contract layout..." value={activityForm.notes} onChange={(e) => setActivityForm({ ...activityForm, notes: e.target.value })} className={cls} /></div>
+                                        <div>
+                                            <label className="text-xs font-bold text-[#18112E] block mb-1.5 font-black uppercase tracking-wider">Publish to Social Platforms</label>
+                                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-[#F8F9FA] rounded-[12px] p-3 border-2 border-transparent focus-within:border-[#FFB800]">
+                                                {['snapdude', 'linkedin', 'youtube', 'carousel'].map((p) => {
+                                                    const enabled = activityForm.platforms?.[p] !== false;
+                                                    return (
+                                                        <label key={p} className="flex items-center gap-2 select-none cursor-pointer">
+                                                            <input 
+                                                                type="checkbox" 
+                                                                checked={enabled} 
+                                                                onChange={(e) => {
+                                                                    const nextPlats = { 
+                                                                        ...(activityForm.platforms || { snapdude: true, linkedin: true, youtube: false, carousel: true }), 
+                                                                        [p]: e.target.checked 
+                                                                    };
+                                                                    setActivityForm(prev => ({ ...prev, platforms: nextPlats }));
+                                                                }}
+                                                                className="w-4 h-4 rounded text-[#FFB800] focus:ring-[#FFB800] border-neutral-300"
+                                                            />
+                                                            <span className="text-xs font-black uppercase tracking-wider text-[#18112E]">{p === 'carousel' ? 'Feed' : p === 'snapdude' ? 'Snap Dude' : p}</span>
+                                                        </label>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+
+                                {/* IDEA SANDBOX FORM */}
+                                {subTab === 'ideas' && (
+                                    <>
+                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Idea Title</label><input placeholder="AI resume roast..." value={ideaForm.title} onChange={(e) => setIdeaForm({ ...ideaForm, title: e.target.value })} className={cls} /></div>
+                                        <div>
+                                            <label className="text-xs font-bold text-[#18112E] block mb-1.5">Status</label>
+                                            <select value={ideaForm.status} onChange={(e) => setIdeaForm({ ...ideaForm, status: e.target.value })} className={cls}>
+                                                <option value="Active">Active</option>
+                                                <option value="Brainstorming">Brainstorming</option>
+                                                <option value="Buried">Buried</option>
+                                            </select>
+                                        </div>
+                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Description</label><textarea rows={2} placeholder="Explain the concept..." value={ideaForm.description} onChange={(e) => setIdeaForm({ ...ideaForm, description: e.target.value })} className={`${cls} resize-none`} /></div>
+                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Current Status Notes</label><input placeholder="Cost constraints / brainstorming..." value={ideaForm.notes} onChange={(e) => setIdeaForm({ ...ideaForm, notes: e.target.value })} className={cls} /></div>
+                                    </>
+                                )}
+
+                                {/* DEVLOG NOW LOGS FORM */}
+                                {subTab === 'devlog' && (
+                                    <>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Date</label><input placeholder="June 17, 2026" value={logForm.date} onChange={(e) => setLogForm({ ...logForm, date: e.target.value })} className={cls} /></div>
+                                            <div>
+                                                <label className="text-xs font-bold text-[#18112E] block mb-1.5">Log Type</label>
+                                                <select value={logForm.type} onChange={(e) => setLogForm({ ...logForm, type: e.target.value })} className={cls}>
+                                                    <option value="Update">Update</option>
+                                                    <option value="Feature">Feature</option>
+                                                    <option value="Learning">Learning</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Short Content / Summary</label><textarea rows={2} placeholder="What did you do?" value={logForm.content} onChange={(e) => setLogForm({ ...logForm, content: e.target.value })} className={`${cls} resize-none`} /></div>
+                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Documentation / Details</label><textarea rows={3} placeholder="Provide in-depth details of what was done..." value={logForm.documentation} onChange={(e) => setLogForm({ ...logForm, documentation: e.target.value })} className={`${cls} resize-none`} /></div>
+                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Photos / Screenshots (comma-separated URLs)</label><input placeholder="https://example.com/img1.jpg, https://example.com/img2.jpg" value={logForm.photos} onChange={(e) => setLogForm({ ...logForm, photos: e.target.value })} className={cls} /></div>
+                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Changes List (one per line)</label><textarea rows={3} placeholder="Fixed mobile spacing&#10;Updated background opacity" value={logForm.changes} onChange={(e) => setLogForm({ ...logForm, changes: e.target.value })} className={`${cls} resize-none`} /></div>
+                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Links (Format: Label|URL, one per line)</label><textarea rows={2} placeholder="Commit #a3f92c|https://github.com/..." value={logForm.links} onChange={(e) => setLogForm({ ...logForm, links: e.target.value })} className={`${cls} resize-none`} /></div>
+                                    </>
+                                )}
+                            </div>
+                            <div className="p-6 border-t border-neutral-100 bg-white flex gap-3">
+                                <button onClick={() => setModal(false)} className="flex-1 bg-[#F8F9FA] text-[#18112E] font-bold py-3 rounded-[12px] hover:bg-neutral-200 transition-colors text-sm">Cancel</button>
+                                <button onClick={handleSave} className="flex-1 bg-[#FFB800] text-[#18112E] font-bold py-3 rounded-[12px] hover:bg-[#ffcc33] transition-colors shadow-md text-sm">{editingId ? 'Update' : 'Add'}</button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Import LinkedIn JSON Modal */}
+            <AnimatePresence>
+                {importModal && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center bg-[#18112E]/40 backdrop-blur-sm p-4" onClick={() => setImportModal(false)}>
+                        <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }} className="bg-white rounded-[24px] w-full max-w-xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+                            <div className="flex items-center justify-between p-6 border-b border-neutral-100 bg-[#F8F9FA]">
+                                <h2 className="text-lg font-bold text-[#18112E] flex items-center gap-2">
+                                    <Upload className="w-5 h-5 text-[#0A66C2]" /> Import LinkedIn JSON
+                                </h2>
+                                <button onClick={() => setImportModal(false)} className="text-neutral-400 hover:text-[#18112E] bg-white p-1.5 rounded-full border border-neutral-100 shadow-sm"><X className="w-4 h-4" /></button>
+                            </div>
+                            <div className="p-6 space-y-4 overflow-y-auto flex-1 text-left">
+                                <div className="p-4 bg-blue-50/50 border border-blue-100 rounded-xl space-y-2 text-xs text-neutral-600 leading-normal">
+                                    <p className="font-bold text-[#0A66C2]">How to use the Bookmarklet sync:</p>
+                                    <ol className="list-decimal pl-4 space-y-1">
+                                        <li>Copy the Bookmarklet code below.</li>
+                                        <li>Create a browser bookmark with any name (e.g. <em>Sync LinkedIn</em>) and paste this code as the URL.</li>
+                                        <li>Visit your public LinkedIn profile (e.g. <code>linkedin.com/in/your-name</code>).</li>
+                                        <li>Click the bookmark. It will scrape your page and copy the JSON payload to your clipboard automatically.</li>
+                                        <li>Come back here, paste the copied text into the box below, and click <strong>"Process & Import"</strong>.</li>
+                                    </ol>
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-bold text-[#18112E] block uppercase tracking-wider font-black">Bookmarklet Code</label>
+                                    <div className="flex gap-2">
+                                        <input readOnly value="javascript:(function(){try{const nameEl=document.querySelector('.text-heading-xlarge')||document.querySelector('h1');const name=nameEl?nameEl.innerText.trim():'';const headlineEl=document.querySelector('.text-body-medium')||document.querySelector('.pv-text-details__left-panel div');const headline=headlineEl?headlineEl.innerText.trim():'';const aboutHeader=document.getElementById('about');let about='';if(aboutHeader){const container=aboutHeader.closest('section');if(container){const textEl=container.querySelector('.inline-show-more-text');about=textEl?textEl.innerText.trim():'';}}const expHeader=document.getElementById('experience');const experiences=[];if(expHeader){const section=expHeader.closest('section');if(section){const items=section.querySelectorAll('.pvs-entity, .experience-item, .pvs-list__outer-container > ul > li');items.forEach((item,index)=>{try{const roleEl=item.querySelector('.t-bold span')||item.querySelector('.mr1.t-bold span');const role=roleEl?roleEl.innerText.trim():'';const companyEl=item.querySelector('.t-normal span')||item.querySelector('.t-14.t-normal span');const company=companyEl?companyEl.innerText.trim().split('Â·')[0].trim():'';const durationEl=item.querySelector('.t-14.t-normal.t-black--light span')||item.querySelector('.pvs-entity__caption-wrapper');const duration=durationEl?durationEl.innerText.trim().split('Â·')[0].trim():'';const descEl=item.querySelector('.inline-show-more-text span');const description=descEl?descEl.innerText.trim():'';if(role&&company){experiences.push({role,company,duration,location:'Remote',description,skills:[]});}}catch(e){}});}}const eduHeader=document.getElementById('education');const educations=[];if(eduHeader){const section=eduHeader.closest('section');if(section){const items=section.querySelectorAll('.pvs-entity, .pvs-list__outer-container > ul > li');items.forEach((item,index)=>{try{const schoolEl=item.querySelector('.t-bold span');const school=schoolEl?schoolEl.innerText.trim():'';const degreeEl=item.querySelector('.t-normal span');const degree=degreeEl?degreeEl.innerText.trim():'';const durationEl=item.querySelector('.t-14.t-normal.t-black--light span');const duration=durationEl?durationEl.innerText.trim():'';if(school){educations.push({school,degree,duration,grade:'',activities:''});}}catch(e){}});}}const payload={profile:{name,title:headline,aboutStory:about},experience:experiences,education:educations};const json=JSON.stringify(payload,null,2);fetch('http://localhost:5173/api/sync',{method:'POST',headers:{'Content-Type':'application/json'},body:json}).then(r=>r.json()).then(d=>{if(d.success){alert('LinkedIn profile synced directly to local portfolio!');}else{throw new Error(d.error||'Failed');}}).catch(err=>{const textarea=document.createElement('textarea');textarea.value=json;document.body.appendChild(textarea);textarea.select();document.execCommand('copy');document.body.removeChild(textarea);alert('Local sync failed (or on production). JSON has been copied to clipboard instead. Paste it manually in the admin panel.');});}catch(err){alert('Scraper Error: '+err.message);}})();" className="flex-1 font-mono text-[10px] bg-[#F8F9FA] border-2 border-transparent focus:border-[#FFB800] focus:bg-white rounded-[12px] px-3 py-2 text-[#18112E] outline-none" />
+                                        <button onClick={() => {
+                                            const code = `javascript:(function(){try{const nameEl=document.querySelector('.text-heading-xlarge')||document.querySelector('h1');const name=nameEl?nameEl.innerText.trim():'';const headlineEl=document.querySelector('.text-body-medium')||document.querySelector('.pv-text-details__left-panel div');const headline=headlineEl?headlineEl.innerText.trim():'';const aboutHeader=document.getElementById('about');let about='';if(aboutHeader){const container=aboutHeader.closest('section');if(container){const textEl=container.querySelector('.inline-show-more-text');about=textEl?textEl.innerText.trim():'';}}const expHeader=document.getElementById('experience');const experiences=[];if(expHeader){const section=expHeader.closest('section');if(section){const items=section.querySelectorAll('.pvs-entity, .experience-item, .pvs-list__outer-container > ul > li');items.forEach((item,index)=>{try{const roleEl=item.querySelector('.t-bold span')||item.querySelector('.mr1.t-bold span');const role=roleEl?roleEl.innerText.trim():'';const companyEl=item.querySelector('.t-normal span')||item.querySelector('.t-14.t-normal span');const company=companyEl?companyEl.innerText.trim().split('·')[0].trim():'';const durationEl=item.querySelector('.t-14.t-normal.t-black--light span')||item.querySelector('.pvs-entity__caption-wrapper');const duration=durationEl?durationEl.innerText.trim().split('·')[0].trim():'';const descEl=item.querySelector('.inline-show-more-text span');const description=descEl?descEl.innerText.trim():'';if(role&&company){experiences.push({role,company,duration,location:'Remote',description,skills:[]});}}catch(e){}});}}const eduHeader=document.getElementById('education');const educations=[];if(eduHeader){const section=eduHeader.closest('section');if(section){const items=section.querySelectorAll('.pvs-entity, .pvs-list__outer-container > ul > li');items.forEach((item,index)=>{try{const schoolEl=item.querySelector('.t-bold span');const school=schoolEl?schoolEl.innerText.trim():'';const degreeEl=item.querySelector('.t-normal span');const degree=degreeEl?degreeEl.innerText.trim():'';const durationEl=item.querySelector('.t-14.t-normal.t-black--light span');const duration=durationEl?durationEl.innerText.trim():'';if(school){educations.push({school,degree,duration,grade:'',activities:''});}}catch(e){}});}}const payload={profile:{name,title:headline,aboutStory:about},experience:experiences,education:educations};const json=JSON.stringify(payload,null,2);const textarea=document.createElement('textarea');textarea.value=json;document.body.appendChild(textarea);textarea.select();document.execCommand('copy');document.body.removeChild(textarea);alert('LinkedIn Scraped Successfully!\n\nJSON data has been copied to your clipboard.\nGo to your Portfolio Admin Panel, open "Import LinkedIn JSON" and paste (Ctrl+V) the data.');}catch(err){alert('Sync Error: '+err.message);}})();`;
+                                            navigator.clipboard.writeText(code);
+                                            alert('Bookmarklet code copied to clipboard!');
+                                        }} className="px-4 py-2 bg-[#18112E] text-white font-bold text-xs uppercase tracking-wider rounded-[12px] hover:bg-neutral-800 transition-colors shrink-0">Copy</button>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold text-[#18112E] block uppercase tracking-wider font-black">Paste JSON Data</label>
+                                    <textarea rows={6} placeholder="Paste copied JSON here..." value={importText} onChange={(e) => setImportText(e.target.value)} className={`${cls} resize-y min-h-[140px]`} />
+                                </div>
+
+                                {importError && (
+                                    <div className="p-3 bg-red-50 border border-red-100 rounded-xl text-xs font-bold text-red-500">{importError}</div>
+                                )}
+                            </div>
+                            <div className="p-6 border-t border-neutral-100 bg-white flex gap-3">
+                                <button onClick={() => setImportModal(false)} className="flex-1 bg-[#F8F9FA] text-[#18112E] font-bold py-3 rounded-[12px] hover:bg-neutral-200 transition-colors text-sm">Cancel</button>
+                                <button onClick={handleImport} className="flex-1 bg-[#FFB800] text-[#18112E] font-bold py-3 rounded-[12px] hover:bg-[#ffcc33] transition-colors shadow-md text-sm">Process & Import</button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
@@ -1221,10 +2055,10 @@ export default function AdminPanel() {
     const [showBg, setShowBg] = useState(true);
     const [showMusic, setShowMusic] = useState(true);
     const profile = useStore((s) => s.profile);
-    const skillCount = useStore((s) => s.skills.length);
-    const projectCount = useStore((s) => s.projects.length);
-    const achievementCount = useStore((s) => s.achievements.length);
-    const messageCount = useStore((s) => s.messages.length);
+    const skillCount = useStore((s) => s.skills?.length || 0);
+    const projectCount = useStore((s) => s.projects?.length || 0);
+    const achievementCount = useStore((s) => s.achievements?.length || 0);
+    const messageCount = useStore((s) => s.messages?.length || 0);
 
     const overviewCards = [
         { label: 'Profile', value: profile?.name || 'Ready', hint: profile?.title || 'Edit your intro' },
@@ -1291,6 +2125,7 @@ export default function AdminPanel() {
                             {activeTab === 'skills' && <SkillsTab />}
                             {activeTab === 'projects' && <ProjectsTab />}
                             {activeTab === 'achievements' && <AchievementsTab />}
+                            {activeTab === 'dashboard' && <DashboardTab />}
                             {activeTab === 'messages' && <MessagesTab />}
                             {activeTab === 'settings' && <SettingsTab />}
                         </div>

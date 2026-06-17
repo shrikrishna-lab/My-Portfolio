@@ -45,7 +45,7 @@ export default function Hero() {
 
                 {/* Main Headline */}
                 <motion.h1
-                    className="text-6xl sm:text-8xl md:text-[8rem] lg:text-[10rem] font-black tracking-tighter text-[#18112E] max-w-7xl leading-[0.85] uppercase"
+                    className="text-5xl sm:text-8xl md:text-[8rem] lg:text-[10rem] font-black tracking-tighter text-[#18112E] max-w-7xl leading-[0.85] uppercase"
                     initial={{ opacity: 0, y: 80 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ type: "spring", stiffness: 80, damping: 18, delay: 0.15 }}

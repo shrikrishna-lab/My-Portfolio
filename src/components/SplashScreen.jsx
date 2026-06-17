@@ -41,31 +41,52 @@ export default function SplashScreen({ onFinish }) {
 
             {/* Falling stars */}
             {[
-                { delay: 0.3, dur: 1.5, top: 3, left: 20 },
-                { delay: 1.0, dur: 1.8, top: 12, left: 55 },
-                { delay: 1.8, dur: 1.3, top: 8, left: 35 },
-                { delay: 2.5, dur: 1.6, top: 18, left: 65 },
-                { delay: 3.2, dur: 1.4, top: 5, left: 45 },
-                { delay: 4.0, dur: 1.7, top: 15, left: 30 },
-                { delay: 4.8, dur: 1.5, top: 10, left: 70 },
-                { delay: 5.5, dur: 1.3, top: 22, left: 50 },
-                { delay: 6.3, dur: 1.6, top: 7, left: 40 },
-                { delay: 7.0, dur: 1.4, top: 14, left: 60 },
-                { delay: 7.8, dur: 1.8, top: 20, left: 25 },
-                { delay: 8.5, dur: 1.5, top: 4, left: 55 },
+                { delay: 0.1, dur: 0.6, top: 2, left: 80, size: 1.2, color: '#ffffff' },
+                { delay: 0.5, dur: 0.8, top: 8, left: 95, size: 1.5, color: '#FFB800' },
+                { delay: 0.9, dur: 0.5, top: 1, left: 45, size: 1.0, color: '#ffffff' },
+                { delay: 0.3, dur: 0.7, top: 5, left: 60, size: 1.6, color: '#3AA8F5' },
+                { delay: 1.4, dur: 0.7, top: 12, left: 75, size: 1.3, color: '#ffffff' },
+                { delay: 0.7, dur: 0.6, top: 4, left: 50, size: 1.1, color: '#FFB800' },
+                { delay: 1.8, dur: 0.8, top: 10, left: 85, size: 1.4, color: '#ffffff' },
+                { delay: 1.2, dur: 0.5, top: 6, left: 70, size: 1.2, color: '#3AA8F5' },
+                { delay: 0.4, dur: 0.7, top: 9, left: 35, size: 1.3, color: '#FFB800' },
+                { delay: 1.6, dur: 0.9, top: 15, left: 90, size: 1.7, color: '#ffffff' },
             ].map((f, i) => (
-                <motion.div key={`f${i}`} className="absolute z-[1]"
+                <motion.div key={`f${i}`} className="absolute z-[1] pointer-events-none"
                     style={{ top: `${f.top}%`, left: `${f.left}%` }}
                     animate={{
-                        y: [0, 300],
-                        x: [0, -60],
-                        opacity: [0, 1, 1, 0],
+                        y: [0, 400],
+                        x: [0, -400],
+                        opacity: [0, 1, 0.8, 0],
                     }}
-                    transition={{ duration: f.dur, repeat: Infinity, delay: f.delay, ease: 'easeOut' }}
+                    transition={{
+                        duration: f.dur,
+                        repeat: Infinity,
+                        delay: f.delay,
+                        ease: 'linear',
+                        repeatDelay: 1.5 + Math.random() * 2
+                    }}
                 >
-                    <div className="flex items-center" style={{ transform: 'rotate(-15deg)' }}>
-                        <div className="w-[2px] h-[2px] rounded-full bg-white" />
-                        <div className="w-12 h-px bg-gradient-to-l from-white/30 to-transparent" />
+                    <div className="flex items-center" style={{ transform: 'rotate(-45deg)', transformOrigin: 'left center' }}>
+                        {/* Star Head */}
+                        <div 
+                            className="rounded-full bg-white shrink-0" 
+                            style={{ 
+                                width: `${f.size * 2}px`, 
+                                height: `${f.size * 2}px`,
+                                boxShadow: `0 0 8px ${f.color}, 0 0 15px ${f.color}`
+                            }} 
+                        />
+                        {/* Star Tail */}
+                        <div 
+                            className="h-[1px] shrink-0" 
+                            style={{ 
+                                width: `${f.size * 80}px`,
+                                backgroundImage: `linear-gradient(to right, ${f.color}, ${f.color}44, transparent)`,
+                                marginLeft: '-1px',
+                                opacity: 0.85
+                            }} 
+                        />
                     </div>
                 </motion.div>
             ))}

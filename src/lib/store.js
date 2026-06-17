@@ -18,6 +18,13 @@ function save(state) {
       projects: state.projects,
       achievements: state.achievements,
       messages: state.messages,
+      nowLogs: state.nowLogs,
+      sandboxIdeas: state.sandboxIdeas,
+      currentProjects: state.currentProjects,
+      learningPaths: state.learningPaths,
+      activities: state.activities,
+      experience: state.experience,
+      education: state.education,
     }));
   } catch {}
 }
@@ -32,6 +39,13 @@ export const useStore = create((set, get) => ({
   projects: [],
   achievements: [],
   messages: [],
+  nowLogs: [],
+  sandboxIdeas: [],
+  currentProjects: [],
+  learningPaths: [],
+  activities: [],
+  experience: [],
+  education: [],
   loading: true,
 
   fetchAll: async () => {
@@ -39,14 +53,42 @@ export const useStore = create((set, get) => ({
       const res = await fetch('/data.json');
       if (res.ok) {
         const data = await res.json();
-        set({ ...data, loading: false });
+        set({
+          profile: data.profile || null,
+          skills: data.skills || [],
+          projects: data.projects || [],
+          achievements: data.achievements || [],
+          messages: data.messages || [],
+          nowLogs: data.nowLogs || [],
+          sandboxIdeas: data.sandboxIdeas || [],
+          currentProjects: data.currentProjects || [],
+          learningPaths: data.learningPaths || [],
+          activities: data.activities || [],
+          experience: data.experience || [],
+          education: data.education || [],
+          loading: false
+        });
         save(data);
         return;
       }
     } catch {}
     const saved = loadSaved();
     if (saved) {
-      set({ ...saved, loading: false });
+      set({
+        profile: saved.profile || null,
+        skills: saved.skills || [],
+        projects: saved.projects || [],
+        achievements: saved.achievements || [],
+        messages: saved.messages || [],
+        nowLogs: saved.nowLogs || [],
+        sandboxIdeas: saved.sandboxIdeas || [],
+        currentProjects: saved.currentProjects || [],
+        learningPaths: saved.learningPaths || [],
+        activities: saved.activities || [],
+        experience: saved.experience || [],
+        education: saved.education || [],
+        loading: false
+      });
       return;
     }
     set({ loading: false });
@@ -146,7 +188,20 @@ export const useStore = create((set, get) => ({
     if (token) {
       try {
         const state = get();
-        const data = { profile: state.profile, skills: state.skills, projects: state.projects, achievements: state.achievements, messages: state.messages };
+        const data = {
+          profile: state.profile,
+          skills: state.skills,
+          projects: state.projects,
+          achievements: state.achievements,
+          messages: state.messages,
+          nowLogs: state.nowLogs,
+          sandboxIdeas: state.sandboxIdeas,
+          currentProjects: state.currentProjects,
+          learningPaths: state.learningPaths,
+          activities: state.activities,
+          experience: state.experience,
+          education: state.education,
+        };
         const repo = 'shrikrishna-lab/My-Portfolio', path = 'public/data.json', branch = 'main';
         const headers = { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' };
         const existing = await fetch(`https://api.github.com/repos/${repo}/contents/${path}?ref=${branch}`, { headers }).then(r => r.json());
@@ -188,7 +243,20 @@ export const useStore = create((set, get) => ({
     if (token) {
       try {
         const state = get();
-        const data = { profile: state.profile, skills: state.skills, projects: state.projects, achievements: state.achievements, messages: state.messages };
+        const data = {
+          profile: state.profile,
+          skills: state.skills,
+          projects: state.projects,
+          achievements: state.achievements,
+          messages: state.messages,
+          nowLogs: state.nowLogs,
+          sandboxIdeas: state.sandboxIdeas,
+          currentProjects: state.currentProjects,
+          learningPaths: state.learningPaths,
+          activities: state.activities,
+          experience: state.experience,
+          education: state.education,
+        };
         const repo = 'shrikrishna-lab/My-Portfolio', path = 'public/data.json', branch = 'main';
         const headers = { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' };
         const existing = await fetch(`https://api.github.com/repos/${repo}/contents/${path}?ref=${branch}`, { headers }).then(r => r.json());
@@ -199,12 +267,192 @@ export const useStore = create((set, get) => ({
     }
   },
 
+  /* ── NOW LOGS (DEVLOG) CRUD ── */
+  addNowLog: (log) => {
+    const newLog = { ...log, id: genId() };
+    set((s) => {
+      const nowLogs = [newLog, ...s.nowLogs];
+      save({ ...s, nowLogs });
+      return { nowLogs };
+    });
+  },
+  updateNowLog: (id, updates) => {
+    set((s) => {
+      const nowLogs = s.nowLogs.map((l) => (l.id === id ? { ...l, ...updates } : l));
+      save({ ...s, nowLogs });
+      return { nowLogs };
+    });
+  },
+  deleteNowLog: (id) => {
+    set((s) => {
+      const nowLogs = s.nowLogs.filter((l) => l.id !== id);
+      save({ ...s, nowLogs });
+      return { nowLogs };
+    });
+  },
+
+  /* ── SANDBOX IDEAS CRUD ── */
+  addSandboxIdea: (idea) => {
+    const newIdea = { ...idea, id: genId() };
+    set((s) => {
+      const sandboxIdeas = [newIdea, ...s.sandboxIdeas];
+      save({ ...s, sandboxIdeas });
+      return { sandboxIdeas };
+    });
+  },
+  updateSandboxIdea: (id, updates) => {
+    set((s) => {
+      const sandboxIdeas = s.sandboxIdeas.map((i) => (i.id === id ? { ...i, ...updates } : i));
+      save({ ...s, sandboxIdeas });
+      return { sandboxIdeas };
+    });
+  },
+  deleteSandboxIdea: (id) => {
+    set((s) => {
+      const sandboxIdeas = s.sandboxIdeas.filter((i) => i.id !== id);
+      save({ ...s, sandboxIdeas });
+      return { sandboxIdeas };
+    });
+  },
+
+  /* ── CURRENT PROJECTS CRUD ── */
+  addCurrentProject: (project) => {
+    const newProject = { ...project, id: genId() };
+    set((s) => {
+      const currentProjects = [...s.currentProjects, newProject];
+      save({ ...s, currentProjects });
+      return { currentProjects };
+    });
+  },
+  updateCurrentProject: (id, updates) => {
+    set((s) => {
+      const currentProjects = s.currentProjects.map((p) => (p.id === id ? { ...p, ...updates } : p));
+      save({ ...s, currentProjects });
+      return { currentProjects };
+    });
+  },
+  deleteCurrentProject: (id) => {
+    set((s) => {
+      const currentProjects = s.currentProjects.filter((p) => p.id !== id);
+      save({ ...s, currentProjects });
+      return { currentProjects };
+    });
+  },
+
+  /* ── LEARNING PATHS CRUD ── */
+  addLearningPath: (path) => {
+    const newPath = { ...path, id: genId() };
+    set((s) => {
+      const learningPaths = [...s.learningPaths, newPath];
+      save({ ...s, learningPaths });
+      return { learningPaths };
+    });
+  },
+  updateLearningPath: (id, updates) => {
+    set((s) => {
+      const learningPaths = s.learningPaths.map((p) => (p.id === id ? { ...p, ...updates } : p));
+      save({ ...s, learningPaths });
+      return { learningPaths };
+    });
+  },
+  deleteLearningPath: (id) => {
+    set((s) => {
+      const learningPaths = s.learningPaths.filter((p) => p.id !== id);
+      save({ ...s, learningPaths });
+      return { learningPaths };
+    });
+  },
+
+  /* ── ACTIVITIES CRUD ── */
+  addActivity: (activity) => {
+    const newActivity = { ...activity, id: genId() };
+    set((s) => {
+      const activities = [newActivity, ...s.activities];
+      save({ ...s, activities });
+      return { activities };
+    });
+  },
+  updateActivity: (id, updates) => {
+    set((s) => {
+      const activities = s.activities.map((a) => (a.id === id ? { ...a, ...updates } : a));
+      save({ ...s, activities });
+      return { activities };
+    });
+  },
+  deleteActivity: (id) => {
+    set((s) => {
+      const activities = s.activities.filter((a) => a.id !== id);
+      save({ ...s, activities });
+      return { activities };
+    });
+  },
+
   uploadImage: async (file) => {
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onloadend = () => resolve({ error: null, url: reader.result });
       reader.onerror = () => resolve({ error: { message: 'Failed to read file' }, url: null });
       reader.readAsDataURL(file);
+    });
+  },
+
+  /* ── EXPERIENCE CRUD ── */
+  addExperience: (exp) => {
+    const newExp = { ...exp, id: genId() };
+    set((s) => {
+      const experience = [...s.experience, newExp];
+      save({ ...s, experience });
+      return { experience };
+    });
+  },
+  updateExperience: (id, updates) => {
+    set((s) => {
+      const experience = s.experience.map((e) => (e.id === id ? { ...e, ...updates } : e));
+      save({ ...s, experience });
+      return { experience };
+    });
+  },
+  deleteExperience: (id) => {
+    set((s) => {
+      const experience = s.experience.filter((e) => e.id !== id);
+      save({ ...s, experience });
+      return { experience };
+    });
+  },
+
+  /* ── EDUCATION CRUD ── */
+  addEducation: (edu) => {
+    const newEdu = { ...edu, id: genId() };
+    set((s) => {
+      const education = [...s.education, newEdu];
+      save({ ...s, education });
+      return { education };
+    });
+  },
+  updateEducation: (id, updates) => {
+    set((s) => {
+      const education = s.education.map((e) => (e.id === id ? { ...e, ...updates } : e));
+      save({ ...s, education });
+      return { education };
+    });
+  },
+  deleteEducation: (id) => {
+    set((s) => {
+      const education = s.education.filter((e) => e.id !== id);
+      save({ ...s, education });
+      return { education };
+    });
+  },
+  setExperience: (experience) => {
+    set((s) => {
+      save({ ...s, experience });
+      return { experience };
+    });
+  },
+  setEducation: (education) => {
+    set((s) => {
+      save({ ...s, education });
+      return { education };
     });
   },
 }));

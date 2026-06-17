@@ -22,51 +22,51 @@ export default function About() {
                         <span className="text-[#FFB800] font-extrabold tracking-widest text-sm uppercase">About The Creator</span>
                     </div>
 
-                    <h2 className="text-5xl md:text-8xl lg:text-[7rem] font-black text-[#18112E] tracking-tighter uppercase leading-[0.9] mb-20">
+                    <h2 className="text-4xl sm:text-5xl md:text-8xl lg:text-[7rem] font-black text-[#18112E] tracking-tighter uppercase leading-[0.9] mb-20">
                         The Story <br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-neutral-400 to-neutral-300">So Far.</span>
                     </h2>
 
                     <div className="grid lg:grid-cols-12 gap-8 lg:gap-12">
-                        <div className="lg:col-span-7">
-                            <motion.div
-                                className="mb-6 rounded-2xl overflow-hidden shadow-md border border-neutral-100"
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true, margin: '-50px' }}
-                                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                            >
-                                <img src="/portfolio%20image2.png" alt="Portfolio" className="w-full h-48 md:h-64 object-cover object-[50%_30%]" />
-                            </motion.div>
-                            <h3 className="text-3xl font-extrabold text-[#18112E] mb-8 flex items-center gap-3">
-                                Background
-                            </h3>
-                            <div className="space-y-6 text-neutral-600 text-xl leading-relaxed font-medium bg-[#F8F9FA] p-8 rounded-[32px] border border-neutral-100 shadow-sm">
-                                <p>{profile.aboutStory}</p>
-                            </div>
-                        </div>
+                         <div className="lg:col-span-7">
+                             <motion.div
+                                 className="mb-6 rounded-2xl overflow-hidden shadow-md border border-neutral-100"
+                                 initial={{ opacity: 0, y: 20 }}
+                                 whileInView={{ opacity: 1, y: 0 }}
+                                 viewport={{ once: true, margin: '-50px' }}
+                                 transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                             >
+                                 <img src="/portfolio%20image2.png" alt="Portfolio" className="w-full h-48 md:h-64 object-cover object-[50%_30%]" />
+                             </motion.div>
+                             <h3 className="text-3xl font-extrabold text-[#18112E] mb-8 flex items-center gap-3">
+                                 Background
+                             </h3>
+                             <div className="space-y-6 text-neutral-600 text-lg sm:text-xl leading-relaxed font-medium bg-[#F8F9FA] p-6 sm:p-8 rounded-[32px] border border-neutral-100 shadow-sm">
+                                 <p>{profile.aboutStory}</p>
+                             </div>
+                         </div>
 
-                        <div className="lg:col-span-5 relative">
-                            <h3 className="text-3xl font-extrabold text-[#18112E] mb-10">Timeline</h3>
-                            <div className="relative border-l-2 border-neutral-200 space-y-16 pl-12 bg-white rounded-[32px] p-8 border shadow-sm">
-                                <div className="relative">
-                                    <div className="absolute -left-[58px] top-1.5 w-5 h-5 bg-[#FFB800] rounded-full shadow-[0_0_15px_rgba(255,184,0,0.5)] border-4 border-white" />
-                                    <h4 className="text-2xl font-extrabold text-[#18112E] mb-3 tracking-tight">Present</h4>
-                                    <p className="text-neutral-500 font-bold leading-relaxed">Building Startups & Learning Advanced Web Dev</p>
-                                </div>
-                                <div className="relative">
-                                    <div className="absolute -left-[58px] top-1.5 w-5 h-5 bg-neutral-300 rounded-full border-4 border-white" />
-                                    <h4 className="text-2xl font-extrabold text-neutral-400 mb-3 tracking-tight">2024</h4>
-                                    <p className="text-neutral-500 font-bold leading-relaxed">Mastered React & Started Freelancing</p>
-                                </div>
-                                <div className="relative">
-                                    <div className="absolute -left-[58px] top-1.5 w-5 h-5 bg-neutral-300 rounded-full border-4 border-white" />
-                                    <h4 className="text-2xl font-extrabold text-neutral-400 mb-3 tracking-tight">2023</h4>
-                                    <p className="text-neutral-500 font-bold leading-relaxed">Enrolled in IT Degree & Learned Fundamentals</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                         <div className="lg:col-span-5 relative">
+                             <h3 className="text-3xl font-extrabold text-[#18112E] mb-10">Timeline</h3>
+                             <div className="relative border-l-2 border-neutral-200 space-y-16 pl-8 sm:pl-12 bg-white rounded-[32px] p-6 sm:p-8 border shadow-sm">
+                                 <div className="relative">
+                                     <div className="absolute -left-[42px] sm:-left-[58px] top-1.5 w-5 h-5 bg-[#FFB800] rounded-full shadow-[0_0_15px_rgba(255,184,0,0.5)] border-4 border-white" />
+                                     <h4 className="text-2xl font-extrabold text-[#18112E] mb-3 tracking-tight">Present</h4>
+                                     <p className="text-neutral-500 font-bold leading-relaxed">Building Startups & Learning Advanced Web Dev</p>
+                                 </div>
+                                 <div className="relative">
+                                     <div className="absolute -left-[42px] sm:-left-[58px] top-1.5 w-5 h-5 bg-neutral-300 rounded-full border-4 border-white" />
+                                     <h4 className="text-2xl font-extrabold text-neutral-400 mb-3 tracking-tight">2024</h4>
+                                     <p className="text-neutral-500 font-bold leading-relaxed">Mastered React & Started Freelancing</p>
+                                 </div>
+                                 <div className="relative">
+                                     <div className="absolute -left-[42px] sm:-left-[58px] top-1.5 w-5 h-5 bg-neutral-300 rounded-full border-4 border-white" />
+                                     <h4 className="text-2xl font-extrabold text-neutral-400 mb-3 tracking-tight">2023</h4>
+                                     <p className="text-neutral-500 font-bold leading-relaxed">Enrolled in IT Degree & Learned Fundamentals</p>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
                 </motion.div>
             </div>
         </section>
