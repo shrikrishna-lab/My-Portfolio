@@ -1062,6 +1062,7 @@ function DashboardTab() {
                 if (parsed.profile.title) profileUpdates.title = parsed.profile.title;
                 if (parsed.profile.aboutStory) profileUpdates.aboutStory = parsed.profile.aboutStory;
                 if (parsed.profile.characterImage) profileUpdates.characterImage = parsed.profile.characterImage;
+                if (parsed.profile.bannerImage) profileUpdates.bannerImage = parsed.profile.bannerImage;
                 if (Object.keys(profileUpdates).length > 0) {
                     updateProfile(profileUpdates);
                 }

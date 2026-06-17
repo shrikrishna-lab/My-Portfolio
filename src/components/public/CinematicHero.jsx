@@ -125,7 +125,7 @@ function CharacterPortrait({ imageUrl, mouseX, mouseY, scrollProgress }) {
                     <motion.div className="absolute inset-0 overflow-hidden rounded-2xl" style={{ z: 0 }}
                         animate={!isMobile ? { y: [0, -3, 0] } : {}} transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}>
                         <div className="absolute inset-0 bg-gradient-to-t from-[#070707] via-transparent to-transparent z-10 pointer-events-none" style={{ opacity: 0.4 }} />
-                        <div className="absolute inset-0 bg-cover bg-center bg-no-repeat z-[5]" style={{ backgroundImage: `url(${imageUrl})` }} />
+                        <img src={imageUrl} alt="" className="absolute inset-0 w-full h-full object-cover z-[5]" referrerPolicy="no-referrer" />
                         <motion.div className="absolute inset-0 z-[6] pointer-events-none" style={{ background: 'linear-gradient(135deg, rgba(212,116,74,0.1) 0%, transparent 50%, rgba(212,116,74,0.05) 100%)', opacity: glowIntensity }} />
                         <motion.div className="absolute top-0 left-0 right-0 h-[35%] z-[7] pointer-events-none" style={{ background: 'linear-gradient(to bottom, rgba(212,116,74,0.15) 0%, transparent 100%)', opacity: glowRim, rotateX: mouseXN2 }} />
                         <motion.div className="absolute bottom-0 left-0 right-0 h-[25%] z-[4] pointer-events-none" style={{ background: 'linear-gradient(to top, rgba(7,7,7,0.7) 0%, transparent 100%)', y: mouseY3 }} />

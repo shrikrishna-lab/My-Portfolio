@@ -31,6 +31,8 @@ const syncPlugin = () => ({
                 name: data.profile.name || existingData.profile?.name,
                 title: data.profile.title || existingData.profile?.title,
                 aboutStory: data.profile.aboutStory || existingData.profile?.aboutStory,
+                characterImage: data.profile.characterImage || existingData.profile?.characterImage,
+                bannerImage: data.profile.bannerImage || existingData.profile?.bannerImage,
               };
             }
             

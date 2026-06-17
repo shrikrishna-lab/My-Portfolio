@@ -1326,7 +1326,7 @@ export default function Sandbox() {
                                 <div className="space-y-6 animate-fadeIn">
                                     {/* YouTube channel banner */}
                                     <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 pb-6 bg-white border-2 border-[#18112E] rounded-[24px] p-5 sm:p-6 shadow-[6px_6px_0_#18112E]">
-                                        <img src={profile.characterImage} alt="" className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-[#FF0000]" />
+                                        <img src={profile.characterImage} alt="" className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-[#FF0000]" referrerPolicy="no-referrer" />
                                         <div className="space-y-2 text-center sm:text-left flex-1 min-w-0">
                                             <h3 className="text-base sm:text-lg font-black text-[#18112E] tracking-tight">{profile.name} DevLogs</h3>
                                             <div className="flex justify-center sm:justify-start items-center gap-3 text-[10px] sm:text-xs text-neutral-400 font-bold uppercase tracking-wider flex-wrap">
@@ -1354,7 +1354,7 @@ export default function Sandbox() {
                                                         {/* Video Thumbnail */}
                                                         <div className="aspect-video w-full bg-neutral-900 rounded-xl overflow-hidden relative border border-[#18112E]/10">
                                                             {act.photos && act.photos.length > 0 ? (
-                                                                <img src={act.photos[0]} alt="" className="w-full h-full object-cover opacity-85 group-hover:scale-102 group-hover:opacity-100 transition-all duration-500" />
+                                                                <img src={act.photos[0]} alt="" className="w-full h-full object-cover opacity-85 group-hover:scale-102 group-hover:opacity-100 transition-all duration-500" referrerPolicy="no-referrer" />
                                                             ) : (
                                                                 <div className="w-full h-full flex items-center justify-center text-neutral-600 bg-neutral-800"><Play className="w-12 h-12" /></div>
                                                             )}
@@ -1369,7 +1369,7 @@ export default function Sandbox() {
 
                                                         {/* Video Details */}
                                                         <div className="flex gap-2.5 align-top text-left">
-                                                            <img src={profile.characterImage} alt="" className="w-8 h-8 rounded-full object-cover shrink-0 border border-neutral-200" />
+                                                            <img src={profile.characterImage} alt="" className="w-8 h-8 rounded-full object-cover shrink-0 border border-neutral-200" referrerPolicy="no-referrer" />
                                                             <div className="min-w-0">
                                                                 <h4 className="text-xs sm:text-sm font-black text-[#18112E] tracking-tight leading-tight line-clamp-2">{act.title} | {act.type} Vlog</h4>
                                                                 <p className="text-[10px] text-neutral-400 font-bold mt-1 uppercase tracking-wider">Shrikrishna Dev</p>
@@ -1409,7 +1409,7 @@ export default function Sandbox() {
                                                         {/* Card Top: Photo Preview */}
                                                         <div className="h-44 sm:h-52 w-full bg-[#18112E]/5 border-b border-[#18112E]/10 overflow-hidden relative">
                                                             {act.photos && act.photos.length > 0 ? (
-                                                                <img src={act.photos[0]} alt={act.title} className="w-full h-full object-cover animate-fadeIn" />
+                                                                <img src={act.photos[0]} alt={act.title} className="w-full h-full object-cover animate-fadeIn" referrerPolicy="no-referrer" />
                                                             ) : (
                                                                 <div className="w-full h-full flex items-center justify-center text-[#18112E]/30"><Camera className="w-10 h-10" /></div>
                                                             )}
@@ -1651,7 +1651,7 @@ export default function Sandbox() {
                                     <h4 className="text-xs font-black text-neutral-400 uppercase tracking-wider flex items-center gap-1.5"><Camera className="w-4 h-4" /> Journey Gallery</h4>
                                     <div className="flex gap-4 overflow-x-auto pb-2 -mx-2 px-2 scrollbar-thin">
                                         {selectedActivity.photos.map((p, i) => (
-                                            <img key={i} src={p} alt="" className="w-64 sm:w-80 h-44 sm:h-52 rounded-2xl object-cover border-2 border-[#18112E] shrink-0 animate-fadeIn" />
+                                            <img key={i} src={p} alt="" className="w-64 sm:w-80 h-44 sm:h-52 rounded-2xl object-cover border-2 border-[#18112E] shrink-0 animate-fadeIn" referrerPolicy="no-referrer" />
                                         ))}
                                     </div>
                                 </div>
