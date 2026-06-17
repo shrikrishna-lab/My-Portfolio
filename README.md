@@ -239,6 +239,36 @@ YouTube music plays entirely in the background — no visible video:
 
 ---
 
+## 🏖️ Sandbox Page
+
+The public **Sandbox** page (`/sandbox`) is a playground that showcases your activities, ongoing learning, startup ideas, and social integrations. It is fully responsive, interactive, and acts as a dynamic resume.
+
+### 1. Interactive Activities Feed
+The activities feed allows visitors to toggle between different integrations dynamically using a tab switcher:
+- **Snap Dude**: An Instagram-like visual social timeline for developer updates.
+- **LinkedIn Profile View**: A high-fidelity, pixel-perfect mock LinkedIn profile page. Displays:
+  - Cover banner and verified profile badge.
+  - **About** summary story.
+  - **Experience** timeline displaying roles, dates, company details, descriptions, and tag pills.
+  - **Education** history with school, degree, dates, and achievements.
+  - **Certifications** badge list dynamically populated from your achievements.
+  - **Activity Posts** showing portfolio updates published to LinkedIn with interactive likes.
+- **GitHub View**: Summarizes your open-source projects, contributions, and repositories.
+- **YouTube View**: Integrates video logs or demo highlights.
+- **Feed (Carousel)**: A card-based carousel for quick horizontal scrolling through all adventures.
+
+### 2. Learning Tracker
+A visual upskilling tracker that keeps tabs on your active learning curves. It displays the emoji icon, status pill (In Progress, Completed, etc.), progress percentage bar, completed/pending topics, study resources, and general notes.
+
+### 3. Current Projects & Idea Sandbox
+- **Current Projects**: Shows active project cards with dynamic checklist items, pending tasks, status badges, and project-specific changelogs.
+- **Idea Repository**: A repository of startup pitches, app concepts, and brainstorm notes.
+
+### 4. Activity Log (Devlog)
+A chronological week-by-week timeline detailing your updates, complete with type badges (Update, Feature, Learning) and expandability for technical details and screenshots.
+
+---
+
 ## 🎨 Admin Panel Features
 
 <details open>
