@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line 
 import {
     Shield, User, Sparkles, FolderKanban, Award, MessageSquare, Settings, RefreshCw,
     Plus, Pencil, Trash2, X, Save, Image as ImageIcon, Music, Play, Pause, Eye, EyeOff, VolumeX, AlertCircle,
-    Github, ExternalLink, UploadCloud, Check, Upload, ChevronDown, SkipBack, SkipForward
+    Github, ExternalLink, UploadCloud, Check, Upload, ChevronDown, SkipBack, SkipForward, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 
@@ -1005,6 +1005,17 @@ function SettingsTab() {
 
 function DashboardTab() {
     const [subTab, setSubTab] = useState('projects');
+    const tabsContainerRef = useRef(null);
+
+    const scrollTabs = (direction) => {
+        if (tabsContainerRef.current) {
+            const scrollAmount = 150;
+            tabsContainerRef.current.scrollBy({
+                left: direction === 'left' ? -scrollAmount : scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+    };
 
     const nowLogs = useStore((s) => s.nowLogs) || [];
     const sandboxIdeas = useStore((s) => s.sandboxIdeas) || [];
@@ -1327,13 +1338,40 @@ function DashboardTab() {
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex gap-1.5 overflow-x-auto pb-1 max-w-full">
-                    {subTabs.map(t => (
-                        <button key={t.id} onClick={() => { setSubTab(t.id); }}
-                             className={`px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap ${subTab === t.id ? 'bg-[#FFB800] text-[#18112E] shadow-sm' : 'bg-[#F8F9FA] text-neutral-400 hover:text-[#18112E]'}`}>
-                            {t.label} ({t.count})
-                        </button>
-                    ))}
+                <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                    <button 
+                        onClick={() => scrollTabs('left')}
+                        className="p-2 rounded-lg bg-[#F8F9FA] border border-neutral-200 text-neutral-500 hover:text-[#18112E] hover:bg-neutral-100 transition-all shadow-sm shrink-0"
+                        title="Scroll Left"
+                    >
+                        <ChevronLeft className="w-3.5 h-3.5" />
+                    </button>
+                    
+                    <div 
+                        ref={tabsContainerRef}
+                        className="flex gap-1.5 overflow-x-auto pb-1 max-w-full min-w-0 flex-1 scroll-smooth"
+                        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                    >
+                        <style>{`
+                            div::-webkit-scrollbar {
+                                display: none;
+                            }
+                        `}</style>
+                        {subTabs.map(t => (
+                            <button key={t.id} onClick={() => { setSubTab(t.id); }}
+                                 className={`px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap ${subTab === t.id ? 'bg-[#FFB800] text-[#18112E] shadow-sm' : 'bg-[#F8F9FA] text-neutral-400 hover:text-[#18112E]'}`}>
+                                {t.label} ({t.count})
+                            </button>
+                        ))}
+                    </div>
+
+                    <button 
+                        onClick={() => scrollTabs('right')}
+                        className="p-2 rounded-lg bg-[#F8F9FA] border border-neutral-200 text-neutral-500 hover:text-[#18112E] hover:bg-neutral-100 transition-all shadow-sm shrink-0"
+                        title="Scroll Right"
+                    >
+                        <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
                 </div>
                 <div className="flex gap-2 self-start sm:self-auto shrink-0">
                     <button onClick={() => setImportModal(true)} className="flex items-center gap-1.5 bg-neutral-100 text-[#18112E] px-4 py-2 rounded-[10px] font-bold hover:bg-neutral-200 border border-neutral-200 transition-all text-xs">
