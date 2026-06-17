@@ -20,6 +20,8 @@ const PLAY_IDX_KEY = 'music_play_index';
 
 const LINKEDIN_BOOKMARKLET_CODE = `javascript:(function(){try{const getSec=(t)=>{const e=document.getElementById(t.toLowerCase());if(e)return e.closest('section')||e;const h=Array.from(document.querySelectorAll('h2,h3,h4,h1,span')).find(x=>x.innerText&&x.innerText.trim().toLowerCase()===t.toLowerCase());if(h)return h.closest('section')||h.parentElement.parentElement;return null;};const name=(document.querySelector('.text-heading-xlarge')||document.querySelector('h1')||document.querySelector('h2[class*="_6eda4ab6"]')||{innerText:''}).innerText.trim()||document.title.split('|')[0].trim().split(' - ')[0].trim();let headline='';const headlineEl=document.querySelector('.text-body-medium')||document.querySelector('.pv-text-details__left-panel div')||document.querySelector('p[class*="_91f8a161"]');if(headlineEl){headline=headlineEl.innerText.trim();}else{const nameEl=Array.from(document.querySelectorAll('h1,h2')).find(e=>e.innerText&&e.innerText.trim()===name);if(nameEl&&nameEl.parentElement){const nextEl=nameEl.parentElement.querySelector('p,span');if(nextEl)headline=nextEl.innerText.trim();}}const aboutHeader=getSec('about');let about='';if(aboutHeader){const textEl=aboutHeader.querySelector('.inline-show-more-text')||aboutHeader.querySelector('p')||aboutHeader.querySelector('span');about=textEl?textEl.innerText.trim():'';}const picEl=document.querySelector('img.pv-top-card-profile-picture__image,img[class*="pv-top-card-profile-picture"],img[class*="profile-photo"],img[class*="profile-picture"],img.pv-top-card__photo,img[alt*="photo"]');const pic=picEl?picEl.src:'';const bannerEl=document.querySelector('.profile-background-image img,img[class*="profile-background-image"],img[alt*="background"],img[alt*="Banner"]');const banner=bannerEl?bannerEl.src:'';const experiences=[];const expSec=getSec('experience');if(expSec){let items=Array.from(expSec.querySelectorAll('.pvs-entity,.experience-item,.pvs-list__outer-container > ul > li'));if(items.length===0){const contentDiv=expSec.children[1]||expSec.querySelector('div > div');if(contentDiv){items=Array.from(contentDiv.children).filter(e=>e.tagName!=='HR');}}items.forEach(item=>{const text=item.innerText||'';if(!text.trim())return;const lines=text.split('\\n').map(l=>l.trim()).filter(Boolean);if(lines.length>=2){const role=lines[0];let company=lines[1];if(company.startsWith("Organization:"))company=company.replace("Organization:","").trim();const dateIdx=lines.findIndex(l=>l.includes(' - ')||l.match(/Present|\\b20\\d{2}\\b/));let duration='';let description='';if(dateIdx!==-1){duration=lines[dateIdx];description=lines.slice(dateIdx+1).join('\\n');}else{description=lines.slice(2).join('\\n');}experiences.push({role,company,duration,location:text.toLowerCase().includes('remote')?'Remote':'On-site',description,skills:[]});}});}const educations=[];const eduSec=getSec('education');if(eduSec){let items=Array.from(eduSec.querySelectorAll('.pvs-entity,.pvs-list__outer-container > ul > li'));if(items.length===0){const contentDiv=eduSec.children[1]||eduSec.querySelector('div > div');if(contentDiv){items=Array.from(contentDiv.children).filter(e=>e.tagName!=='HR');}}items.forEach(item=>{const text=item.innerText||'';if(!text.trim())return;const lines=text.split('\\n').map(l=>l.trim()).filter(Boolean);if(lines.length>=2){const school=lines[0];const degree=lines[1];const dateIdx=lines.findIndex(l=>l.includes(' - ')||l.match(/\\b20\\d{2}\\b/));const duration=dateIdx!==-1?lines[dateIdx]:'';educations.push({school,degree,duration,grade:'',activities:''});}});}const payload={profile:{name,title:headline,aboutStory:about,characterImage:pic,bannerImage:banner},experience:experiences,education:educations};const json=JSON.stringify(payload,null,2);fetch('http://localhost:5173/api/sync',{method:'POST',headers:{'Content-Type':'application/json'},body:json}).then(r=>r.json()).then(d=>{if(d.success){alert('LinkedIn profile synced directly to local portfolio!');}else{throw new Error(d.error||'Failed');}}).catch(err=>{const textarea=document.createElement('textarea');textarea.value=json;document.body.appendChild(textarea);textarea.select();document.execCommand('copy');document.body.removeChild(textarea);alert('LinkedIn Scraped Successfully!\\n\\nJSON data has been copied to your clipboard.\\nGo to your Portfolio Admin Panel, open "Import LinkedIn JSON" and paste (Ctrl+V) the data.');});}catch(err){alert('Sync Error: '+err.message);}})();`;
 
+const LINKEDIN_POSTS_BOOKMARKLET_CODE = `javascript:(function(){try{const posts=Array.from(document.querySelectorAll('.feed-shared-update-v2,[data-urn*="urn:li:activity:"]'));const results=[];posts.forEach((post)=>{const textEl=post.querySelector('.feed-shared-update-v2__description,.feed-shared-text-view,.update-components-text');let description=textEl?textEl.innerText.trim():'';description=description.replace(/\\s*…\\s*see more\\s*$/i,'').trim();if(!description)return;const dateEl=post.querySelector('.feed-shared-actor__sub-description,.update-components-actor__sub-description,[class*="actor__sub-description"]');const dateText=dateEl?dateEl.innerText.split('•')[0].trim():'Recently';const imgEl=post.querySelector('.feed-shared-image__container img,.update-components-image img,img.update-components-image__image');const image=imgEl?imgEl.src:'';const hashTags=description.match(/#\\w+/g)||[];const tags=hashTags.map(t=>t.replace('#','').trim());let title=description.split('\\n')[0].trim();if(title.length>60){title=title.substring(0,57)+'...';}title=title.replace(/#\\w+/g,'').trim()||'LinkedIn Post';results.push({title,type:'Event',status:'Finished',date:dateText,location:'LinkedIn',description,photos:image?[image]:[],tags,notes:'',platforms:{snapdude:false,linkedin:true,youtube:false,carousel:true}});});const payload={activities:results};const json=JSON.stringify(payload,null,2);const textarea=document.createElement('textarea');textarea.value=json;document.body.appendChild(textarea);textarea.select();document.execCommand('copy');document.body.removeChild(textarea);alert('LinkedIn Posts Scraped Successfully!\\n\\nScraped '+results.length+' posts and copied to clipboard.\\nGo to your Portfolio Admin Panel and paste the data.');}catch(err){alert('Sync Error: '+err.message);}})();`;
+
 function getToken() { try { return localStorage.getItem(TOKEN_KEY) || ''; } catch { return ''; } }
 function getBgImg() { try { return localStorage.getItem(BG_IMG_KEY) || ''; } catch { return ''; } }
 function getBgVid() { try { return localStorage.getItem(BG_VID_KEY) || ''; } catch { return ''; } }
@@ -1003,6 +1005,7 @@ function DashboardTab() {
     const updateEducation = useStore((s) => s.updateEducation);
     const deleteEducation = useStore((s) => s.deleteEducation);
     const setEducation = useStore((s) => s.setEducation);
+    const setActivities = useStore((s) => s.setActivities);
     
     const updateProfile = useStore((s) => s.updateProfile);
     const uploadImage = useStore((s) => s.uploadImage);
@@ -1010,6 +1013,7 @@ function DashboardTab() {
     const [importModal, setImportModal] = useState(false);
     const [importText, setImportText] = useState('');
     const [importError, setImportError] = useState('');
+    const [syncType, setSyncType] = useState('profile');
 
     const handleImport = () => {
         try {
@@ -1047,10 +1051,27 @@ function DashboardTab() {
                 setEducation(educationsWithIds);
             }
 
+            // 4. Update Activities (Posts)
+            if (Array.isArray(parsed.activities)) {
+                const activitiesWithIds = parsed.activities.map((act, idx) => ({
+                    ...act,
+                    id: act.id || `act_${Date.now()}_${idx}`,
+                    platforms: act.platforms || { snapdude: false, linkedin: true, youtube: false, carousel: true }
+                }));
+                const existing = useStore.getState().activities || [];
+                const merged = [...existing];
+                activitiesWithIds.forEach(newAct => {
+                    if (!merged.some(m => m.description === newAct.description)) {
+                        merged.unshift(newAct);
+                    }
+                });
+                setActivities(merged);
+            }
+
             setImportText('');
             setImportError('');
             setImportModal(false);
-            alert('LinkedIn JSON data successfully imported! Check the Experience and Education lists. Remember to click "Deploy to Production" to push changes.');
+            alert('LinkedIn JSON data successfully imported! Check the updated sections. Remember to click "Deploy to Production" to push changes.');
         } catch (err) {
             setImportError('Failed to parse JSON: ' + err.message);
         }
@@ -1690,13 +1711,34 @@ function DashboardTab() {
                                 <button onClick={() => setImportModal(false)} className="text-neutral-400 hover:text-[#18112E] bg-white p-1.5 rounded-full border border-neutral-100 shadow-sm"><X className="w-4 h-4" /></button>
                             </div>
                             <div className="p-6 space-y-4 overflow-y-auto flex-1 text-left">
+                                {/* Sync Type Tabs */}
+                                <div className="flex gap-2 border-b border-neutral-100 pb-3">
+                                    <button 
+                                        onClick={() => setSyncType('profile')}
+                                        className={`flex-1 py-2 text-xs font-black uppercase tracking-wider rounded-lg transition-all ${syncType === 'profile' ? 'bg-[#FFB800] text-[#18112E] shadow-sm' : 'bg-[#F8F9FA] text-neutral-400 hover:text-[#18112E]'}`}
+                                    >
+                                        Profile & CV Sync
+                                    </button>
+                                    <button 
+                                        onClick={() => setSyncType('posts')}
+                                        className={`flex-1 py-2 text-xs font-black uppercase tracking-wider rounded-lg transition-all ${syncType === 'posts' ? 'bg-[#FFB800] text-[#18112E] shadow-sm' : 'bg-[#F8F9FA] text-neutral-400 hover:text-[#18112E]'}`}
+                                    >
+                                        Posts & Activities Feed
+                                    </button>
+                                </div>
+
                                 <div className="p-4 bg-blue-50/50 border border-blue-100 rounded-xl space-y-2 text-xs text-neutral-600 leading-normal">
-                                    <p className="font-bold text-[#0A66C2]">How to use the Bookmarklet sync:</p>
+                                    <p className="font-bold text-[#0A66C2]">How to sync your {syncType === 'profile' ? 'Profile Details & CV' : 'LinkedIn Posts'}:</p>
                                     <ol className="list-decimal pl-4 space-y-1">
                                         <li>Copy the Bookmarklet code below.</li>
-                                        <li>Create a browser bookmark with any name (e.g. <em>Sync LinkedIn</em>) and paste this code as the URL.</li>
-                                        <li>Visit your public LinkedIn profile (e.g. <code>linkedin.com/in/your-name</code>).</li>
-                                        <li>Click the bookmark. It will scrape your page and copy the JSON payload to your clipboard automatically.</li>
+                                        <li>Create a browser bookmark with any name (e.g. <em>{syncType === 'profile' ? 'Sync LinkedIn Profile' : 'Sync LinkedIn Posts'}</em>) and paste this code as the URL.</li>
+                                        <li>
+                                            {syncType === 'profile' 
+                                                ? <span>Visit your LinkedIn profile page (e.g. <code>linkedin.com/in/your-name</code>).</span>
+                                                : <span>Visit your LinkedIn **Recent Activity/Posts** page (e.g. <code>linkedin.com/in/your-name/recent-activity/all/</code>).</span>
+                                            }
+                                        </li>
+                                        <li>Click the bookmark. It will scrape the page and copy the JSON data to your clipboard automatically.</li>
                                         <li>Come back here, paste the copied text into the box below, and click <strong>"Process & Import"</strong>.</li>
                                     </ol>
                                 </div>
@@ -1704,9 +1746,9 @@ function DashboardTab() {
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-bold text-[#18112E] block uppercase tracking-wider font-black">Bookmarklet Code</label>
                                     <div className="flex gap-2">
-                                        <input readOnly value={LINKEDIN_BOOKMARKLET_CODE} className="flex-1 font-mono text-[10px] bg-[#F8F9FA] border-2 border-transparent focus:border-[#FFB800] focus:bg-white rounded-[12px] px-3 py-2 text-[#18112E] outline-none" />
+                                        <input readOnly value={syncType === 'profile' ? LINKEDIN_BOOKMARKLET_CODE : LINKEDIN_POSTS_BOOKMARKLET_CODE} className="flex-1 font-mono text-[10px] bg-[#F8F9FA] border-2 border-transparent focus:border-[#FFB800] focus:bg-white rounded-[12px] px-3 py-2 text-[#18112E] outline-none" />
                                         <button onClick={() => {
-                                            navigator.clipboard.writeText(LINKEDIN_BOOKMARKLET_CODE);
+                                            navigator.clipboard.writeText(syncType === 'profile' ? LINKEDIN_BOOKMARKLET_CODE : LINKEDIN_POSTS_BOOKMARKLET_CODE);
                                             alert('Bookmarklet code copied to clipboard!');
                                         }} className="px-4 py-2 bg-[#18112E] text-white font-bold text-xs uppercase tracking-wider rounded-[12px] hover:bg-neutral-800 transition-colors shrink-0">Copy</button>
                                     </div>

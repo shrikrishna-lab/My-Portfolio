@@ -455,4 +455,10 @@ export const useStore = create((set, get) => ({
       return { education };
     });
   },
+  setActivities: (activities) => {
+    set((s) => {
+      save({ ...s, activities });
+      return { activities };
+    });
+  },
 }));
