@@ -21,30 +21,74 @@
     "characterImage": "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=1974"
   },
   "skills": [
-    { "id": "1", "name": "React", "icon": "Code", "category": "Frontend", "sortOrder": 1 },
-    { "id": "2", "name": "TailwindCSS", "icon": "Brush", "category": "Frontend", "sortOrder": 2 },
-    { "id": "3", "name": "Node.js", "icon": "Server", "category": "Backend", "sortOrder": 3 },
-    { "id": "4", "name": "PostgreSQL", "icon": "Database", "category": "Backend", "sortOrder": 4 }
+    {
+      "id": "1",
+      "name": "React",
+      "icon": "Code",
+      "category": "Frontend",
+      "sortOrder": 1
+    },
+    {
+      "id": "2",
+      "name": "TailwindCSS",
+      "icon": "Brush",
+      "category": "Frontend",
+      "sortOrder": 2
+    },
+    {
+      "id": "3",
+      "name": "Node.js",
+      "icon": "Server",
+      "category": "Backend",
+      "sortOrder": 3
+    },
+    {
+      "id": "4",
+      "name": "PostgreSQL",
+      "icon": "Database",
+      "category": "Backend",
+      "sortOrder": 4
+    }
   ],
   "projects": [
     {
-      "id": "1", "title": "DevConnect Platform",
+      "id": "1",
+      "title": "DevConnect Platform",
       "description": "A comprehensive developer platform for startups and students.",
       "techStack": "React, Supabase, Tailwind",
       "imageUrl": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=2070",
-      "githubUrl": "https://github.com", "liveUrl": "https://example.com", "sortOrder": 1
+      "githubUrl": "https://github.com",
+      "liveUrl": "https://example.com",
+      "sortOrder": 1
     },
     {
-      "id": "2", "title": "Portfolio CMS",
+      "id": "2",
+      "title": "Portfolio CMS",
       "description": "A dynamic portfolio with a built-in admin dashboard.",
       "techStack": "React, Vite, Zustand",
       "imageUrl": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2015",
-      "githubUrl": "https://github.com", "liveUrl": "https://example.com", "sortOrder": 2
+      "githubUrl": "https://github.com",
+      "liveUrl": "https://example.com",
+      "sortOrder": 2
     }
   ],
   "achievements": [
-    { "id": "1", "title": "1st Place Global Hackathon", "date": "2025", "sortOrder": 1, "description": "", "imageUrl": "" },
-    { "id": "2", "title": "AWS Certified Developer", "date": "2024", "sortOrder": 2, "description": "", "imageUrl": "" }
+    {
+      "id": "1",
+      "title": "1st Place Global Hackathon",
+      "date": "2025",
+      "sortOrder": 1,
+      "description": "",
+      "imageUrl": ""
+    },
+    {
+      "id": "2",
+      "title": "AWS Certified Developer",
+      "date": "2024",
+      "sortOrder": 2,
+      "description": "",
+      "imageUrl": ""
+    }
   ],
   "messages": [],
   "nowLogs": [
@@ -54,11 +98,21 @@
       "type": "Update",
       "content": "Optimized the entire portfolio mobile responsiveness and fixed card layout clipping.",
       "documentation": "Rewrote Tailwind responsive breakpoints for all major sections. Fixed overflow clipping on project cards, adjusted padding on mobile hero, and resolved horizontal scroll bleed on the activities carousel.",
-      "photos": ["https://images.unsplash.com/photo-1555066931-bf19f8fd1085?q=80&w=2070"],
-      "links": [
-        { "label": "Commit #a3f92c", "url": "https://github.com/shrikrishna-lab/My-Portfolio/commits/main" }
+      "photos": [
+        "https://images.unsplash.com/photo-1555066931-bf19f8fd1085?q=80&w=2070"
       ],
-      "changes": ["Fixed card clipping on small screens", "Updated Sandbox mobile layout", "Added horizontal scroll for activities", "Adjusted hero padding and font sizes"]
+      "links": [
+        {
+          "label": "Commit #a3f92c",
+          "url": "https://github.com/shrikrishna-lab/My-Portfolio/commits/main"
+        }
+      ],
+      "changes": [
+        "Fixed card clipping on small screens",
+        "Updated Sandbox mobile layout",
+        "Added horizontal scroll for activities",
+        "Adjusted hero padding and font sizes"
+      ]
     },
     {
       "id": "2",
@@ -71,7 +125,12 @@
         "https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?q=80&w=2071"
       ],
       "links": [],
-      "changes": ["Created SplashScreen component", "Added canvas particle system", "Implemented radial gradient glow trails", "Added fade-out transition to App.jsx"]
+      "changes": [
+        "Created SplashScreen component",
+        "Added canvas particle system",
+        "Implemented radial gradient glow trails",
+        "Added fade-out transition to App.jsx"
+      ]
     },
     {
       "id": "3",
@@ -81,10 +140,20 @@
       "documentation": "Explored Ethereum, Solana, and IPFS-based storage patterns. Compared state management approaches: on-chain vs. off-chain hybrid solutions. Built a small demo connecting MetaMask to a React frontend.",
       "photos": [],
       "links": [
-        { "label": "Ethereum Docs", "url": "https://ethereum.org/en/developers/docs/" },
-        { "label": "IPFS Guide", "url": "https://docs.ipfs.tech/" }
+        {
+          "label": "Ethereum Docs",
+          "url": "https://ethereum.org/en/developers/docs/"
+        },
+        {
+          "label": "IPFS Guide",
+          "url": "https://docs.ipfs.tech/"
+        }
       ],
-      "changes": ["Studied Ethereum smart contracts", "Built MetaMask connect demo", "Explored IPFS pinning services"]
+      "changes": [
+        "Studied Ethereum smart contracts",
+        "Built MetaMask connect demo",
+        "Explored IPFS pinning services"
+      ]
     },
     {
       "id": "4",
@@ -92,17 +161,45 @@
       "type": "Feature",
       "content": "Built the full admin panel with CRUD operations, GitHub sync, and settings management.",
       "documentation": "Designed a glassmorphism-styled admin dashboard with profile editing, skills/projects/achievements CRUD, background image/video support, and a music player bar. Integrated GitHub API for direct data.json deployment.",
-      "photos": ["https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070"],
-      "links": [
-        { "label": "GitHub REST API", "url": "https://docs.github.com/en/rest" }
+      "photos": [
+        "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070"
       ],
-      "changes": ["Built ProfileTab, SkillsTab, ProjectsTab, AchievementsTab", "Added GitHub token-based deployment", "Created MusicBar with YouTube/Spotify/audio support", "Added background image/video settings"]
+      "links": [
+        {
+          "label": "GitHub REST API",
+          "url": "https://docs.github.com/en/rest"
+        }
+      ],
+      "changes": [
+        "Built ProfileTab, SkillsTab, ProjectsTab, AchievementsTab",
+        "Added GitHub token-based deployment",
+        "Created MusicBar with YouTube/Spotify/audio support",
+        "Added background image/video settings"
+      ]
     }
   ],
   "sandboxIdeas": [
-    { "id": "1", "title": "DevConnect Hub", "status": "Active", "description": "An all-in-one hub for student hackathons and developer collaborations.", "notes": "Currently implementing real-time messaging and team formation features." },
-    { "id": "2", "title": "Retro Web Game Suite", "status": "Brainstorming", "description": "A collection of 8-bit web games styled with neo-brutalist layouts.", "notes": "Thinking about integrating multiplayer socket lobbies." },
-    { "id": "3", "title": "AI Resume Roast Bot", "status": "Buried", "description": "A fun tool that takes a PDF resume and roasts it using an AI LLM agent.", "notes": "Buried due to API usage cost constraints and market saturation." }
+    {
+      "id": "1",
+      "title": "DevConnect Hub",
+      "status": "Active",
+      "description": "An all-in-one hub for student hackathons and developer collaborations.",
+      "notes": "Currently implementing real-time messaging and team formation features."
+    },
+    {
+      "id": "2",
+      "title": "Retro Web Game Suite",
+      "status": "Brainstorming",
+      "description": "A collection of 8-bit web games styled with neo-brutalist layouts.",
+      "notes": "Thinking about integrating multiplayer socket lobbies."
+    },
+    {
+      "id": "3",
+      "title": "AI Resume Roast Bot",
+      "status": "Buried",
+      "description": "A fun tool that takes a PDF resume and roasts it using an AI LLM agent.",
+      "notes": "Buried due to API usage cost constraints and market saturation."
+    }
   ],
   "currentProjects": [
     {
@@ -116,13 +213,38 @@
       "githubUrl": "https://github.com/shrikrishna-lab",
       "liveUrl": "",
       "changelog": [
-        { "date": "June 17", "text": "Implemented user authentication with Supabase Auth" },
-        { "date": "June 14", "text": "Designed the team matching algorithm MVP" },
-        { "date": "June 10", "text": "Set up project structure and database schema" },
-        { "date": "June 5", "text": "Initial wireframes and component architecture" }
+        {
+          "date": "June 17",
+          "text": "Implemented user authentication with Supabase Auth"
+        },
+        {
+          "date": "June 14",
+          "text": "Designed the team matching algorithm MVP"
+        },
+        {
+          "date": "June 10",
+          "text": "Set up project structure and database schema"
+        },
+        {
+          "date": "June 5",
+          "text": "Initial wireframes and component architecture"
+        }
       ],
-      "tasksDone": ["Project setup", "Auth flow", "Database schema", "Landing page", "Team matching UI"],
-      "tasksPending": ["Real-time chat", "Hackathon registration", "Admin dashboard", "Payment integration", "Email notifications", "Mobile responsiveness"]
+      "tasksDone": [
+        "Project setup",
+        "Auth flow",
+        "Database schema",
+        "Landing page",
+        "Team matching UI"
+      ],
+      "tasksPending": [
+        "Real-time chat",
+        "Hackathon registration",
+        "Admin dashboard",
+        "Payment integration",
+        "Email notifications",
+        "Mobile responsiveness"
+      ]
     },
     {
       "id": "cp2",
@@ -135,12 +257,33 @@
       "githubUrl": "https://github.com/shrikrishna-lab/My-Portfolio",
       "liveUrl": "https://example.com",
       "changelog": [
-        { "date": "June 12", "text": "Added image upload to Cloudflare R2" },
-        { "date": "June 8", "text": "Built admin panel with full CRUD operations" },
-        { "date": "June 3", "text": "Migrated from localStorage to data.json" }
+        {
+          "date": "June 12",
+          "text": "Added image upload to Cloudflare R2"
+        },
+        {
+          "date": "June 8",
+          "text": "Built admin panel with full CRUD operations"
+        },
+        {
+          "date": "June 3",
+          "text": "Migrated from localStorage to data.json"
+        }
       ],
-      "tasksDone": ["Admin panel", "CRUD operations", "Image upload", "Splash screen", "Mobile fixes", "Contact form", "GitHub sync"],
-      "tasksPending": ["Analytics dashboard", "SEO improvements", "Blog section"]
+      "tasksDone": [
+        "Admin panel",
+        "CRUD operations",
+        "Image upload",
+        "Splash screen",
+        "Mobile fixes",
+        "Contact form",
+        "GitHub sync"
+      ],
+      "tasksPending": [
+        "Analytics dashboard",
+        "SEO improvements",
+        "Blog section"
+      ]
     },
     {
       "id": "cp3",
@@ -153,10 +296,25 @@
       "githubUrl": "",
       "liveUrl": "",
       "changelog": [
-        { "date": "May 20", "text": "Server went live with 50+ concurrent players" },
-        { "date": "May 15", "text": "Final testing and bug fixes" }
+        {
+          "date": "May 20",
+          "text": "Server went live with 50+ concurrent players"
+        },
+        {
+          "date": "May 15",
+          "text": "Final testing and bug fixes"
+        }
       ],
-      "tasksDone": ["Server setup", "Custom scripts", "UI overlays", "Database", "Anti-cheat", "Player management", "Testing", "Deployment"],
+      "tasksDone": [
+        "Server setup",
+        "Custom scripts",
+        "UI overlays",
+        "Database",
+        "Anti-cheat",
+        "Player management",
+        "Testing",
+        "Deployment"
+      ],
       "tasksPending": []
     }
   ],
@@ -168,11 +326,34 @@
       "icon": "☕",
       "progress": 35,
       "startDate": "May 2026",
-      "topicsCompleted": ["Variables & Data Types", "Control Flow", "Arrays & Strings", "OOP Basics (Classes, Objects)", "Inheritance & Polymorphism"],
-      "topicsPending": ["Interfaces & Abstract Classes", "Exception Handling", "Collections Framework", "Generics", "File I/O", "Multithreading", "Lambda & Streams", "JDBC"],
+      "topicsCompleted": [
+        "Variables & Data Types",
+        "Control Flow",
+        "Arrays & Strings",
+        "OOP Basics (Classes, Objects)",
+        "Inheritance & Polymorphism"
+      ],
+      "topicsPending": [
+        "Interfaces & Abstract Classes",
+        "Exception Handling",
+        "Collections Framework",
+        "Generics",
+        "File I/O",
+        "Multithreading",
+        "Lambda & Streams",
+        "JDBC"
+      ],
       "resources": [
-        { "name": "Java Programming Masterclass", "url": "https://www.udemy.com", "type": "Course" },
-        { "name": "Head First Java", "url": "#", "type": "Book" }
+        {
+          "name": "Java Programming Masterclass",
+          "url": "https://www.udemy.com",
+          "type": "Course"
+        },
+        {
+          "name": "Head First Java",
+          "url": "#",
+          "type": "Book"
+        }
       ],
       "notes": "Focusing on OOP concepts and building small CLI projects to practice."
     },
@@ -183,11 +364,31 @@
       "icon": "⚡",
       "progress": 50,
       "startDate": "April 2026",
-      "topicsCompleted": ["Installation & Setup", "Basic Workflows", "HTTP Requests & Webhooks", "Data Transformation", "Conditional Logic"],
-      "topicsPending": ["Database Nodes", "Error Handling", "Custom Functions", "API Integrations", "Production Deployment"],
+      "topicsCompleted": [
+        "Installation & Setup",
+        "Basic Workflows",
+        "HTTP Requests & Webhooks",
+        "Data Transformation",
+        "Conditional Logic"
+      ],
+      "topicsPending": [
+        "Database Nodes",
+        "Error Handling",
+        "Custom Functions",
+        "API Integrations",
+        "Production Deployment"
+      ],
       "resources": [
-        { "name": "n8n Official Docs", "url": "https://docs.n8n.io", "type": "Docs" },
-        { "name": "n8n Community Templates", "url": "https://n8n.io/workflows", "type": "Templates" }
+        {
+          "name": "n8n Official Docs",
+          "url": "https://docs.n8n.io",
+          "type": "Docs"
+        },
+        {
+          "name": "n8n Community Templates",
+          "url": "https://n8n.io/workflows",
+          "type": "Templates"
+        }
       ],
       "notes": "Building automation workflows for social media scheduling and lead generation."
     },
@@ -198,10 +399,24 @@
       "icon": "🐳",
       "progress": 20,
       "startDate": "March 2026",
-      "topicsCompleted": ["Docker basics", "Dockerfile creation", "Docker Compose"],
-      "topicsPending": ["Kubernetes intro", "CI/CD pipelines", "GitHub Actions", "Cloud deployment", "Monitoring & Logging"],
+      "topicsCompleted": [
+        "Docker basics",
+        "Dockerfile creation",
+        "Docker Compose"
+      ],
+      "topicsPending": [
+        "Kubernetes intro",
+        "CI/CD pipelines",
+        "GitHub Actions",
+        "Cloud deployment",
+        "Monitoring & Logging"
+      ],
       "resources": [
-        { "name": "Docker Official Tutorial", "url": "https://docs.docker.com/get-started/", "type": "Docs" }
+        {
+          "name": "Docker Official Tutorial",
+          "url": "https://docs.docker.com/get-started/",
+          "type": "Docs"
+        }
       ],
       "notes": "Paused to focus on Java and n8n first. Will resume after completing Java Core."
     }
@@ -215,10 +430,21 @@
       "date": "July 2026",
       "location": "India (Online Round)",
       "description": "Registered for Smart India Hackathon 2026. Working on a problem statement related to healthcare accessibility using AI.",
-      "photos": ["https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=2070"],
-      "tags": ["Hackathon", "AI", "Healthcare"],
+      "photos": [
+        "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=2070"
+      ],
+      "tags": [
+        "Hackathon",
+        "AI",
+        "Healthcare"
+      ],
       "notes": "Team of 6, currently brainstorming solutions and building prototype.",
-      "platforms": { "snapdude": true, "linkedin": true, "youtube": false, "carousel": true }
+      "platforms": {
+        "snapdude": true,
+        "linkedin": true,
+        "youtube": false,
+        "carousel": true
+      }
     },
     {
       "id": "act2",
@@ -232,9 +458,18 @@
         "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073",
         "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=2070"
       ],
-      "tags": ["Travel", "Networking", "Tech Meetup"],
+      "tags": [
+        "Travel",
+        "Networking",
+        "Tech Meetup"
+      ],
       "notes": "Got 3 potential collaborators for DevConnect from this trip!",
-      "platforms": { "snapdude": true, "linkedin": true, "youtube": false, "carousel": true }
+      "platforms": {
+        "snapdude": true,
+        "linkedin": true,
+        "youtube": false,
+        "carousel": true
+      }
     },
     {
       "id": "act3",
@@ -244,10 +479,21 @@
       "date": "December 2025",
       "location": "Bangalore, India",
       "description": "Won 1st place at HackWithIndia 2025. Built a real-time collaboration tool for remote dev teams in 48 hours.",
-      "photos": ["https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=2070"],
-      "tags": ["Hackathon", "Winner", "Collaboration"],
+      "photos": [
+        "https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=2070"
+      ],
+      "tags": [
+        "Hackathon",
+        "Winner",
+        "Collaboration"
+      ],
       "notes": "This win motivated me to pursue DevConnect as a full startup idea.",
-      "platforms": { "snapdude": true, "linkedin": true, "youtube": false, "carousel": true }
+      "platforms": {
+        "snapdude": true,
+        "linkedin": true,
+        "youtube": false,
+        "carousel": true
+      }
     },
     {
       "id": "act4",
@@ -258,9 +504,18 @@
       "location": "Online",
       "description": "Preparing for the AWS Cloud Practitioner certification exam. Studying cloud fundamentals, pricing models, and core services.",
       "photos": [],
-      "tags": ["Certification", "AWS", "Cloud"],
+      "tags": [
+        "Certification",
+        "AWS",
+        "Cloud"
+      ],
       "notes": "Scheduled for August 15. Currently completing practice tests.",
-      "platforms": { "snapdude": false, "linkedin": true, "youtube": false, "carousel": true }
+      "platforms": {
+        "snapdude": false,
+        "linkedin": true,
+        "youtube": false,
+        "carousel": true
+      }
     },
     {
       "id": "act5",
@@ -270,10 +525,21 @@
       "date": "November 2025",
       "location": "College Campus",
       "description": "Organized a coding competition and workshop at the college tech fest. 200+ participants across 3 events.",
-      "photos": ["https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070"],
-      "tags": ["Event", "Organizing", "Workshop"],
+      "photos": [
+        "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070"
+      ],
+      "tags": [
+        "Event",
+        "Organizing",
+        "Workshop"
+      ],
       "notes": "Great experience in event management and public speaking.",
-      "platforms": { "snapdude": true, "linkedin": true, "youtube": false, "carousel": true }
+      "platforms": {
+        "snapdude": true,
+        "linkedin": true,
+        "youtube": false,
+        "carousel": true
+      }
     },
     {
       "id": "act6",
@@ -284,48 +550,20 @@
       "location": "Mumbai, India",
       "description": "Attempted to build a decentralized freelancing platform in 54 hours. Team faced technical challenges with smart contract deployment.",
       "photos": [],
-      "tags": ["Hackathon", "Blockchain", "Web3"],
+      "tags": [
+        "Hackathon",
+        "Blockchain",
+        "Web3"
+      ],
       "notes": "Learned a lot about Solidity and smart contracts. The failure taught me to scope projects better.",
-      "platforms": { "snapdude": false, "linkedin": true, "youtube": false, "carousel": true }
+      "platforms": {
+        "snapdude": false,
+        "linkedin": true,
+        "youtube": false,
+        "carousel": true
+      }
     }
   ],
-  "experience": [
-    {
-      "id": "exp1",
-      "role": "Full-Stack Developer & Tech Lead",
-      "company": "DevConnect Startup Initiative",
-      "duration": "2025 - Present",
-      "location": "Pune, India",
-      "description": "Designing and building an all-in-one developer collaboration platform. Implementing state management, real-time messaging, and multi-tenant database architectures.",
-      "skills": ["React", "Supabase", "Node.js", "Zustand"]
-    },
-    {
-      "id": "exp2",
-      "role": "Freelance Web Developer",
-      "company": "Self-Employed",
-      "duration": "2024 - 2025",
-      "location": "Remote",
-      "description": "Created high-performance landing pages, custom portfolios, and e-commerce web applications for various clients.",
-      "skills": ["HTML/CSS", "JavaScript", "React", "TailwindCSS"]
-    },
-    {
-      "id": "exp3",
-      "role": "FiveM Game Server Developer",
-      "company": "Contract",
-      "duration": "May 2026",
-      "location": "Remote",
-      "description": "Programmed server-side scripting in Lua and JavaScript. Configured citizen system resources and managed MySQL databases to host 50+ concurrent players.",
-      "skills": ["Lua", "JavaScript", "MySQL"]
-    }
-  ],
-  "education": [
-    {
-      "id": "edu1",
-      "school": "Savitribai Phule Pune University",
-      "degree": "Bachelor of Science in Information Technology (B.Sc. IT)",
-      "duration": "2023 - 2026",
-      "grade": "CGPA: 8.9",
-      "activities": "Organized TechFest 2025, Lead Developer for College Coding Club."
-    }
-  ]
+  "experience": [],
+  "education": []
 }
