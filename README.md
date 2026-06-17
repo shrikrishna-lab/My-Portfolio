@@ -326,6 +326,30 @@ Set a background in **Settings** tab:
 
 Syncing data from LinkedIn is notoriously difficult due to CORS, authwalls, and bot blocks. This project uses a **Browser Bookmarklet Scraper** to sync your profile, experiences, and education in real-time under your own logged-in browser session.
 
+```mermaid
+flowchart TD
+    subgraph Browser [Your Browser Session]
+        A[Visit LinkedIn Profile] --> B[Click Bookmarklet]
+        B --> C{Scrape profile, experiences, education}
+        C --> D{POST to http://localhost:5173/api/sync}
+    end
+
+    subgraph DevServer [Local Portfolio Server]
+        D -- "Success (CORS Preflight OK)" --> E[Vite server mock API]
+        E --> F[Merge with existing data]
+        F --> G[Write to public/data.json on disk]
+    end
+
+    subgraph Fallback [Clipboard Backup]
+        D -- "Failed (Offline / Production)" --> H[Copy JSON to Clipboard]
+        H --> I[Open Admin Modal]
+        I --> J[Paste & Import manually]
+    end
+
+    style DevServer fill:#FFB800,stroke:#18112E,stroke-width:2px,color:#18112E
+    style Fallback fill:#667eea,stroke:#fff,stroke-width:1px,color:#fff
+```
+
 #### How it works:
 1. **Copy the Bookmarklet**: Inside the Admin Panel (Life Dashboard → Import LinkedIn JSON), copy the bookmarklet code.
 2. **Create a Bookmark**: Create a new bookmark in your browser bookmarks bar, name it (e.g., *Sync Portfolio*), and paste the copied javascript code as the URL.
