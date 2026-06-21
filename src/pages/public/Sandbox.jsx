@@ -317,6 +317,25 @@ export default function Sandbox() {
     const [socialTab, setSocialTab] = useState(null); // dynamic default
     const [likedStates, setLikedStates] = useState({}); // e.g., { act1: { liked: true, count: 43 } }
     const [socialComments, setSocialComments] = useState({}); // user added comments to posts
+    const [showAllLinkedinPosts, setShowAllLinkedinPosts] = useState(false);
+    const [expandedPosts, setExpandedPosts] = useState({});
+
+    const cleanDescription = useCallback((text) => {
+        if (!text) return '';
+        return text
+            .replace(/\s*…\s*more\s*$/i, '')
+            .replace(/\s*…\s*see\s+more\s*$/i, '')
+            .replace(/\s*\.\.\.\s*see\s+more\s*$/i, '')
+            .replace(/\s*\.\.\.\s*more\s*$/i, '')
+            .trim();
+    }, []);
+
+    const togglePostExpand = useCallback((postId) => {
+        setExpandedPosts(prev => ({
+            ...prev,
+            [postId]: !prev[postId]
+        }));
+    }, []);
 
     // GitHub fetching state with cache fallback
     const [ghProfile, setGhProfile] = useState(() => {
@@ -1078,136 +1097,195 @@ export default function Sandbox() {
                                         <span className="inline-flex items-center px-2 py-0.5 rounded text-[8px] sm:text-[9px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-600 border border-emerald-200">⚡ Live Feed</span>
                                     </div>
 
-                                    {/* Posts Feed */}
-                                    {filteredLinkedinActivities.length === 0 ? (
-                                        <div className="bg-white border-2 border-[#18112E] rounded-[24px] p-10 text-center text-neutral-400 font-bold uppercase tracking-wider text-xs">No updates found.</div>
-                                    ) : (
-                                        filteredLinkedinActivities.map((act) => {
-                                            const likes = likedStates[act.id]?.count || ((act.id.charCodeAt(2) || 45) * 5) % 150 + 34;
-                                            const isLiked = likedStates[act.id]?.liked || false;
-                                            const comments = socialComments[act.id] || [];
+                                                                         {/* Posts Feed */}
+                                     {filteredLinkedinActivities.length === 0 ? (
+                                         <div className="bg-white border-2 border-[#18112E] rounded-[24px] p-10 text-center text-neutral-400 font-bold uppercase tracking-wider text-xs">No updates found.</div>
+                                     ) : (
+                                         <div className="space-y-6">
+                                             <motion.div layout className="space-y-6">
+                                                 <AnimatePresence mode="popLayout">
+                                                     {(showAllLinkedinPosts ? filteredLinkedinActivities : filteredLinkedinActivities.slice(0, 3)).map((act, index) => {
+                                                         const likes = likedStates[act.id]?.count || ((act.id.charCodeAt(2) || 45) * 5) % 150 + 34;
+                                                         const isLiked = likedStates[act.id]?.liked || false;
+                                                         const comments = socialComments[act.id] || [];
 
-                                            return (
-                                                <div key={act.id} className="bg-white border-2 border-[#18112E] rounded-[24px] p-5 sm:p-6 shadow-[6px_6px_0_#18112E] space-y-4 text-left">
-                                                    {/* Post Header */}
-                                                    <div className="flex items-start justify-between gap-2 min-w-0">
-                                                        <div className="flex items-center gap-3 min-w-0 flex-1">
-                                                            <img 
-                                                                src={profile.characterImage || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"} 
-                                                                alt="" 
-                                                                className="w-10 h-10 rounded-full object-cover border border-[#18112E] shrink-0" 
-                                                                referrerPolicy="no-referrer"
-                                                                onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"; }}
-                                                            />
-                                                            <div className="min-w-0 flex-1">
-                                                                <h4 className="text-xs sm:text-sm font-black text-[#18112E] tracking-tight truncate">{profile.name}</h4>
-                                                                <p className="text-[10px] text-neutral-400 font-bold truncate">{profile.title}</p>
-                                                                <p className="text-[9px] text-neutral-400 font-medium truncate">{act.date} • {act.location || 'Online'} • 🌐</p>
-                                                            </div>
-                                                        </div>
-                                                        <div className="shrink-0">
-                                                            <StatusBadge status={act.status} />
-                                                        </div>
-                                                    </div>
+                                                         return (
+                                                             <motion.div 
+                                                                 key={act.id} 
+                                                                 layout
+                                                                 initial={{ opacity: 0, y: 30 }}
+                                                                 animate={{ opacity: 1, y: 0 }}
+                                                                 exit={{ opacity: 0, scale: 0.95 }}
+                                                                 transition={{ duration: 0.4, delay: showAllLinkedinPosts && index >= 3 ? (index - 3) * 0.05 : 0 }}
+                                                                 className="bg-white border-2 border-[#18112E] rounded-[24px] p-5 sm:p-6 shadow-[6px_6px_0_#18112E] space-y-4 text-left relative overflow-hidden group hover:shadow-[10px_10px_0_#18112E] transition-shadow duration-300"
+                                                             >
+                                                                 {/* Post Header */}
+                                                                 <div className="flex items-start justify-between gap-2 min-w-0">
+                                                                     <div className="flex items-center gap-3 min-w-0 flex-1">
+                                                                         <img 
+                                                                             src={profile.characterImage || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"} 
+                                                                             alt="" 
+                                                                             className="w-10 h-10 rounded-full object-cover border border-[#18112E] shrink-0" 
+                                                                             referrerPolicy="no-referrer"
+                                                                             onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"; }}
+                                                                         />
+                                                                         <div className="min-w-0 flex-1">
+                                                                             <h4 className="text-xs sm:text-sm font-black text-[#18112E] tracking-tight truncate">{profile.name}</h4>
+                                                                             <p className="text-[10px] text-neutral-400 font-bold truncate">{profile.title}</p>
+                                                                             <p className="text-[9px] text-neutral-400 font-medium truncate">{act.date} • {act.location || 'Online'} • 🌐</p>
+                                                                         </div>
+                                                                     </div>
+                                                                     <div className="shrink-0">
+                                                                         <StatusBadge status={act.status} />
+                                                                     </div>
+                                                                 </div>
 
-                                                    {/* Text description */}
-                                                    <div className="space-y-2">
-                                                        <p className="text-xs sm:text-sm text-neutral-600 font-medium leading-relaxed whitespace-pre-wrap">{act.description}</p>
-                                                        {act.tags && (
-                                                            <div className="flex flex-wrap gap-1.5 text-[10px] sm:text-xs font-black text-[#0A66C2]">
-                                                                {act.tags.map((tag, i) => (
-                                                                    <span key={i}>#{tag.toLowerCase().replace(/\s+/g, '')}</span>
-                                                                ))}
-                                                            </div>
-                                                        )}
-                                                    </div>
+                                                                 {/* Text description */}
+                                                                 <div className="space-y-2">
+                                                                     <p className="text-xs sm:text-sm text-neutral-600 font-medium leading-relaxed whitespace-pre-wrap">
+                                                                         {(() => {
+                                                                             const cleaned = cleanDescription(act.description);
+                                                                             const isExpanded = expandedPosts[act.id] || false;
+                                                                             if (cleaned.length <= 250) return cleaned;
+                                                                             return isExpanded ? (
+                                                                                 <>
+                                                                                     {cleaned}
+                                                                                     <button 
+                                                                                         onClick={() => togglePostExpand(act.id)}
+                                                                                         className="text-[#0A66C2] hover:underline font-black ml-1.5 focus:outline-none inline-flex items-center gap-0.5 text-xs uppercase tracking-wider"
+                                                                                     >
+                                                                                         Show Less <ChevronUp className="w-3 h-3" />
+                                                                                     </button>
+                                                                                 </>
+                                                                             ) : (
+                                                                                 <>
+                                                                                     {cleaned.slice(0, 250)}...
+                                                                                     <button 
+                                                                                         onClick={() => togglePostExpand(act.id)}
+                                                                                         className="text-[#0A66C2] hover:underline font-black ml-1.5 focus:outline-none inline-flex items-center gap-0.5 text-xs uppercase tracking-wider"
+                                                                                     >
+                                                                                         Show More <ChevronDown className="w-3 h-3" />
+                                                                                     </button>
+                                                                                 </>
+                                                                             );
+                                                                         })()}
+                                                                     </p>
+                                                                     {act.tags && (
+                                                                         <div className="flex flex-wrap gap-1.5 text-[10px] sm:text-xs font-black text-[#0A66C2]">
+                                                                             {act.tags.map((tag, i) => (
+                                                                                 <span key={i}>#{tag.toLowerCase().replace(/\s+/g, '')}</span>
+                                                                             ))}
+                                                                         </div>
+                                                                     )}
+                                                                 </div>
 
-                                                    {/* Image Media */}
-                                                    {act.photos && act.photos.length > 0 && (
-                                                        <div onClick={() => setSelectedActivity(act)}
-                                                            className="rounded-xl overflow-hidden border border-neutral-100 bg-neutral-50 max-h-80 cursor-pointer">
-                                                            <img 
-                                                                src={act.photos[0]} 
-                                                                alt="" 
-                                                                className="w-full h-full object-cover" 
-                                                                referrerPolicy="no-referrer"
-                                                                onError={(e) => {
-                                                                    const parent = e.target.closest('.rounded-xl');
-                                                                    if (parent) parent.style.display = 'none';
-                                                                }}
-                                                            />
-                                                        </div>
-                                                    )}
+                                                                 {/* Image Media */}
+                                                                 {act.photos && act.photos.length > 0 && (
+                                                                     <div onClick={() => setSelectedActivity(act)}
+                                                                         className="rounded-xl overflow-hidden border border-neutral-100 bg-neutral-50 max-h-80 cursor-pointer">
+                                                                         <img 
+                                                                             src={act.photos[0]} 
+                                                                             alt="" 
+                                                                             className="w-full h-full object-cover" 
+                                                                             referrerPolicy="no-referrer"
+                                                                             onError={(e) => {
+                                                                                 const parent = e.target.closest('.rounded-xl');
+                                                                                 if (parent) parent.style.display = 'none';
+                                                                             }}
+                                                                         />
+                                                                     </div>
+                                                                 )}
 
-                                                    {/* Notes Alert */}
-                                                    {act.notes && (
-                                                        <div className="p-3 bg-[#F8F9FA] border border-neutral-200 rounded-xl text-xs font-bold text-neutral-500 italic">
-                                                            📌 Key Learnings: {act.notes}
-                                                        </div>
-                                                    )}
+                                                                 {/* Notes Alert */}
+                                                                 {act.notes && (
+                                                                     <div className="p-3 bg-[#F8F9FA] border border-neutral-200 rounded-xl text-xs font-bold text-neutral-500 italic">
+                                                                         📌 Key Learnings: {act.notes}
+                                                                     </div>
+                                                                 )}
 
-                                                    {/* Likes counts */}
-                                                    <div className="flex items-center justify-between text-[9px] text-neutral-400 font-black uppercase tracking-wider pt-2 border-t border-neutral-100">
-                                                        <span>👍 {likes} likes</span>
-                                                        <span>{comments.length + 2} comments</span>
-                                                    </div>
+                                                                 {/* Likes counts */}
+                                                                 <div className="flex items-center justify-between text-[9px] text-neutral-400 font-black uppercase tracking-wider pt-2 border-t border-neutral-100">
+                                                                     <span>👍 {likes} likes</span>
+                                                                     <span>{comments.length + 2} comments</span>
+                                                                 </div>
 
-                                                    {/* Engagement Action buttons */}
-                                                    <div className="flex items-center justify-between border-t border-b border-neutral-100 py-1 text-xs font-bold text-neutral-500">
-                                                        <button onClick={() => handleLike(act.id, likes)}
-                                                            className={`flex-1 py-1.5 rounded-lg flex items-center justify-center gap-1.5 hover:bg-neutral-50 active:scale-95 transition-all ${isLiked ? 'text-[#0A66C2]' : ''}`}>
-                                                            <ThumbsUp className={`w-4 h-4 ${isLiked ? 'fill-current' : ''}`} />
-                                                            <span>Like</span>
-                                                        </button>
-                                                        <button onClick={() => document.getElementById(`comm-input-${act.id}`)?.focus()}
-                                                            className="flex-1 py-1.5 rounded-lg flex items-center justify-center gap-1.5 hover:bg-neutral-50 transition-all">
-                                                            <MessageCircle className="w-4 h-4" />
-                                                            <span>Comment</span>
-                                                        </button>
-                                                        <button className="flex-1 py-1.5 rounded-lg flex items-center justify-center gap-1.5 hover:bg-neutral-50 transition-all">
-                                                            <Share2 className="w-4 h-4" />
-                                                            <span>Share</span>
-                                                        </button>
-                                                    </div>
+                                                                 {/* Engagement Action buttons */}
+                                                                 <div className="flex items-center justify-between border-t border-b border-neutral-100 py-1 text-xs font-bold text-neutral-500">
+                                                                     <button onClick={() => handleLike(act.id, likes)}
+                                                                         className={`flex-1 py-1.5 rounded-lg flex items-center justify-center gap-1.5 hover:bg-neutral-50 active:scale-95 transition-all \${isLiked ? 'text-[#0A66C2]' : ''}`}>
+                                                                         <ThumbsUp className={`w-4 h-4 \${isLiked ? 'fill-current' : ''}`} />
+                                                                         <span>Like</span>
+                                                                     </button>
+                                                                     <button onClick={() => document.getElementById(`comm-input-\${act.id}`)?.focus()}
+                                                                         className="flex-1 py-1.5 rounded-lg flex items-center justify-center gap-1.5 hover:bg-neutral-50 transition-all">
+                                                                         <MessageCircle className="w-4 h-4" />
+                                                                         <span>Comment</span>
+                                                                     </button>
+                                                                     <button className="flex-1 py-1.5 rounded-lg flex items-center justify-center gap-1.5 hover:bg-neutral-50 transition-all">
+                                                                         <Share2 className="w-4 h-4" />
+                                                                         <span>Share</span>
+                                                                     </button>
+                                                                 </div>
 
-                                                    {/* Comments display & submission */}
-                                                    <div className="space-y-3">
-                                                        <div className="space-y-2 max-h-40 overflow-y-auto pr-1 scrollbar-thin">
-                                                            <div className="flex gap-2 text-xs">
-                                                                <div className="w-6 h-6 rounded-full bg-neutral-200 flex items-center justify-center shrink-0 font-black text-[9px] text-neutral-500">JD</div>
-                                                                <div className="bg-neutral-50 rounded-xl p-2 flex-1">
-                                                                    <div className="flex items-center justify-between"><strong className="text-neutral-700">John Doe</strong><span className="text-[9px] text-neutral-400">1d</span></div>
-                                                                    <p className="text-neutral-500 font-medium mt-0.5">Awesome! Great experience 🚀</p>
-                                                                </div>
-                                                            </div>
-                                                            {comments.map((comment, i) => (
-                                                                <div key={i} className="flex gap-2 text-xs animate-fadeIn">
-                                                                    <div className="w-6 h-6 rounded-full bg-[#18112E] text-white flex items-center justify-center shrink-0 font-black text-[9px] uppercase">{comment.username.substring(0,2)}</div>
-                                                                    <div className="bg-neutral-50 rounded-xl p-2 flex-1">
-                                                                        <div className="flex items-center justify-between"><strong className="text-neutral-700">{comment.username}</strong><span className="text-[9px] text-neutral-400">{comment.date}</span></div>
-                                                                        <p className="text-neutral-500 font-medium mt-0.5">{comment.text}</p>
-                                                                    </div>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                        <form onSubmit={(e) => {
-                                                            e.preventDefault();
-                                                            const fd = new FormData(e.target);
-                                                            const txt = fd.get('text');
-                                                            if (txt) {
-                                                                addLocalComment(act.id, 'Visitor', txt);
-                                                                e.target.reset();
-                                                            }
-                                                        }} className="flex gap-2">
-                                                            <input id={`comm-input-${act.id}`} name="text" type="text" placeholder="Add a comment..." required
-                                                                className="flex-1 bg-[#F8F9FA] border-2 border-[#18112E] rounded-xl px-3 py-1.5 text-xs font-medium focus:outline-none focus:bg-white transition-all" />
-                                                            <button type="submit" className="px-3 py-1.5 bg-[#18112E] text-white font-black uppercase text-[10px] rounded-xl shadow-[2px_2px_0_#18112E] active:scale-95 transition-all">Post</button>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })
-                                    )}
+                                                                 {/* Comments display & submission */}
+                                                                 <div className="space-y-3">
+                                                                     <div className="space-y-2 max-h-40 overflow-y-auto pr-1 scrollbar-thin">
+                                                                         <div className="flex gap-2 text-xs">
+                                                                             <div className="w-6 h-6 rounded-full bg-neutral-200 flex items-center justify-center shrink-0 font-black text-[9px] text-neutral-500">JD</div>
+                                                                             <div className="bg-neutral-50 rounded-xl p-2 flex-1">
+                                                                                 <div className="flex items-center justify-between"><strong className="text-neutral-700">John Doe</strong><span className="text-[9px] text-neutral-400">1d</span></div>
+                                                                                 <p className="text-neutral-500 font-medium mt-0.5">Awesome! Great experience 🚀</p>
+                                                                             </div>
+                                                                         </div>
+                                                                         {comments.map((comment, i) => (
+                                                                             <div key={i} className="flex gap-2 text-xs animate-fadeIn">
+                                                                                 <div className="w-6 h-6 rounded-full bg-[#18112E] text-white flex items-center justify-center shrink-0 font-black text-[9px] uppercase">{comment.username.substring(0,2)}</div>
+                                                                                 <div className="bg-neutral-50 rounded-xl p-2 flex-1">
+                                                                                     <div className="flex items-center justify-between"><strong className="text-neutral-700">{comment.username}</strong><span className="text-[9px] text-neutral-400">{comment.date}</span></div>
+                                                                                     <p className="text-neutral-500 font-medium mt-0.5">{comment.text}</p>
+                                                                                 </div>
+                                                                             </div>
+                                                                         ))}
+                                                                     </div>
+                                                                     <form onSubmit={(e) => {
+                                                                         e.preventDefault();
+                                                                         const fd = new FormData(e.target);
+                                                                         const txt = fd.get('text');
+                                                                         if (txt) {
+                                                                             addLocalComment(act.id, 'Visitor', txt);
+                                                                             e.target.reset();
+                                                                         }
+                                                                     }} className="flex gap-2">
+                                                                         <input id={`comm-input-\${act.id}`} name="text" type="text" placeholder="Add a comment..." required
+                                                                             className="flex-1 bg-[#F8F9FA] border-2 border-[#18112E] rounded-xl px-3 py-1.5 text-xs font-medium focus:outline-none focus:bg-white transition-all" />
+                                                                         <button type="submit" className="px-3 py-1.5 bg-[#18112E] text-white font-black uppercase text-[10px] rounded-xl shadow-[2px_2px_0_#18112E] active:scale-95 transition-all">Post</button>
+                                                                     </form>
+                                                                 </div>
+                                                             </motion.div>
+                                                         );
+                                                     })}
+                                                 </AnimatePresence>
+                                             </motion.div>
+
+                                             {filteredLinkedinActivities.length > 3 && (
+                                                 <motion.div layout className="flex justify-center pt-2">
+                                                     <button
+                                                         onClick={() => setShowAllLinkedinPosts(!showAllLinkedinPosts)}
+                                                         className="px-6 py-3 bg-[#0A66C2] text-white border-2 border-[#18112E] font-black uppercase text-xs tracking-wider rounded-xl shadow-[4px_4px_0_#18112E] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_#18112E] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0_#18112E] transition-all duration-200 flex items-center gap-1.5 group"
+                                                     >
+                                                         <span>{showAllLinkedinPosts ? "Show Recent 3 Posts" : `View all posts (\${filteredLinkedinActivities.length})`}</span>
+                                                         <motion.div
+                                                             animate={{ y: showAllLinkedinPosts ? 0 : [0, 3, 0] }}
+                                                             transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                                                         >
+                                                             {showAllLinkedinPosts ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                                                         </motion.div>
+                                                     </button>
+                                                 </motion.div>
+                                             )}
+                                         </div>
+                                     )}
+
                                 </div>
                             )}
 

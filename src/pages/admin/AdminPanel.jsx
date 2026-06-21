@@ -1155,10 +1155,31 @@ function DashboardTab() {
                 setActivities(merged);
             }
 
+            // Save state to local server to write data.json to disk during development
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                const state = useStore.getState();
+                const syncPayload = {
+                    profile: state.profile,
+                    experience: state.experience,
+                    education: state.education,
+                    activities: state.activities
+                };
+                fetch('/api/sync', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(syncPayload)
+                })
+                .then(r => r.json())
+                .then(d => {
+                    if (d.success) console.log("State written to local data.json!");
+                })
+                .catch(err => console.error("Local sync error:", err));
+            }
+
             setImportText('');
             setImportError('');
             setImportModal(false);
-            alert('LinkedIn JSON data successfully imported! Check the updated sections. Remember to click "Deploy to Production" to push changes.');
+            alert('LinkedIn JSON data successfully imported and synced to local disk!');
         } catch (err) {
             setImportError('Failed to parse JSON: ' + err.message);
         }

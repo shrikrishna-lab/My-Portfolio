@@ -55,6 +55,14 @@ const syncPlugin = () => ({
                 id: edu.id || `edu_${Date.now()}_${idx}`
               }));
             }
+
+            if (Array.isArray(data.activities)) {
+              existingData.activities = data.activities.map((act, idx) => ({
+                ...act,
+                id: act.id || `act_${Date.now()}_${idx}`,
+                platforms: act.platforms || { snapdude: false, linkedin: true, youtube: false, carousel: true }
+              }));
+            }
             
             fs.writeFileSync(dataPath, JSON.stringify(existingData, null, 2) + '\n');
             
