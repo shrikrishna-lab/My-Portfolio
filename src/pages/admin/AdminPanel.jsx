@@ -196,6 +196,23 @@ function ProfileTab() {
                         </label>
                     </div>
                 </div>
+                <div className="md:col-span-2">
+                    <label className="text-xs font-bold text-[#18112E] mb-1.5 block">About Story Image (Homepage)</label>
+                    <div className="flex gap-2">
+                        <input type="text" placeholder="About Image URL" value={form.aboutImage || ''} onChange={(e) => set('aboutImage', e.target.value)} className={cls} />
+                        <label className="flex items-center justify-center px-4 bg-[#18112E] text-white hover:bg-[#FFB800] hover:text-[#18112E] rounded-[12px] font-bold text-xs cursor-pointer transition-colors shrink-0">
+                            {uploading ? '...' : 'Upload'}
+                            <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                setUploading(true);
+                                const { url } = await uploadImage(file);
+                                setUploading(false);
+                                if (url) set('aboutImage', url);
+                            }} />
+                        </label>
+                    </div>
+                </div>
             </div>
             <hr className="border-neutral-100" />
             <h2 className="text-xl font-bold text-[#18112E]">About</h2>
@@ -1792,7 +1809,28 @@ function DashboardTab() {
                                         </div>
                                         <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Short Content / Summary</label><textarea rows={2} placeholder="What did you do?" value={logForm.content} onChange={(e) => setLogForm({ ...logForm, content: e.target.value })} className={`${cls} resize-none`} /></div>
                                         <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Documentation / Details</label><textarea rows={3} placeholder="Provide in-depth details of what was done..." value={logForm.documentation} onChange={(e) => setLogForm({ ...logForm, documentation: e.target.value })} className={`${cls} resize-none`} /></div>
-                                        <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Photos / Screenshots (comma-separated URLs)</label><input placeholder="https://example.com/img1.jpg, https://example.com/img2.jpg" value={logForm.photos} onChange={(e) => setLogForm({ ...logForm, photos: e.target.value })} className={cls} /></div>
+                                        <div>
+                                            <label className="text-xs font-bold text-[#18112E] block mb-1.5">Photos / Screenshots (comma-separated URLs)</label>
+                                            <div className="flex gap-2">
+                                                <input placeholder="https://example.com/img1.jpg, https://example.com/img2.jpg" value={logForm.photos} onChange={(e) => setLogForm({ ...logForm, photos: e.target.value })} className="flex-1 bg-[#F8F9FA] border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-2.5 text-[#18112E] font-medium outline-none text-sm" />
+                                                <label className="flex items-center justify-center px-4 bg-[#18112E] text-white hover:bg-[#FFB800] hover:text-[#18112E] rounded-[12px] font-bold text-xs cursor-pointer transition-colors shrink-0">
+                                                    {uploading ? '...' : 'Upload'}
+                                                    <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (!file) return;
+                                                        setUploading(true);
+                                                        const { url } = await uploadImage(file);
+                                                        setUploading(false);
+                                                        if (url) {
+                                                            setLogForm(prev => ({
+                                                                ...prev,
+                                                                photos: prev.photos ? `${prev.photos},${url}` : url
+                                                            }));
+                                                        }
+                                                    }} />
+                                                </label>
+                                            </div>
+                                        </div>
                                         <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Changes List (one per line)</label><textarea rows={3} placeholder="Fixed mobile spacing&#10;Updated background opacity" value={logForm.changes} onChange={(e) => setLogForm({ ...logForm, changes: e.target.value })} className={`${cls} resize-none`} /></div>
                                         <div><label className="text-xs font-bold text-[#18112E] block mb-1.5">Links (Format: Label|URL, one per line)</label><textarea rows={2} placeholder="Commit #a3f92c|https://github.com/..." value={logForm.links} onChange={(e) => setLogForm({ ...logForm, links: e.target.value })} className={`${cls} resize-none`} /></div>
                                     </>

@@ -11,22 +11,42 @@ function loadSaved() {
 }
 
 function save(state) {
+  const payload = {
+    profile: state.profile,
+    skills: state.skills,
+    projects: state.projects,
+    achievements: state.achievements,
+    messages: state.messages,
+    nowLogs: state.nowLogs,
+    sandboxIdeas: state.sandboxIdeas,
+    currentProjects: state.currentProjects,
+    learningPaths: state.learningPaths,
+    activities: state.activities,
+    experience: state.experience,
+    education: state.education,
+  };
+
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      profile: state.profile,
-      skills: state.skills,
-      projects: state.projects,
-      achievements: state.achievements,
-      messages: state.messages,
-      nowLogs: state.nowLogs,
-      sandboxIdeas: state.sandboxIdeas,
-      currentProjects: state.currentProjects,
-      learningPaths: state.learningPaths,
-      activities: state.activities,
-      experience: state.experience,
-      education: state.education,
-    }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
   } catch {}
+
+  // Automatically sync to local data.json file during development
+  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+    fetch('/api/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(d => {
+      if (d.success) {
+        console.log("Portfolio state successfully synced to public/data.json on disk.");
+      } else {
+        console.error("Local disk sync failed:", d.error);
+      }
+    })
+    .catch(err => console.warn("Local sync connection failed:", err));
+  }
 }
 
 let nextId = 100;

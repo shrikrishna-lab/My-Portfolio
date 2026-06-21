@@ -38,6 +38,7 @@ const syncPlugin = () => ({
                 linkedinAbout: data.profile.linkedinAbout || existingData.profile?.linkedinAbout,
                 characterImage: keepLocalImage ? existingData.profile.characterImage : (newCharImage || existingData.profile?.characterImage),
                 bannerImage: data.profile.bannerImage || existingData.profile?.bannerImage,
+                aboutImage: data.profile.aboutImage || existingData.profile?.aboutImage,
               };
             }
             
@@ -63,6 +64,14 @@ const syncPlugin = () => ({
                 platforms: act.platforms || { snapdude: false, linkedin: true, youtube: false, carousel: true }
               }));
             }
+
+            // Sync other collection fields from local modifications
+            const otherFields = ['skills', 'projects', 'achievements', 'messages', 'nowLogs', 'sandboxIdeas', 'currentProjects', 'learningPaths'];
+            otherFields.forEach(k => {
+              if (data[k] !== undefined) {
+                existingData[k] = data[k];
+              }
+            });
             
             fs.writeFileSync(dataPath, JSON.stringify(existingData, null, 2) + '\n');
             

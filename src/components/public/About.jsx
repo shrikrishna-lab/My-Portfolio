@@ -36,7 +36,7 @@ export default function About() {
                                  viewport={{ once: true, margin: '-50px' }}
                                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                              >
-                                 <img src="/portfolio%20image2.png" alt="Portfolio" className="w-full h-48 md:h-64 object-cover object-[50%_30%]" />
+                                 <img src={profile.aboutImage || "/portfolio image2.png"} alt="Portfolio" className="w-full h-48 md:h-64 object-cover object-[50%_30%]" />
                              </motion.div>
                              <h3 className="text-3xl font-extrabold text-[#18112E] mb-8 flex items-center gap-3">
                                  About

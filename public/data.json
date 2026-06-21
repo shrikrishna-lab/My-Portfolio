@@ -21,7 +21,8 @@
       "carousel": true
     },
     "characterImage": "/my_profile_photo.png",
-    "bannerImage": "https://media.licdn.com/dms/image/v2/D5616AQHOvVCECux7bA/profile-displaybackgroundimage-shrink_200_800/B56Z43R4mtIsAU-/0/1779043895990?e=1783555200&v=beta&t=3kwmuhAJGVCzL9LDHnTphxnB26tdSLv7uTNF_nz44xU"
+    "bannerImage": "https://media.licdn.com/dms/image/v2/D5616AQHOvVCECux7bA/profile-displaybackgroundimage-shrink_200_800/B56Z43R4mtIsAU-/0/1779043895990?e=1783555200&v=beta&t=3kwmuhAJGVCzL9LDHnTphxnB26tdSLv7uTNF_nz44xU",
+    "aboutImage": "/portfolio image2.png"
   },
   "skills": [
     {
