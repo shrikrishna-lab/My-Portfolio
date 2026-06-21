@@ -669,6 +669,7 @@ function SettingsTab() {
     const [bgImgInput, setBgImgInput] = useState(getBgImg());
     const [bgVidInput, setBgVidInput] = useState(getBgVid());
     const [passInput, setPassInput] = useState(profile?.adminPassword || 'admin123');
+    const [web3formsKeyInput, setWeb3formsKeyInput] = useState(profile?.web3formsKey || '');
     const [deploying, setDeploying] = useState(false);
     const [msg, setMsg] = useState({ text: '', type: '' });
 
@@ -676,11 +677,19 @@ function SettingsTab() {
         if (profile?.adminPassword) {
             setPassInput(profile.adminPassword);
         }
+        if (profile?.web3formsKey) {
+            setWeb3formsKeyInput(profile.web3formsKey);
+        }
     }, [profile]);
 
     const showMsg = (text, type = 'success') => {
         setMsg({ text, type });
         window.setTimeout(() => setMsg({ text: '', type: '' }), 3000);
+    };
+
+    const saveWeb3formsKey = () => {
+        updateProfile({ web3formsKey: web3formsKeyInput.trim() });
+        showMsg('Web3Forms key saved locally. Deploy to make it permanent.');
     };
 
     const saveToken = () => {
@@ -976,6 +985,28 @@ function SettingsTab() {
                         className="bg-[#18112E] text-white px-5 py-3 rounded-[12px] text-sm font-bold hover:bg-[#FFB800] hover:text-[#18112E] transition-all"
                     >
                         Save Password
+                    </button>
+                </div>
+            </div>
+
+            <div className="rounded-[24px] border border-neutral-200 bg-white p-5 shadow-sm space-y-4">
+                <div>
+                    <h2 className="text-xl font-bold text-[#18112E]">Web3Forms Settings</h2>
+                    <p className="text-sm text-neutral-500 font-medium">Configure your Web3Forms Access Key for contact email delivery. Deploy to apply permanently.</p>
+                </div>
+                <div className="flex gap-2">
+                    <input 
+                        type="password" 
+                        value={web3formsKeyInput} 
+                        onChange={(e) => setWeb3formsKeyInput(e.target.value)} 
+                        placeholder="Web3Forms Access Key (e.g. xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)" 
+                        className="flex-1 bg-[#F8F9FA] border-2 border-transparent focus:border-[#FFB800] rounded-[12px] px-4 py-3 text-sm font-medium outline-none transition-all" 
+                    />
+                    <button 
+                        onClick={saveWeb3formsKey} 
+                        className="bg-[#18112E] text-white px-5 py-3 rounded-[12px] text-sm font-bold hover:bg-[#FFB800] hover:text-[#18112E] transition-all"
+                    >
+                        Save Key
                     </button>
                 </div>
             </div>

@@ -18,8 +18,8 @@ export default function Footer() {
                         <Command className="w-8 h-8 text-[#FFB800]" />
                     </div>
                     <div>
-                        <h2 className="text-4xl font-black tracking-tighter text-[#18112E] mb-2 uppercase">{profile.name}</h2>
-                        <p className="text-neutral-500 font-bold uppercase tracking-widest text-sm">{profile.title || 'Digital Architect'}</p>
+                        <h2 className="text-4xl font-black tracking-tighter text-[#18112E] mb-2">{profile.name}</h2>
+                        <p className="text-neutral-500 font-bold tracking-widest text-sm">{profile.title || 'Digital Architect'}</p>
                     </div>
                 </div>
 
@@ -35,8 +35,8 @@ export default function Footer() {
                         </motion.a>
                     )}
                     {profile.snapdude && (
-                        <motion.a whileHover={{ scale: 1.05, y: -3 }} whileTap={{ scale: 0.95 }} href={profile.snapdude} target="_blank" rel="noreferrer" className="w-14 h-14 rounded-[16px] bg-[#F8F9FA] border-2 border-[#18112E] shadow-[4px_4px_0_#18112E] flex items-center justify-center hover:bg-[#FFFC00] hover:shadow-[6px_6px_0_#18112E] transition-colors group">
-                            <Camera className="w-6 h-6 text-[#18112E] group-hover:text-[#18112E] transition-colors" />
+                        <motion.a whileHover={{ scale: 1.05, y: -3 }} whileTap={{ scale: 0.95 }} href={profile.snapdude} target="_blank" rel="noreferrer" className="w-14 h-14 rounded-[16px] bg-[#F8F9FA] border-2 border-[#18112E] shadow-[4px_4px_0_#18112E] flex items-center justify-center hover:bg-[#FF3B30] hover:shadow-[6px_6px_0_#18112E] transition-colors group">
+                            <Camera className="w-6 h-6 text-[#18112E] group-hover:text-white transition-colors" />
                         </motion.a>
                     )}
                 </div>

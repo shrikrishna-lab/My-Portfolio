@@ -308,6 +308,11 @@ export default function Sandbox() {
     const [sending, setSending] = useState(false);
     const [sent, setSent] = useState(false);
 
+    const [sugForm, setSugForm] = useState({ name: '', email: '', category: 'General', message: '' });
+    const [sugSending, setSugSending] = useState(false);
+    const [sugSent, setSugSent] = useState(false);
+    const [sugError, setSugError] = useState('');
+
     // Social Feed states
     const [socialTab, setSocialTab] = useState(null); // dynamic default
     const [likedStates, setLikedStates] = useState({}); // e.g., { act1: { liked: true, count: 43 } }
@@ -345,11 +350,12 @@ export default function Sandbox() {
     const socialTabsConfig = profile?.socialTabs || { snapdude: true, linkedin: true, youtube: false, github: true, carousel: true };
 
     const allTabs = [
-        { id: 'snapdude', label: 'Snap Dude', icon: Camera, activeColor: 'bg-[#FFFC00] text-[#18112E]', configKey: 'snapdude' },
+        { id: 'snapdude', label: 'Snap Dude', icon: Camera, activeColor: 'bg-[#FF3B30] text-white', configKey: 'snapdude' },
         { id: 'linkedin', label: 'LinkedIn', icon: Linkedin, activeColor: 'bg-[#0A66C2] text-white', configKey: 'linkedin' },
         { id: 'github', label: 'GitHub', icon: Github, activeColor: 'bg-neutral-800 text-white', configKey: 'github' },
         { id: 'youtube', label: 'YouTube', icon: Youtube, activeColor: 'bg-[#FF0000] text-white', configKey: 'youtube' },
-        { id: 'carousel', label: 'Feed', icon: Globe, activeColor: 'bg-[#18112E] text-white', configKey: 'carousel' }
+        { id: 'carousel', label: 'Feed', icon: Globe, activeColor: 'bg-[#18112E] text-white', configKey: 'carousel' },
+        { id: 'suggestions', label: 'Suggestion Box', icon: Lightbulb, activeColor: 'bg-[#FF3B30] text-white', configKey: 'suggestions' }
     ];
 
     const activeTabs = allTabs.filter(t => socialTabsConfig[t.configKey] !== false);
@@ -496,6 +502,55 @@ export default function Sandbox() {
         setTimeout(() => setSent(false), 4000);
     };
 
+    const handleSuggestionSubmit = async (e) => {
+        e.preventDefault();
+        setSugError('');
+        if (!sugForm.message.trim()) {
+            setSugError('Please enter a suggestion.');
+            return;
+        }
+        setSugSending(true);
+
+        const nameLabel = sugForm.name.trim() || 'Anonymous';
+        const emailLabel = sugForm.email.trim() || 'anonymous@example.com';
+        const formattedMsg = `[SUGGESTION] [${sugForm.category}] from ${nameLabel} (${emailLabel}): ${sugForm.message.trim()}`;
+
+        // Save locally to store
+        await addMessage({
+            name: nameLabel,
+            email: emailLabel,
+            message: formattedMsg
+        });
+
+        // Dispatch via Web3Forms if key exists
+        if (profile.web3formsKey) {
+            try {
+                const response = await fetch('https://api.web3forms.com/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        access_key: profile.web3formsKey,
+                        name: nameLabel,
+                        email: emailLabel,
+                        message: sugForm.message.trim(),
+                        subject: `New Portfolio Suggestion: [${sugForm.category}]`
+                    })
+                });
+                const resData = await response.json();
+                if (!response.ok || !resData.success) {
+                    throw new Error(resData.message || 'Web3Forms API error');
+                }
+            } catch (err) {
+                console.error('Suggestion email dispatch error:', err);
+            }
+        }
+
+        setSugSending(false);
+        setSugSent(true);
+        setSugForm({ name: '', email: '', category: 'General', message: '' });
+        setTimeout(() => setSugSent(false), 4000);
+    };
+
     return (
         <>
             <Navbar />
@@ -544,7 +599,7 @@ export default function Sandbox() {
                                     </a>
                                 )}
                                 {profile.snapdude && (
-                                    <a href={profile.snapdude} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase tracking-wider rounded-xl border-2 border-[#18112E] bg-white text-[#18112E] shadow-[2px_2px_0_#18112E] hover:bg-[#FFFC00] hover:text-[#18112E] hover:border-[#FFFC00] hover:translate-y-px hover:shadow-[1px_1px_0_#18112E] transition-all">
+                                    <a href={profile.snapdude} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase tracking-wider rounded-xl border-2 border-[#18112E] bg-white text-[#18112E] shadow-[2px_2px_0_#18112E] hover:bg-[#FF3B30] hover:text-white hover:border-[#FF3B30] hover:translate-y-px hover:shadow-[1px_1px_0_#18112E] transition-all">
                                         <Camera className="w-3.5 h-3.5" /> Snap Dude
                                     </a>
                                 )}
@@ -770,7 +825,7 @@ export default function Sandbox() {
                                     {/* Profile Header */}
                                     <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-10 pb-6 border-b border-neutral-100">
                                         <div className="relative shrink-0">
-                                            <div className="absolute inset-0 -m-1 rounded-full bg-[#FFFC00] border-2 border-[#18112E]" />
+                                            <div className="absolute inset-0 -m-1 rounded-full bg-[#FF3B30] border-2 border-[#18112E]" />
                                             <img 
                                                 src={profile.characterImage || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"} 
                                                 alt="" 
@@ -783,7 +838,7 @@ export default function Sandbox() {
                                             <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                                                 <h3 className="text-lg sm:text-xl font-black text-[#18112E] tracking-tight truncate">@{snapdudeHandle || profile.name.toLowerCase().replace(/\s+/g, '_')}</h3>
                                                 <a href={profile.snapdude || '#'} target="_blank" rel="noreferrer"
-                                                   className="inline-flex items-center gap-1.5 px-4 py-1 text-xs font-black uppercase tracking-wider bg-[#FFFC00] text-[#18112E] border-2 border-[#18112E] rounded-xl shadow-[2px_2px_0_#18112E] hover:translate-y-px hover:shadow-[1px_1px_0_#18112E] transition-all">
+                                                   className="inline-flex items-center gap-1.5 px-4 py-1 text-xs font-black uppercase tracking-wider bg-[#FF3B30] text-white border-2 border-[#18112E] rounded-xl shadow-[2px_2px_0_#18112E] hover:translate-y-px hover:shadow-[1px_1px_0_#18112E] transition-all">
                                                     👻 Add Friend
                                                 </a>
                                             </div>
@@ -811,7 +866,7 @@ export default function Sandbox() {
 
                                                 return (
                                                     <div key={act.id} onClick={() => setSelectedActivity(act)}
-                                                        className="group relative aspect-square bg-neutral-100 rounded-[16px] sm:rounded-[24px] overflow-hidden cursor-pointer border-2 border-[#18112E] shadow-[3px_3px_0_#18112E] hover:translate-y-px hover:shadow-[1px_1px_0_#18112E] transition-all hover:ring-2 hover:ring-[#FFFC00]">
+                                                        className="group relative aspect-square bg-neutral-100 rounded-[16px] sm:rounded-[24px] overflow-hidden cursor-pointer border-2 border-[#18112E] shadow-[3px_3px_0_#18112E] hover:translate-y-px hover:shadow-[1px_1px_0_#18112E] transition-all hover:ring-2 hover:ring-[#FF3B30]">
                                                         {act.photos && act.photos.length > 0 ? (
                                                             <img src={act.photos[0]} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                                                         ) : (
@@ -839,7 +894,7 @@ export default function Sandbox() {
                                     {/* Real Snap Dude CTA */}
                                     <div className="text-center pt-4 border-t border-neutral-100">
                                         <a href={profile.snapdude || '#'} target="_blank" rel="noreferrer"
-                                           className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#FFFC00] text-[#18112E] font-black uppercase text-xs tracking-wider rounded-2xl border-2 border-[#18112E] shadow-[3px_3px_0_#18112E] hover:translate-y-px hover:shadow-[1px_1px_0_#18112E] transition-all active:scale-95">
+                                           className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#FF3B30] text-white font-black uppercase text-xs tracking-wider rounded-2xl border-2 border-[#18112E] shadow-[3px_3px_0_#18112E] hover:translate-y-px hover:shadow-[1px_1px_0_#18112E] transition-all active:scale-95">
                                             👻 Add Shrikrishna on Snap Dude →
                                         </a>
                                         <p className="text-[10px] text-neutral-400 font-bold mt-2 uppercase tracking-wider">Follow for coding updates, vlogs, and tech journeys</p>
@@ -1439,6 +1494,86 @@ export default function Sandbox() {
                                             </div>
                                         )}
                                     </div>
+                                </div>
+                            )}
+
+                            {/* 7. Suggestion Box View */}
+                            {activeSocialTab === 'suggestions' && (
+                                <div className="space-y-8 bg-white border-2 border-[#18112E] rounded-[24px] p-5 sm:p-8 shadow-[6px_6px_0_#18112E] animate-fadeIn text-left max-w-2xl mx-auto">
+                                    <div className="space-y-2">
+                                        <h3 className="text-2xl font-black text-[#18112E]">Anonymous Suggestion Box</h3>
+                                        <p className="text-sm text-neutral-500 font-medium">Have a suggestion, feedback, or a cool feature idea for my projects? Send it here! It will be emailed directly to me.</p>
+                                    </div>
+                                    <form onSubmit={handleSuggestionSubmit} className="space-y-4">
+                                        <div className="grid md:grid-cols-2 gap-4">
+                                            <div className="space-y-1">
+                                                <label className="text-xs font-black text-[#18112E] uppercase tracking-wider">Your Name (Optional)</label>
+                                                <input 
+                                                    type="text" 
+                                                    name="sug_name" 
+                                                    placeholder="Anonymous" 
+                                                    value={sugForm.name} 
+                                                    onChange={(e) => setSugForm({ ...sugForm, name: e.target.value })} 
+                                                    className="w-full bg-[#F8F9FA] border-2 border-[#18112E] rounded-xl px-4 py-3 text-xs font-medium focus:outline-none focus:bg-white focus:shadow-[2px_2px_0_#18112E] transition-all font-bold" 
+                                                />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <label className="text-xs font-black text-[#18112E] uppercase tracking-wider">Your Email (Optional)</label>
+                                                <input 
+                                                    type="email" 
+                                                    name="sug_email" 
+                                                    placeholder="anonymous@example.com" 
+                                                    value={sugForm.email} 
+                                                    onChange={(e) => setSugForm({ ...sugForm, email: e.target.value })} 
+                                                    className="w-full bg-[#F8F9FA] border-2 border-[#18112E] rounded-xl px-4 py-3 text-xs font-medium focus:outline-none focus:bg-white focus:shadow-[2px_2px_0_#18112E] transition-all font-bold" 
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-xs font-black text-[#18112E] uppercase tracking-wider">Category</label>
+                                            <select 
+                                                value={sugForm.category} 
+                                                onChange={(e) => setSugForm({ ...sugForm, category: e.target.value })} 
+                                                className="w-full bg-[#F8F9FA] border-2 border-[#18112E] rounded-xl px-4 py-3 text-xs font-bold focus:outline-none focus:bg-white focus:shadow-[2px_2px_0_#18112E] transition-all"
+                                            >
+                                                <option value="General">General Suggestion</option>
+                                                <option value="Feature">Feature Idea</option>
+                                                <option value="Bug">Bug Report</option>
+                                                <option value="Collaboration">Collaboration</option>
+                                            </select>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-xs font-black text-[#18112E] uppercase tracking-wider">Your Suggestion</label>
+                                            <textarea 
+                                                rows={5} 
+                                                placeholder="Write your suggestions here..." 
+                                                value={sugForm.message} 
+                                                onChange={(e) => setSugForm({ ...sugForm, message: e.target.value })} 
+                                                required 
+                                                className="w-full bg-[#F8F9FA] border-2 border-[#18112E] rounded-xl px-4 py-3 text-xs font-medium focus:outline-none focus:bg-white focus:shadow-[2px_2px_0_#18112E] transition-all resize-none font-bold min-h-[120px]" 
+                                            />
+                                        </div>
+                                        <motion.button 
+                                            type="submit" 
+                                            whileHover={{ scale: 1.02 }} 
+                                            whileTap={{ scale: 0.98 }} 
+                                            disabled={sugSending} 
+                                            className="w-full py-4 bg-[#18112E] text-white font-black uppercase text-xs tracking-wider rounded-xl shadow-[3px_3px_0_#18112E] border-2 border-[#18112E] hover:text-[#FFB800] disabled:opacity-50 transition-all"
+                                        >
+                                            {sugSending ? 'Sending...' : 'Submit Suggestion'}
+                                        </motion.button>
+
+                                        {sugError && (
+                                            <div className="p-3 bg-red-50 border-2 border-red-500 text-red-600 rounded-xl text-xs font-bold text-center">
+                                                ⚠️ {sugError}
+                                            </div>
+                                        )}
+                                        {sugSent && (
+                                            <div className="p-3 bg-emerald-50 border-2 border-emerald-500 text-emerald-600 rounded-xl text-xs font-bold text-center">
+                                                🎉 Suggestion submitted successfully! Thank you.
+                                            </div>
+                                        )}
+                                    </form>
                                 </div>
                             )}
                         </div>

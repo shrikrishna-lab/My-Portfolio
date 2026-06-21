@@ -18,7 +18,8 @@
       "github": true,
       "carousel": true
     },
-    "characterImage": "https://media.licdn.com/dms/image/v2/D5616AQHOvVCECux7bA/profile-displaybackgroundimage-shrink_200_800/B56Z43R4mtIsAU-/0/1779043895990?e=1783555200&v=beta&t=3kwmuhAJGVCzL9LDHnTphxnB26tdSLv7uTNF_nz44xU"
+    "characterImage": "/my_profile_photo.jpeg",
+    "bannerImage": "https://media.licdn.com/dms/image/v2/D5616AQHOvVCECux7bA/profile-displaybackgroundimage-shrink_200_800/B56Z43R4mtIsAU-/0/1779043895990?e=1783555200&v=beta&t=3kwmuhAJGVCzL9LDHnTphxnB26tdSLv7uTNF_nz44xU"
   },
   "skills": [
     {
@@ -74,19 +75,19 @@
   ],
   "achievements": [
     {
-      "id": "1",
-      "title": "1st Place Global Hackathon",
-      "date": "2025",
+      "id": "ach_iit_kharagpur",
+      "title": "IIT Kharagpur - \"Discover Yourself\" Session Course",
+      "date": "1yr",
       "sortOrder": 1,
-      "description": "",
+      "description": "Successfully completed the \"Discover Yourself\" session course from IIT Kharagpur, earning recognition for performance. This journey has been an incredible opportunity for self-reflection, growth, and learning.",
       "imageUrl": ""
     },
     {
-      "id": "2",
-      "title": "AWS Certified Developer",
-      "date": "2024",
+      "id": "ach_oracle_mysql",
+      "title": "Oracle Certified Associate – MySQL HeatWave Implementation",
+      "date": "7mo",
       "sortOrder": 2,
-      "description": "",
+      "description": "Earned the Oracle Certified Associate – MySQL HeatWave Implementation Certified Associate certification from Oracle University. Validates skills in MySQL database management, HeatWave implementation, and performance optimization.",
       "imageUrl": ""
     }
   ],
@@ -423,62 +424,6 @@
   ],
   "activities": [
     {
-      "title": "Thrilled to Share an Achievement!",
-      "type": "Event",
-      "status": "Finished",
-      "date": "1yr",
-      "location": "LinkedIn",
-      "description": "Thrilled to Share an Achievement!\n\nI am delighted to have successfully completed the \"Discover Yourself\" session course from IIT Kharagpur, earning recognition for my performance. This journey has been an incredible opportunity for self-reflection, growth, and learning.\n\nA heartfelt thanks to the esteemed faculty and organizers for curating such an enriching program. This accomplishment motivates me to continue exploring and pushing my boundaries.\n\n\nhashtag\n#AchievementUnlocked \nhashtag\n#IITKharagpur \nhashtag\n#DiscoverYourself \nhashtag\n#LifelongLearning \nhashtag\n#ProfessionalGrowth\n…more",
-      "photos": [
-        "https://media.licdn.com/dms/image/v2/D4E22AQH4LXnna1z4eA/feedshare-shrink_800/feedshare-shrink_800/0/1733678110916?e=1783555200&v=beta&t=rAVxcnO40Ndp-JyAuRLOQNSUidgSPvnM3qyOqh2w7UE"
-      ],
-      "tags": [
-        "AchievementUnlocked",
-        "IITKharagpur",
-        "DiscoverYourself",
-        "LifelongLearning",
-        "ProfessionalGrowth"
-      ],
-      "notes": "",
-      "platforms": {
-        "snapdude": false,
-        "linkedin": true,
-        "youtube": false,
-        "carousel": true
-      },
-      "id": "act_1781718920004_4"
-    },
-    {
-      "title": "🎉 Thrilled to Announce! 🎉",
-      "type": "Event",
-      "status": "Finished",
-      "date": "7mo",
-      "location": "LinkedIn",
-      "description": "🎉 Thrilled to Announce! 🎉\n\nI’m excited to share that I’ve officially earned the Oracle Certified Associate – MySQL HeatWave Implementation Certified Associate (Rel 1) certification from Oracle University! ☁️\n\nThis certification validates my skills in MySQL database management, HeatWave implementation, and performance optimization — helping me take one step further in my journey as an aspiring IT professional.\n\nA big thanks to everyone who supported me along the way! 🙌\n\n\nhashtag\n#OracleCertified \nhashtag\n#MySQL \nhashtag\n#HeatWave \nhashtag\n#DatabaseAdministration \nhashtag\n#Certification \nhashtag\n#CloudComputing \nhashtag\n#IT \nhashtag\n#LearningJourney \nhashtag\n#ProfessionalGrowth\n…more",
-      "photos": [
-        "https://media.licdn.com/dms/image/v2/D4E22AQEx5boGrHOJvg/feedshare-shrink_800/B4EZphdfAuIwAk-/0/1762571716988?e=1783555200&v=beta&t=32Wpf2eWyCoxVT_lTb6CKSeFD_xoeMsWkaFoHI92D1Q"
-      ],
-      "tags": [
-        "OracleCertified",
-        "MySQL",
-        "HeatWave",
-        "DatabaseAdministration",
-        "Certification",
-        "CloudComputing",
-        "IT",
-        "LearningJourney",
-        "ProfessionalGrowth"
-      ],
-      "notes": "",
-      "platforms": {
-        "snapdude": false,
-        "linkedin": true,
-        "youtube": false,
-        "carousel": true
-      },
-      "id": "act_1781718920004_3"
-    },
-    {
       "title": "🚀 Great learning experience at the Generative AI Workshop!",
       "type": "Event",
       "status": "Finished",
@@ -574,138 +519,6 @@
         "carousel": true
       },
       "id": "act_1781718920004_0"
-    },
-    {
-      "id": "act1",
-      "title": "Smart India Hackathon 2026",
-      "type": "Hackathon",
-      "status": "Registered",
-      "date": "July 2026",
-      "location": "India (Online Round)",
-      "description": "Registered for Smart India Hackathon 2026. Working on a problem statement related to healthcare accessibility using AI.",
-      "photos": [],
-      "tags": [
-        "Hackathon",
-        "AI",
-        "Healthcare"
-      ],
-      "notes": "Team of 6, currently brainstorming solutions and building prototype.",
-      "platforms": {
-        "snapdude": true,
-        "linkedin": true,
-        "youtube": false,
-        "carousel": true
-      }
-    },
-    {
-      "id": "act2",
-      "title": "Goa Tech Meetup Trip",
-      "type": "Journey",
-      "status": "Success",
-      "date": "May 2026",
-      "location": "Goa, India",
-      "description": "Attended a developer meetup in Goa. Networked with 50+ developers and pitched the DevConnect idea. Amazing experience combining travel with tech community building.",
-      "photos": [],
-      "tags": [
-        "Travel",
-        "Networking",
-        "Tech Meetup"
-      ],
-      "notes": "Got 3 potential collaborators for DevConnect from this trip!",
-      "platforms": {
-        "snapdude": true,
-        "linkedin": true,
-        "youtube": false,
-        "carousel": true
-      }
-    },
-    {
-      "id": "act3",
-      "title": "HackWithIndia 2025",
-      "type": "Hackathon",
-      "status": "Success",
-      "date": "December 2025",
-      "location": "Bangalore, India",
-      "description": "Won 1st place at HackWithIndia 2025. Built a real-time collaboration tool for remote dev teams in 48 hours.",
-      "photos": [],
-      "tags": [
-        "Hackathon",
-        "Winner",
-        "Collaboration"
-      ],
-      "notes": "This win motivated me to pursue DevConnect as a full startup idea.",
-      "platforms": {
-        "snapdude": true,
-        "linkedin": true,
-        "youtube": false,
-        "carousel": true
-      }
-    },
-    {
-      "id": "act4",
-      "title": "AWS Cloud Practitioner Exam",
-      "type": "Certification",
-      "status": "Pending",
-      "date": "August 2026",
-      "location": "Online",
-      "description": "Preparing for the AWS Cloud Practitioner certification exam. Studying cloud fundamentals, pricing models, and core services.",
-      "photos": [],
-      "tags": [
-        "Certification",
-        "AWS",
-        "Cloud"
-      ],
-      "notes": "Scheduled for August 15. Currently completing practice tests.",
-      "platforms": {
-        "snapdude": false,
-        "linkedin": true,
-        "youtube": false,
-        "carousel": true
-      }
-    },
-    {
-      "id": "act5",
-      "title": "College Cultural Fest - TechFest 2025",
-      "type": "Event",
-      "status": "Finished",
-      "date": "November 2025",
-      "location": "College Campus",
-      "description": "Organized a coding competition and workshop at the college tech fest. 200+ participants across 3 events.",
-      "photos": [],
-      "tags": [
-        "Event",
-        "Organizing",
-        "Workshop"
-      ],
-      "notes": "Great experience in event management and public speaking.",
-      "platforms": {
-        "snapdude": true,
-        "linkedin": true,
-        "youtube": false,
-        "carousel": true
-      }
-    },
-    {
-      "id": "act6",
-      "title": "Blockchain Startup Weekend",
-      "type": "Hackathon",
-      "status": "Failed",
-      "date": "October 2025",
-      "location": "Mumbai, India",
-      "description": "Attempted to build a decentralized freelancing platform in 54 hours. Team faced technical challenges with smart contract deployment.",
-      "photos": [],
-      "tags": [
-        "Hackathon",
-        "Blockchain",
-        "Web3"
-      ],
-      "notes": "Learned a lot about Solidity and smart contracts. The failure taught me to scope projects better.",
-      "platforms": {
-        "snapdude": false,
-        "linkedin": true,
-        "youtube": false,
-        "carousel": true
-      }
     }
   ],
   "experience": [],

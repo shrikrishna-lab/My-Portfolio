@@ -39,7 +39,7 @@ export default function About() {
                                  <img src="/portfolio%20image2.png" alt="Portfolio" className="w-full h-48 md:h-64 object-cover object-[50%_30%]" />
                              </motion.div>
                              <h3 className="text-3xl font-extrabold text-[#18112E] mb-8 flex items-center gap-3">
-                                 Background
+                                 About
                              </h3>
                              <div className="space-y-6 text-neutral-600 text-lg sm:text-xl leading-relaxed font-medium bg-[#F8F9FA] p-6 sm:p-8 rounded-[32px] border border-neutral-100 shadow-sm">
                                  <p className="whitespace-pre-wrap">{profile.aboutStory}</p>

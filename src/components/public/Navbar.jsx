@@ -74,7 +74,7 @@ export default function Navbar() {
                         <motion.a
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.97 }}
-                            href="#contact"
+                            href="/#contact"
                             className="px-6 py-3 text-sm font-bold bg-[#FFB800] text-[#18112E] border-2 border-[#18112E] rounded-[16px] shadow-[4px_4px_0_#18112E] hover:shadow-[6px_6px_0_#18112E] transition-all"
                         >
                             Hire Me
@@ -139,7 +139,7 @@ export default function Navbar() {
                                 initial={{ y: 20, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: 0.4 }}
-                                href="#contact"
+                                href="/#contact"
                                 className="w-full py-5 bg-[#FFB800] text-[#18112E] text-center font-bold text-lg rounded-[20px] active:scale-95 shadow-[0_15px_30px_rgba(255,184,0,0.2)] transition-all"
                                 onClick={() => setMobileOpen(false)}
                             >

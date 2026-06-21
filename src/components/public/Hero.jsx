@@ -39,7 +39,7 @@ export default function Hero() {
                         className="inline-flex items-center gap-3 bg-white px-5 py-2.5 rounded-[16px] border border-[#18112E] shadow-[4px_4px_0_#18112E]"
                     >
                         <span className="w-2.5 h-2.5 rounded-full bg-[#FFB800] animate-pulse shadow-[0_0_10px_rgba(255,184,0,0.5)]" />
-                        <span className="text-sm font-bold tracking-widest text-[#18112E] uppercase">{profile.title}</span>
+                        <span className="text-sm font-bold tracking-widest text-[#18112E]">{profile.title}</span>
                     </motion.div>
                 </div>
 

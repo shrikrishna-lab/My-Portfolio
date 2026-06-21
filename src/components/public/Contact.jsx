@@ -9,18 +9,62 @@ export default function Contact() {
     const [form, setForm] = useState({ name: '', email: '', message: '' });
     const [sent, setSent] = useState(false);
     const [sending, setSending] = useState(false);
+    const [error, setError] = useState('');
 
     if (!profile) return null;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!form.name || !form.email || !form.message) return;
+        setError('');
+        
+        if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
+            setError('All fields are required.');
+            return;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(form.email.trim())) {
+            setError('Please enter a valid email address.');
+            return;
+        }
+
         setSending(true);
-        await addMessage(form);
+
+        // Store message locally
+        await addMessage({
+            name: form.name.trim(),
+            email: form.email.trim(),
+            message: form.message.trim()
+        });
+
+        // Dispatch email via Web3Forms if key exists
+        if (profile.web3formsKey) {
+            try {
+                const response = await fetch('https://api.web3forms.com/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        access_key: profile.web3formsKey,
+                        name: form.name.trim(),
+                        email: form.email.trim(),
+                        message: form.message.trim(),
+                        subject: `New Portfolio Contact Message from ${form.name.trim()}`
+                    })
+                });
+                const resData = await response.json();
+                if (!response.ok || !resData.success) {
+                    throw new Error(resData.message || 'Web3Forms API error');
+                }
+            } catch (err) {
+                console.error('Email dispatch error:', err);
+                // Note: We don't block user experience since the message is saved locally
+            }
+        }
+
         setSending(false);
         setSent(true);
         setForm({ name: '', email: '', message: '' });
-        setTimeout(() => setSent(false), 3000);
+        setTimeout(() => setSent(false), 4000);
     };
 
     return (
@@ -140,6 +184,16 @@ export default function Contact() {
                                 </>
                             )}
                         </motion.button>
+                        {error && (
+                            <div className="mt-4 p-4 bg-red-50 border-2 border-red-500 text-red-600 rounded-[16px] text-sm font-bold text-center">
+                                ⚠️ {error}
+                            </div>
+                        )}
+                        {sent && (
+                            <div className="mt-4 p-4 bg-emerald-50 border-2 border-emerald-500 text-emerald-600 rounded-[16px] text-sm font-bold text-center">
+                                🎉 Thank you! Your message has been sent successfully.
+                            </div>
+                        )}
                     </motion.form>
                 </div>
             </div>

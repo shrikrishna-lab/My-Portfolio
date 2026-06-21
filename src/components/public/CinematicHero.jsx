@@ -179,7 +179,7 @@ function CinematicText({ profile, mouseY }) {
             >
                 <div className="inline-flex items-center gap-3 mb-6 px-4 py-2 rounded-full border border-[#d4744a]/20 bg-[#d4744a]/5 backdrop-blur-sm">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#d4744a] shadow-[0_0_8px_rgba(212,116,74,0.6)]" />
-                    <span className="text-xs font-medium text-[#d4744a]/70 uppercase tracking-[0.2em]">
+                    <span className="text-xs font-medium text-[#d4744a]/70 tracking-[0.2em]">
                         {profile.title || 'Creative Developer'}
                     </span>
                 </div>
