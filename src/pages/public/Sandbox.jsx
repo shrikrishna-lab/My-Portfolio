@@ -967,7 +967,7 @@ export default function Sandbox() {
                                     {/* LinkedIn About Card */}
                                     <div className="bg-white border-2 border-[#18112E] rounded-[24px] p-5 sm:p-6 shadow-[6px_6px_0_#18112E] space-y-3">
                                         <h4 className="text-sm font-black text-[#18112E] uppercase tracking-wider">About</h4>
-                                        <p className="text-xs sm:text-sm text-neutral-600 font-medium leading-relaxed whitespace-pre-wrap">{profile.aboutStory}</p>
+                                        <p className="text-xs sm:text-sm text-neutral-600 font-medium leading-relaxed whitespace-pre-wrap">{profile.linkedinAbout || profile.aboutStory}</p>
                                     </div>
 
                                     {/* LinkedIn Experience Card */}
