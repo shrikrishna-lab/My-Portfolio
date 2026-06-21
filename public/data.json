@@ -2,7 +2,8 @@
   "profile": {
     "id": "default",
     "name": "Shrikrishna Handibag",
-    "title": "S.Y IT Engineering Student | Web Developer & Open Source Contributor | GSSoC 2026 | Building with Java, Python & AI 🚀",
+    "title": "IT Student • Web Developer • Startup Builder",
+    "linkedinTitle": "S.Y IT Engineering Student | Web Developer & Open Source Contributor | GSSoC 2026 | Building with Java, Python & AI 🚀",
     "intro": "I build modern web applications and explore the startup ecosystem.",
     "aboutStory": "I started my journey with a deep curiosity for how things work on the internet. Now I build full-stack web applications and am currently exploring my startup idea.",
     "linkedinAbout": "Hey, I'm Shrikrishna — a Second Year IT Engineering student at JSPM's Rajarshi Shahu College of Engineering, Pune, with a deep passion for building things that matter.\n\nI started coding out of curiosity, and now I'm on a mission to turn every project into a learning milestone. From crafting web apps to diving into open-source, I believe the best way to grow is to build in public and contribute to the community.\n\n🔥 Currently:\n• Selected as a Contributor & Mentee at GSSoC 2026 (Open Source Track + AI Agents Track)\n• Building real-world projects in Java, Python, and Web Development\n• Developing my portfolio at portfolio-tau-three-joek7fsz4x.vercel.app\n\n💡 What drives me:\nI love the intersection of clean code and creative thinking. Whether it's debugging a tricky problem, collaborating on open-source, or experimenting with AI tools — I'm always learning something new.\n\n🎯 Looking for:\nInternships, open-source collaborations, hackathons, and opportunities to work with teams that value growth and innovation.\n\nLet's connect and build something great together! 🚀\n… more",
@@ -19,7 +20,7 @@
       "github": true,
       "carousel": true
     },
-    "characterImage": "/my_profile_photo.jpeg",
+    "characterImage": "/my_profile_photo.png",
     "bannerImage": "https://media.licdn.com/dms/image/v2/D5616AQHOvVCECux7bA/profile-displaybackgroundimage-shrink_200_800/B56Z43R4mtIsAU-/0/1779043895990?e=1783555200&v=beta&t=3kwmuhAJGVCzL9LDHnTphxnB26tdSLv7uTNF_nz44xU"
   },
   "skills": [

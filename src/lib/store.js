@@ -50,7 +50,7 @@ export const useStore = create((set, get) => ({
 
   fetchAll: async () => {
     try {
-      const res = await fetch('/data.json');
+      const res = await fetch(`/data.json?t=${Date.now()}`);
       if (res.ok) {
         const data = await res.json();
         set({

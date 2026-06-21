@@ -26,13 +26,17 @@ const syncPlugin = () => ({
             }
             
             if (data.profile) {
+              const newCharImage = data.profile.characterImage;
+              const keepLocalImage = existingData.profile?.characterImage?.startsWith('/') && newCharImage && !newCharImage.startsWith('/');
+
               existingData.profile = {
                 ...existingData.profile,
                 name: data.profile.name || existingData.profile?.name,
                 title: data.profile.title || existingData.profile?.title,
+                linkedinTitle: data.profile.linkedinTitle || existingData.profile?.linkedinTitle,
                 aboutStory: data.profile.aboutStory || existingData.profile?.aboutStory,
                 linkedinAbout: data.profile.linkedinAbout || existingData.profile?.linkedinAbout,
-                characterImage: data.profile.characterImage || existingData.profile?.characterImage,
+                characterImage: keepLocalImage ? existingData.profile.characterImage : (newCharImage || existingData.profile?.characterImage),
                 bannerImage: data.profile.bannerImage || existingData.profile?.bannerImage,
               };
             }

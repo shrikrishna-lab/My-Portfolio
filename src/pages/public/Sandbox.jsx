@@ -942,7 +942,7 @@ export default function Sandbox() {
                                                         IN
                                                     </span>
                                                 </div>
-                                                <p className="text-xs sm:text-sm text-neutral-500 font-bold leading-relaxed">{profile.title}</p>
+                                                <p className="text-xs sm:text-sm text-neutral-500 font-bold leading-relaxed">{profile.linkedinTitle || profile.title}</p>
                                                 <div className="flex items-center gap-2 text-[10px] text-neutral-400 font-bold uppercase tracking-wider flex-wrap">
                                                     <span>📍 Pune, Maharashtra, India</span>
                                                     <span>•</span>
