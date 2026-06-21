@@ -590,6 +590,94 @@ export default function Sandbox() {
                     <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }}
                         className="bg-white border-4 border-[#18112E] rounded-[24px] sm:rounded-[32px] p-6 sm:p-10 md:p-12 shadow-[8px_8px_0_#18112E] relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-[#FFB800]/20 blur-2xl rounded-full" />
+                        
+                        {/* Interactive Animated Cartoon / Tech Setup */}
+                        <div className="hidden md:flex absolute right-8 lg:right-16 top-1/2 -translate-y-1/2 w-48 h-48 lg:w-56 lg:h-56 items-center justify-center z-10 pointer-events-none select-none">
+                            <motion.div 
+                                className="relative w-full h-full flex items-center justify-center"
+                                animate={{ y: [0, -8, 0] }}
+                                transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+                            >
+                                {/* Glowing Background blob */}
+                                <div className="absolute inset-4 bg-gradient-to-tr from-[#3AA8F5]/10 to-[#FFB800]/10 rounded-full filter blur-xl animate-pulse" />
+
+                                {/* Retro Neobrutalist Monitor */}
+                                <motion.div 
+                                    className="relative w-32 h-26 lg:w-38 lg:h-30 bg-white border-4 border-[#18112E] rounded-2xl shadow-[6px_6px_0_#18112E] flex flex-col overflow-hidden pointer-events-auto"
+                                    whileHover={{ scale: 1.05 }}
+                                >
+                                    {/* Window Header */}
+                                    <div className="h-6 bg-[#18112E] px-2 flex items-center gap-1.5 shrink-0">
+                                        <div className="w-2 h-2 rounded-full bg-[#FF3B30]" />
+                                        <div className="w-2 h-2 rounded-full bg-[#FFB800]" />
+                                        <div className="w-2 h-2 rounded-full bg-emerald-400" />
+                                        <div className="flex-1 text-right text-[6px] font-black uppercase text-white/50 tracking-widest pr-1">Dev.jsx</div>
+                                    </div>
+                                    {/* Screen Content - scrolling code lines */}
+                                    <div className="flex-1 bg-[#18112E]/95 p-3 flex flex-col gap-1.5 relative justify-center overflow-hidden">
+                                        <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[size:100%_4px,6px_100%] pointer-events-none" />
+                                        
+                                        {/* Code Lines */}
+                                        <motion.div 
+                                            className="space-y-1.5"
+                                            animate={{ y: [0, -20, 0] }}
+                                            transition={{ repeat: Infinity, duration: 8, ease: "linear" }}
+                                        >
+                                            <div className="h-2 w-11/12 bg-[#3AA8F5] rounded-sm opacity-90" />
+                                            <div className="h-2 w-3/4 bg-[#FFB800] rounded-sm opacity-90" />
+                                            <div className="h-2 w-4/5 bg-emerald-400 rounded-sm opacity-90" />
+                                            <div className="h-2 w-1/2 bg-[#FF3B30] rounded-sm opacity-90" />
+                                            <div className="h-2 w-5/6 bg-[#3AA8F5] rounded-sm opacity-90" />
+                                            <div className="h-2 w-2/3 bg-emerald-400 rounded-sm opacity-90" />
+                                        </motion.div>
+                                    </div>
+                                </motion.div>
+
+                                {/* Stand of monitor */}
+                                <div className="absolute top-[calc(50%+30px)] lg:top-[calc(50%+42px)] w-6 h-8 bg-white border-4 border-[#18112E] z-[-1]" />
+                                <div className="absolute top-[calc(50%+38px)] lg:top-[calc(50%+50px)] w-16 h-3 bg-white border-4 border-[#18112E] rounded-md shadow-[3px_3px_0_#18112E] z-[-1]" />
+
+                                {/* Floating Cup */}
+                                <motion.div 
+                                    className="absolute -left-2 top-24 lg:left-0 lg:top-28 w-9 h-9 bg-white border-4 border-[#18112E] rounded-xl shadow-[3px_3px_0_#18112E] flex items-center justify-center pointer-events-auto"
+                                    animate={{ y: [0, 6, 0], rotate: [0, -5, 0] }}
+                                    transition={{ repeat: Infinity, duration: 3.2, ease: "easeInOut" }}
+                                    whileHover={{ scale: 1.1 }}
+                                >
+                                    <span className="font-black text-[10px]">☕</span>
+                                    {/* Cup handle */}
+                                    <div className="absolute right-[-8px] top-2 w-3 h-3.5 bg-white border-4 border-[#18112E] border-l-0 rounded-r-md" />
+                                </motion.div>
+
+                                {/* Floating Star 1 */}
+                                <motion.div 
+                                    className="absolute right-2 top-4 w-6 h-6 text-[#FFB800]"
+                                    animate={{ scale: [1, 1.2, 1], rotate: [0, 180, 360] }}
+                                    transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
+                                >
+                                    <Star className="w-full h-full fill-current stroke-[#18112E] stroke-[2px]" />
+                                </motion.div>
+
+                                {/* Floating Brackets */}
+                                <motion.div 
+                                    className="absolute left-6 -top-4 bg-white border-2 border-[#18112E] rounded-lg px-1.5 py-0.5 shadow-[2px_2px_0_#18112E] text-[9px] font-black text-[#FF3B30] tracking-tight uppercase"
+                                    animate={{ y: [0, -6, 0], rotate: [0, 8, 0] }}
+                                    transition={{ repeat: Infinity, duration: 2.8, ease: "easeInOut" }}
+                                >
+                                    {"{code}"}
+                                </motion.div>
+
+                                {/* Floating Gear */}
+                                <motion.div 
+                                    className="absolute right-[-10px] bottom-10 bg-white border-4 border-[#18112E] rounded-full w-9 h-9 flex items-center justify-center shadow-[3px_3px_0_#18112E]"
+                                    animate={{ rotate: [0, -360] }}
+                                    transition={{ repeat: Infinity, duration: 10, ease: "linear" }}
+                                >
+                                    <Sparkles className="w-4 h-4 text-[#3AA8F5]" />
+                                </motion.div>
+                            </motion.div>
+                        </div>
+
                         <div className="relative z-10 space-y-6">
                             <div>
                                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#18112E] text-[#FFB800] text-[10px] sm:text-xs font-black uppercase tracking-wider mb-4 sm:mb-6">
