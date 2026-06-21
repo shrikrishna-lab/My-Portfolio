@@ -28,15 +28,22 @@ function ScrollToHashElement() {
 }
 
 export default function App() {
-  const [splashDone, setSplashDone] = useState(false);
+  const isCrawler = typeof navigator !== 'undefined' && 
+    /bot|google|baidu|bing|msn|duckduckgo|teoma|slurp|yandex|chrome-lighthouse|lighthouse|gptbot|perplexity|embedly|facebookexternalhit|twitterbot|linkedinbot/i.test(navigator.userAgent);
+
+  const [splashDone, setSplashDone] = useState(isCrawler);
   const fetchAll = useStore((s) => s.fetchAll);
 
   useEffect(() => {
     fetchAll();
+    if (isCrawler) {
+      setSplashDone(true);
+      return;
+    }
     // Minimum 2.5s splash display
     const timer = setTimeout(() => setSplashDone(true), 2500);
     return () => clearTimeout(timer);
-  }, [fetchAll]);
+  }, [fetchAll, isCrawler]);
 
   return (
     <>

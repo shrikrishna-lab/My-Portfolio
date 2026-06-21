@@ -570,8 +570,50 @@ export default function Sandbox() {
         setTimeout(() => setSugSent(false), 4000);
     };
 
+    const sandboxSchema = {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "ProfilePage",
+                "@id": "https://shrikrishna-intro.vercel.app/sandbox#profilepage",
+                "url": "https://shrikrishna-intro.vercel.app/sandbox",
+                "name": `Sandbox & Now Board | ${profile?.name || "Shrikrishna Handibag"}`,
+                "description": "Live dashboard tracking learning paths, certifications, projects, hackathons, and real-time updates of Shrikrishna Handibag.",
+                "about": {
+                    "@type": "Person",
+                    "name": profile?.name || "Shrikrishna Handibag",
+                    "url": "https://shrikrishna-intro.vercel.app/"
+                }
+            }
+        ]
+    };
+
     return (
         <>
+            {/* React 19 Document Metadata Hoisting */}
+            <title>Sandbox & Now Board | Shrikrishna Handibag</title>
+            <meta name="description" content="Live progress tracker and daily updates of Shrikrishna Handibag. Follow along with real-time projects, learning paths, hackathons, and certifications." />
+            <meta name="keywords" content="Shrikrishna Handibag Sandbox, Learning Tracker, Now Board, Java learning path, GSSoC updates, IT Engineering Pune, Oracle MySQL certification" />
+            <link rel="canonical" href="https://shrikrishna-intro.vercel.app/sandbox" />
+            
+            {/* Open Graph Tags */}
+            <meta property="og:title" content="Sandbox & Now Board | Shrikrishna Handibag" />
+            <meta property="og:description" content="Live progress tracker and daily updates of Shrikrishna Handibag. Follow along with real-time projects, learning paths, hackathons, and certifications." />
+            <meta property="og:type" content="website" />
+            <meta property="og:url" content="https://shrikrishna-intro.vercel.app/sandbox" />
+            <meta property="og:image" content="https://shrikrishna-intro.vercel.app/my_profile_photo.png" />
+            
+            {/* Twitter Card Tags */}
+            <meta name="twitter:title" content="Sandbox & Now Board | Shrikrishna Handibag" />
+            <meta name="twitter:description" content="Live progress tracker and daily updates of Shrikrishna Handibag. Follow along with real-time projects, learning paths, hackathons, and certifications." />
+            <meta name="twitter:card" content="summary_large_image" />
+            <meta name="twitter:image" content="https://shrikrishna-intro.vercel.app/my_profile_photo.png" />
+
+            {/* Structured Data (JSON-LD) */}
+            <script type="application/ld+json">
+                {JSON.stringify(sandboxSchema)}
+            </script>
+
             <Navbar />
             <div className="min-h-screen bg-[#F8F9FA] pt-40 sm:pt-32 pb-24 px-4 sm:px-6 relative overflow-hidden">
                 <div className="absolute top-20 right-10 w-[400px] h-[400px] bg-[#3AA8F5]/5 blur-[120px] rounded-full pointer-events-none" />
